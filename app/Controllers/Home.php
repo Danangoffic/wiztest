@@ -1,6 +1,9 @@
-<?php namespace App\Controllers;
+<?php
 
-class Home extends BaseController
+use CodeIgniter\RESTful\ResourceController;
+use CodeIgniter\API\ResponseTrait;
+
+class Home extends ResourceController
 {
 	public function index()
 	{
