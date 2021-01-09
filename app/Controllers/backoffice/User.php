@@ -91,7 +91,9 @@ class User extends ResourceController
             }
         } catch (\Throwable $th) {
             //throw $th;
+            session()->setFlashdata('error', 'Gagal login');
             echo "error " . $th->getMessage();
+            return redirect()->to('backoffice')->withInput();
         }
     }
 
