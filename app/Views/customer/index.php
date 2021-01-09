@@ -475,16 +475,16 @@
                 $("#registrasi").html(`Loading..<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
                 snap.pay(midtransToken, {
                     onSuccess: result => {
-                        location.reload;
+                        location.reload();
                     },
                     onPending: result => {
-                        location.reload;
+                        location.reload();
                     },
                     onError: result => {
-                        location.reload;
+                        location.reload();
                     },
                     onClose: () => {
-                        location.reload;
+                        location.reload();
                     }
                 });
             }
