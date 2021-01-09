@@ -369,7 +369,7 @@ class Peserta extends Controller
             $this->session->setFlashdata('success', 'Berhasil update data peserta untuk hadir');
             return redirect()->to('/backoffice/peserta/' . $id_peserta);
         } else {
-            $this->session->setFlashdata('error', 'Gagal update data peserta untuk hadir');
+            // $this->session->setFlashdata('error', 'Gagal update data peserta untuk hadir');
             return redirect()->to('/backoffice/peserta/' . $id_peserta);
         }
     }
@@ -388,9 +388,11 @@ class Peserta extends Controller
                 if ($updateCustomer) {
                     return true;
                 } else {
+                    $this->session->setFlashdata('error', 'Gagal update data peserta');
                     return false;
                 }
             } else {
+                $this->session->setFlashdata('error', 'Peserta belum melakukan pelunasan');
                 return false;
             }
         }
