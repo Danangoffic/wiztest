@@ -82,6 +82,11 @@ $routes->get('/backoffice/faskes/(:segment)', 'backoffice\Faskes::$1');
 $routes->post('/backoffice/faskes/(:segment)', 'backoffice\Faskes::$1');
 $routes->get('/backoffice/faskes/(:segment)/(:num)', 'backoffice\Faskes::$1/$2');
 $routes->post('/backoffice/faskes/(:segment)/(:num)', 'backoffice\Faskes::$1/$2');
+
+$routes->get('/backoffice/frontoffice', 'backoffice\Frontoffice::index');
+$routes->get('/backoffice/frontoffice/(:segment)', 'backoffice\Frontoffice::$1');
+$routes->get('/backoffice/frontoffice/(:segment)/(:num)', 'backoffice\Frontoffice::$1/$2');
+$routes->post('/backoffice/frontoffice/(:segment)/(:num)', 'backoffice\Frontoffice::$1/$2');
 /**
  * --------------------------------------------------------------------
  * Additional Routing
