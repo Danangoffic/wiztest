@@ -74,7 +74,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="layanan_test" class="col-2">Jenis Layanan</label>
+                                <label for="layanan_test" class="col-2">Paket Pemeriksaan</label>
                                 <div class="col-10">
                                     <select name="layanan_test" id="layanan_test" class="form-control">
                                         <?php
@@ -85,6 +85,20 @@
                                             $nama_test = $DetailTest['nama_test'];
                                         ?>
                                             <option value="<?= $value['id']; ?>"><?= $nama_test; ?> (<?= $namaLayanan; ?>)</option>
+                                        <?php
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="jenis_layanan" class="col-2">Jenis Layanan</label>
+                                <div class="col-10">
+                                    <select name="jenis_layanan" id="jenis_layanan" class="form-control">
+                                        <?php
+                                        foreach ($jenis_pemeriksaan as $key => $value) {
+                                        ?>
+                                            <option value="<?= $value['id']; ?>"><?= $value['nama_pemeriksaan']; ?></option>
                                         <?php
                                         }
                                         ?>

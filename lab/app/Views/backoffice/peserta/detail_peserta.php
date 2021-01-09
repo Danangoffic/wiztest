@@ -7,6 +7,22 @@
 
         <!-- filtering box -->
         <div id="accordion">
+            <?php
+            if (session()->getFlashdata('success')) {
+            ?>
+                <div class="alert alert-success fade show" role="alert">
+                    <?= session()->getFlashdata('success'); ?>
+                </div>
+            <?php
+            }
+            if (session()->getFlashdata('error')) {
+            ?>
+                <div class="alert alert-warning fade show" role="alert">
+                    <?= session()->getFlashdata('error'); ?>
+                </div>
+            <?php
+            }
+            ?>
             <div class="card">
                 <div class="card-header" id="headingOne">
                     <h5 class="mb-0">Invoice No : <strong><?= $data_customer->invoice_number; ?></strong></h5>
@@ -66,7 +82,14 @@
                 </div>
                 <div class="card-footer">
                     <a href="<?= base_url('backoffice/print/pdf/' . $data_customer->id); ?>" class="btn btn-primary btn-sm">Print Pdf</a>
-                    <a href="<?= base_url('backoffice/peserta_hadir/' . $data_customer->id); ?>" class="btn btn-primary btn-sm">Hadir</a>
+                    <!-- <?= $data_customer->kehadiran; ?> -->
+                    <?php
+                    if ($data_customer->kehadiran == 0) {
+                    ?>
+                        <a href="<?= base_url('backoffice/peserta/hadirkan_peserta/' . $data_customer->id); ?>" class="btn btn-primary btn-sm">Hadir</a>
+                    <?php
+                    }
+                    ?>
                 </div>
             </div>
         </div>
@@ -114,7 +137,13 @@
                                         <a href="<?= base_url('backoffice/layanan/printbarcode/' . $data_customer->id); ?>" class="btn btn-primary btn-sm mt-2" id="print_barcode">Barcode</a>
                                         <a href="<?= base_url('backoffice/peserta/edit/' . $data_customer->id); ?>" class="btn btn-primary btn-sm mt-2" id="edit">Edit</a>
                                         <a href="<?= base_url('backoffice/peserta/hapus/' . $data_customer->id); ?>" class="btn btn-danger btn-sm mt-2" id="hapus">Hapus</a>
-                                        <a href="<?= base_url('backoffice/peserta/hadir/' . $data_customer->id); ?>" class="btn btn-primary btn-sm mt-2" id="hadir">Hadir</a>
+                                        <?php
+                                        if ($data_customer->kehadiran == 0) {
+                                        ?>
+                                            <a href="<?= base_url('backoffice/peserta/hadirkan_peserta/' . $data_customer->id); ?>" class="btn btn-primary btn-sm">Hadir</a>
+                                        <?php
+                                        }
+                                        ?>
                                         <a href="<?= base_url('backoffice/peserta/reschedule/' . $data_customer->id); ?>" class="btn btn-info btn-sm disabled mt-2" id="reschedule">Reschedule</a>
                                     </td>
                                 </tr>

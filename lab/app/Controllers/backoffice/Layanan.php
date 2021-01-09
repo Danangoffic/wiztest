@@ -6,7 +6,8 @@ use App\Models\LayananModel;
 use App\Models\LayananTestModel;
 use App\Models\TestModel;
 use CodeIgniter\Controller;
-use Dompdf\Cpdf;
+// use Dompdf\Cpdf;
+use Dompdf\Dompdf;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
@@ -14,11 +15,12 @@ class Layanan extends Controller
 {
     public $session;
     public $codeBarCode;
-
+    public $dompdf;
     public function __construct()
     {
         $this->codeBarCode = "code128";;
         $this->session = session();
+        $this->dompdf = new Dompdf();
     }
     public function index()
     {
@@ -49,8 +51,9 @@ class Layanan extends Controller
         return $resultData;
     }
 
-    public function pdf($id_customer)
+    public function printPDFCustomer($id)
     {
+        view('backoffice/layanan/invoice_pdf');
     }
 
     protected function file_get_contents_curl($url)
