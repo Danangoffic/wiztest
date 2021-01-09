@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 05, 2021 at 09:58 AM
+-- Generation Time: Jan 09, 2021 at 10:55 AM
 -- Server version: 10.4.6-MariaDB
 -- PHP Version: 7.3.9
 
@@ -36,6 +36,60 @@ CREATE TABLE `customers` (
   `faskes_asal` int(11) NOT NULL,
   `customer_unique` varchar(255) NOT NULL,
   `invoice_number` varchar(30) DEFAULT NULL,
+  `pemeriksa` int(11) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
+  `nama` varchar(255) NOT NULL,
+  `nik` varchar(16) NOT NULL,
+  `phone` varchar(13) DEFAULT NULL,
+  `jenis_kelamin` enum('pria','wanita') NOT NULL,
+  `tempat_lahir` varchar(255) NOT NULL,
+  `tanggal_lahir` date NOT NULL,
+  `alamat` text NOT NULL,
+  `id_marketing` int(11) NOT NULL,
+  `instansi` int(11) NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `status_test` varchar(20) DEFAULT NULL,
+  `tahap` int(11) DEFAULT NULL,
+  `kehadiran` enum('0','1') NOT NULL DEFAULT '0',
+  `no_antrian` int(11) DEFAULT NULL,
+  `jam_kunjungan` time NOT NULL,
+  `tgl_kunjungan` date NOT NULL,
+  `status_pembayaran` enum('unpaid','paid','invoice') DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `catatan` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `customers`
+--
+
+INSERT INTO `customers` (`id`, `jenis_test`, `jenis_pemeriksaan`, `jenis_layanan`, `faskes_asal`, `customer_unique`, `invoice_number`, `pemeriksa`, `email`, `nama`, `nik`, `phone`, `jenis_kelamin`, `tempat_lahir`, `tanggal_lahir`, `alamat`, `id_marketing`, `instansi`, `created_at`, `updated_at`, `status_test`, `tahap`, `kehadiran`, `no_antrian`, `jam_kunjungan`, `tgl_kunjungan`, `status_pembayaran`, `token`, `catatan`) VALUES
+(1, 1, 1, 1, 1, 'SPS2101031', 'INV-210103001', NULL, 'darifrahmanda@gmail.com', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan Jakarta', 1, 1, '2021-01-03 21:50:30', '2021-01-03 21:50:31', 'menunggu', 1, '1', 1, '12:00:00', '2021-01-04', 'paid', NULL, NULL),
+(2, 1, 1, 1, 1, 'SPS2101031', 'INV-210103002', NULL, 'darifrahmanda@gmail.com', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan Jakarta', 1, 1, '2021-01-03 21:54:03', '2021-01-03 21:54:03', 'menunggu', 1, '0', 2, '12:00:00', '2021-01-04', 'unpaid', NULL, NULL),
+(3, 3, 1, 1, 1, 'RTB2101031', 'INV-210103001', NULL, 'danang.a.rahmanda@danangoffic.xyz', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan rawa bahagia', 1, 1, '2021-01-03 21:54:32', '2021-01-03 21:54:32', 'menunggu', 1, '0', 1, '11:00:00', '2021-01-07', 'unpaid', NULL, NULL),
+(4, 4, 1, 1, 1, 'SAB21010312001', 'INV-210103001', NULL, 'haibisnisdotcom@gmail.com', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan apa aja', 1, 1, '2021-01-03 21:56:50', '2021-01-03 21:56:50', 'menunggu', 1, '0', 1, '12:00:00', '2021-01-06', 'unpaid', NULL, NULL),
+(5, 1, 1, 1, 2, 'SPS21010913001', 'INV-210109001', NULL, 'risleda.lalusu@mail.com', 'Riselda Lalusu', '3232618321321232', '085261641500', 'pria', 'Sleman', '2021-01-01', 'Jl Jogja', 1, 1, '2021-01-09 12:23:50', '2021-01-09 12:23:50', 'menunggu', 1, '', 1, '13:00:00', '2021-01-11', '', NULL, NULL),
+(6, 1, 1, 1, 2, 'SPS21010913001', 'INV-210109001', NULL, 'risleda.lalusu@mail.com', 'Riselda Lalusu', '3232618321321232', '085261641500', 'wanita', 'Sleman', '2021-01-01', 'Jl Jogja', 1, 1, '2021-01-09 12:25:18', '2021-01-09 12:25:18', 'menunggu', 1, '', 1, '13:00:00', '2021-01-11', '', NULL, NULL),
+(7, 1, 1, 1, 2, 'SPS21010913001', 'INV-210109001', NULL, 'risleda.lalusu@mail.com', 'Riselda Lalusu', '3232618321321232', '085261641500', 'pria', 'Sleman', '2021-01-01', 'Jl Jogja', 1, 1, '2021-01-09 12:26:11', '2021-01-09 12:26:11', 'menunggu', 1, '', 1, '13:00:00', '2021-01-11', '', NULL, NULL),
+(8, 1, 1, 1, 2, 'SPS21010913001', 'INV-210109001', NULL, 'risleda.lalusu@mail.com', 'Riselda Lalusu', '3232618321321232', '085261641500', 'pria', 'Sleman', '2021-01-01', 'Jl Jogja', 1, 1, '2021-01-09 12:29:07', '2021-01-09 12:29:07', 'menunggu', 1, '', 1, '13:00:00', '2021-01-11', '', NULL, NULL),
+(9, 1, 1, 1, 2, 'SPS21010913001', 'INV-210109001', 1, 'risleda.lalusu@mail.com', 'Riselda Rahma', '3232618321321232', '085261641500', 'wanita', 'Sleman', '2021-01-01', 'Jl Jogja', 1, 1, '2021-01-09 12:29:26', '2021-01-09 16:12:36', 'menunggu', 1, '1', 1, '13:00:00', '2021-01-11', 'paid', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `customers_overload`
+--
+
+CREATE TABLE `customers_overload` (
+  `id` int(11) NOT NULL,
+  `jenis_test` int(11) NOT NULL,
+  `jenis_pemeriksaan` int(11) NOT NULL,
+  `jenis_layanan` int(11) NOT NULL,
+  `faskes_asal` int(11) NOT NULL,
+  `customer_unique` varchar(255) NOT NULL,
+  `invoice_number` varchar(30) DEFAULT NULL,
+  `pemeriksa` int(11) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `nama` varchar(255) NOT NULL,
   `nik` varchar(16) NOT NULL,
@@ -60,49 +114,14 @@ CREATE TABLE `customers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `customers`
+-- Dumping data for table `customers_overload`
 --
 
-INSERT INTO `customers` (`id`, `jenis_test`, `jenis_pemeriksaan`, `jenis_layanan`, `faskes_asal`, `customer_unique`, `invoice_number`, `email`, `nama`, `nik`, `phone`, `jenis_kelamin`, `tempat_lahir`, `tanggal_lahir`, `alamat`, `id_marketing`, `instansi`, `created_at`, `updated_at`, `status_test`, `tahap`, `kehadiran`, `no_antrian`, `jam_kunjungan`, `tgl_kunjungan`, `status_pembayaran`, `token`, `catatan`) VALUES
-(1, 1, 1, 1, 1, 'SPS2101031', 'INV-210103001', 'darifrahmanda@gmail.com', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan Jakarta', 1, 1, '2021-01-03 21:50:30', '2021-01-03 21:50:31', 'menunggu', 1, '1', 1, '12:00:00', '2021-01-04', 'paid', NULL, NULL),
-(2, 1, 1, 1, 1, 'SPS2101031', 'INV-210103002', 'darifrahmanda@gmail.com', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan Jakarta', 1, 1, '2021-01-03 21:54:03', '2021-01-03 21:54:03', 'menunggu', 1, '0', 2, '12:00:00', '2021-01-04', 'unpaid', NULL, NULL),
-(3, 3, 1, 1, 1, 'RTB2101031', 'INV-210103001', 'danang.a.rahmanda@danangoffic.xyz', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan rawa bahagia', 1, 1, '2021-01-03 21:54:32', '2021-01-03 21:54:32', 'menunggu', 1, '0', 1, '11:00:00', '2021-01-07', 'unpaid', NULL, NULL),
-(4, 4, 1, 1, 1, 'SAB21010312001', 'INV-210103001', 'haibisnisdotcom@gmail.com', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan apa aja', 1, 1, '2021-01-03 21:56:50', '2021-01-03 21:56:50', 'menunggu', 1, '0', 1, '12:00:00', '2021-01-06', 'unpaid', NULL, NULL);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `customers_overload`
---
-
-CREATE TABLE `customers_overload` (
-  `id` int(11) NOT NULL,
-  `jenis_test` int(11) NOT NULL,
-  `jenis_pemeriksaan` int(11) NOT NULL,
-  `jenis_layanan` int(11) NOT NULL,
-  `faskes_asal` int(11) NOT NULL,
-  `customer_unique` varchar(10) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `nama` varchar(255) NOT NULL,
-  `nik` varchar(16) NOT NULL,
-  `phone` char(13) NOT NULL,
-  `jenis_kelamin` enum('pria','wanita') NOT NULL,
-  `tempat_lahir` varchar(255) NOT NULL,
-  `tanggal_lahir` date NOT NULL,
-  `alamat` text NOT NULL,
-  `id_marketing` int(11) NOT NULL,
-  `instansi` int(11) NOT NULL,
-  `id_pembayaran` int(11) NOT NULL,
-  `status_pembayaran` enum('unpaid','paid') NOT NULL DEFAULT 'unpaid',
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  `status_test` varchar(20) DEFAULT NULL,
-  `tahap` int(11) DEFAULT NULL,
-  `kehadiran` enum('0','1','2') NOT NULL DEFAULT '0',
-  `no_antrian` int(11) DEFAULT NULL,
-  `jam_kunjungan` int(11) NOT NULL,
-  `tgl_kunjungan` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+INSERT INTO `customers_overload` (`id`, `jenis_test`, `jenis_pemeriksaan`, `jenis_layanan`, `faskes_asal`, `customer_unique`, `invoice_number`, `pemeriksa`, `email`, `nama`, `nik`, `phone`, `jenis_kelamin`, `tempat_lahir`, `tanggal_lahir`, `alamat`, `id_marketing`, `instansi`, `created_at`, `updated_at`, `status_test`, `tahap`, `kehadiran`, `no_antrian`, `jam_kunjungan`, `tgl_kunjungan`, `status_pembayaran`, `token`, `catatan`) VALUES
+(1, 1, 1, 1, 1, 'SPS2101031', 'INV-210103001', NULL, 'darifrahmanda@gmail.com', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan Jakarta', 1, 1, '2021-01-03 21:50:30', '2021-01-03 21:50:31', 'menunggu', 1, '1', 1, '12:00:00', '2021-01-04', 'paid', NULL, NULL),
+(2, 1, 1, 1, 1, 'SPS2101031', 'INV-210103002', NULL, 'darifrahmanda@gmail.com', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan Jakarta', 1, 1, '2021-01-03 21:54:03', '2021-01-03 21:54:03', 'menunggu', 1, '0', 2, '12:00:00', '2021-01-04', 'unpaid', NULL, NULL),
+(3, 3, 1, 1, 1, 'RTB2101031', 'INV-210103001', NULL, 'danang.a.rahmanda@danangoffic.xyz', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan rawa bahagia', 1, 1, '2021-01-03 21:54:32', '2021-01-03 21:54:32', 'menunggu', 1, '0', 1, '11:00:00', '2021-01-07', 'unpaid', NULL, NULL),
+(4, 4, 1, 1, 1, 'SAB21010312001', 'INV-210103001', NULL, 'haibisnisdotcom@gmail.com', 'Danang Arif Rahmanda', '3232132132132132', '081230759128', 'pria', 'Sleman', '0000-00-00', 'Jalan apa aja', 1, 1, '2021-01-03 21:56:50', '2021-01-03 21:56:50', 'menunggu', 1, '0', 1, '12:00:00', '2021-01-06', 'unpaid', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -147,7 +166,7 @@ CREATE TABLE `data_pembayaran` (
   `jenis_test` int(11) NOT NULL,
   `nama_test` varchar(255) NOT NULL,
   `jenis_pembayaran` varchar(255) DEFAULT NULL,
-  `status_pembayaran` enum('unpaid','paid') NOT NULL DEFAULT 'unpaid',
+  `status_pembayaran` enum('unpaid','paid','invoice') DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -160,7 +179,9 @@ INSERT INTO `data_pembayaran` (`id`, `id_customer`, `nama`, `jenis_test`, `nama_
 (1, 1, 'Danang Arif Rahmanda', 1, 'SWAB PCR', NULL, 'unpaid', '2021-01-03 21:50:31', '2021-01-03 21:50:31'),
 (2, 2, 'Danang Arif Rahmanda', 1, 'SWAB PCR', NULL, 'unpaid', '2021-01-03 21:54:03', '2021-01-03 21:54:03'),
 (3, 3, 'Danang Arif Rahmanda', 3, 'SWAB PCR', NULL, 'unpaid', '2021-01-03 21:54:32', '2021-01-03 21:54:32'),
-(4, 4, 'Danang Arif Rahmanda', 4, 'SWAB PCR', NULL, 'unpaid', '2021-01-03 21:56:51', '2021-01-03 21:56:51');
+(4, 4, 'Danang Arif Rahmanda', 4, 'SWAB PCR', NULL, 'unpaid', '2021-01-03 21:56:51', '2021-01-03 21:56:51'),
+(5, 8, 'Riselda Lalusu', 1, 'SWAB PCR', NULL, 'unpaid', '2021-01-09 12:29:07', '2021-01-09 12:29:07'),
+(6, 0, 'Riselda Rahma', 1, 'SWAB PCR', NULL, '', '2021-01-09 12:29:26', '2021-01-09 12:29:26');
 
 -- --------------------------------------------------------
 
@@ -170,17 +191,50 @@ INSERT INTO `data_pembayaran` (`id`, `id_customer`, `nama`, `jenis_test`, `nama_
 
 CREATE TABLE `dokter` (
   `id` int(11) NOT NULL,
-  `nama` int(11) NOT NULL,
-  `alamat` int(11) DEFAULT NULL,
-  `img_ttd` int(11) DEFAULT NULL,
+  `id_user` int(11) NOT NULL,
+  `nama` varchar(255) NOT NULL,
+  `phone` varchar(13) DEFAULT NULL,
+  `img_ttd` text DEFAULT NULL,
   `qrcode_ttd` text DEFAULT NULL,
-  `tempat_lahir` varchar(255) DEFAULT NULL,
-  `tgl_lahir` date DEFAULT NULL,
   `created_by` int(11) NOT NULL,
   `updated_by` int(11) NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `dokter`
+--
+
+INSERT INTO `dokter` (`id`, `id_user`, `nama`, `phone`, `img_ttd`, `qrcode_ttd`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
+(2, 11, 'Riselda', '085261641500', '1610134583_8a325cfabab580251339.jpg', 'https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=http://localhost:8080/assets/dokter/1610134583_8a325cfabab580251339.jpg&choe=UTF-8', 0, 0, '2021-01-09 02:36:23', '2021-01-09 02:36:23');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `faskes`
+--
+
+CREATE TABLE `faskes` (
+  `id` int(11) NOT NULL,
+  `nama_faskes` varchar(255) NOT NULL,
+  `health_facility` varchar(255) NOT NULL,
+  `phone` varchar(13) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `alamat` text DEFAULT NULL,
+  `kota` int(11) NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `updated_by` int(11) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `faskes`
+--
+
+INSERT INTO `faskes` (`id`, `nama_faskes`, `health_facility`, `phone`, `email`, `alamat`, `kota`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
+(2, 'ABC', 'DEF', '081230759128', 'abcdef@mail.com', 'Jl Cendrawasih 15B', 1, 1, 1, '2021-01-09 02:35:37', '2021-01-09 02:35:37');
 
 -- --------------------------------------------------------
 
@@ -190,8 +244,15 @@ CREATE TABLE `dokter` (
 
 CREATE TABLE `instansi` (
   `id` int(11) NOT NULL,
+  `kota` int(11) NOT NULL,
   `nama` varchar(255) NOT NULL,
   `alamat` text DEFAULT 'NULL',
+  `nama_user` varchar(255) DEFAULT NULL,
+  `tempat_lahir` varchar(255) DEFAULT NULL,
+  `tgl_lahir` date NOT NULL,
+  `phone` varchar(13) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `pic_marketing` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime NOT NULL,
   `created_by` int(11) NOT NULL,
@@ -202,8 +263,8 @@ CREATE TABLE `instansi` (
 -- Dumping data for table `instansi`
 --
 
-INSERT INTO `instansi` (`id`, `nama`, `alamat`, `created_at`, `updated_at`, `created_by`, `updated_by`) VALUES
-(1, 'Umum', NULL, '2021-01-03 00:00:00', '2021-01-03 00:00:00', 1, 1);
+INSERT INTO `instansi` (`id`, `kota`, `nama`, `alamat`, `nama_user`, `tempat_lahir`, `tgl_lahir`, `phone`, `email`, `pic_marketing`, `created_at`, `updated_at`, `created_by`, `updated_by`) VALUES
+(1, 0, 'Umum', NULL, NULL, NULL, '0000-00-00', '', '', NULL, '2021-01-03 00:00:00', '2021-01-03 00:00:00', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -249,7 +310,10 @@ CREATE TABLE `jenis_pemeriksaan` (
 
 INSERT INTO `jenis_pemeriksaan` (`id`, `nama_pemeriksaan`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
 (1, 'WALK IN', 1, 1, '2021-01-01 00:00:00', NULL),
-(2, 'HOME SERVICE', 1, 1, '2021-01-01 00:00:00', NULL);
+(2, 'HOME SERVICE', 1, 1, '2021-01-01 00:00:00', NULL),
+(3, 'CORPORATE', 1, 1, '2021-01-06 00:00:00', NULL),
+(4, 'RUJUKAN', 1, 1, '2021-01-06 00:00:00', NULL),
+(5, 'OVERLOAD', 1, 1, '2021-01-07 00:00:00', NULL);
 
 -- --------------------------------------------------------
 
@@ -299,11 +363,20 @@ CREATE TABLE `kehadiran` (
 CREATE TABLE `kota` (
   `id` int(11) NOT NULL,
   `nama_kota` varchar(255) NOT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `province` varchar(255) DEFAULT NULL,
   `created_by` int(11) NOT NULL,
   `updated_by` int(11) NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `kota`
+--
+
+INSERT INTO `kota` (`id`, `nama_kota`, `city`, `province`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
+(1, 'Jakarta Utara', 'North Jakarta', 'DKI Jakarta', 1, 1, '2021-01-08 23:59:16', '2021-01-09 00:07:04');
 
 -- --------------------------------------------------------
 
@@ -428,6 +501,29 @@ INSERT INTO `kuota_customer` (`id`, `jenis_test_layanan`, `jam`, `kuota`, `statu
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `lokasi_input`
+--
+
+CREATE TABLE `lokasi_input` (
+  `id` int(11) NOT NULL,
+  `id_kota` int(11) NOT NULL,
+  `url_kop` text DEFAULT NULL,
+  `created_by` int(11) NOT NULL,
+  `updated_by` int(11) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `lokasi_input`
+--
+
+INSERT INTO `lokasi_input` (`id`, `id_kota`, `url_kop`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
+(5, 1, 'http://speedlab.galeritekno.com/asset/kop.png', 1, 1, '2021-01-09 01:21:20', '2021-01-09 01:24:28');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `marketing`
 --
 
@@ -475,6 +571,43 @@ INSERT INTO `menu` (`id`, `id_jenis_test`, `jenis_menu`, `keterangan`, `img_url`
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `nav`
+--
+
+CREATE TABLE `nav` (
+  `id` int(11) NOT NULL,
+  `nama_nav` int(11) NOT NULL,
+  `created_at` int(11) NOT NULL,
+  `updated_by` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pemeriksa`
+--
+
+CREATE TABLE `pemeriksa` (
+  `id` int(11) NOT NULL,
+  `nama` varchar(255) NOT NULL,
+  `phone` varchar(13) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `updated_by` int(11) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `pemeriksa`
+--
+
+INSERT INTO `pemeriksa` (`id`, `nama`, `phone`, `email`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
+(1, 'Dananggg', '081230759128', 'danangrahmanda@mail.com', 1, 1, '2021-01-09 01:47:37', '2021-01-09 02:19:01');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `system_parameter`
 --
 
@@ -509,7 +642,8 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `user_level` int(11) NOT NULL,
-  `created_by` varchar(20) NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `updated_by` int(11) NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -518,8 +652,18 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `password`, `user_level`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'admin@admiin2.com', '0192023a7bbd73250516f069df18b500', 1, 'admin', '2020-12-31 23:18:05', '2020-12-31 23:18:05');
+INSERT INTO `users` (`id`, `email`, `password`, `user_level`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
+(1, 'admin@admiin2.com', '0192023a7bbd73250516f069df18b500', 1, 1, 1, '2020-12-31 23:18:05', '2020-12-31 23:18:05'),
+(2, 'darifrahmanda@gmail.com', '4a695374e3296f670f3789ebbb050ba1', 0, 1, 0, '2021-01-08 22:00:37', '2021-01-08 22:00:37'),
+(3, 'darifrahmanda@gmail.com', '4a695374e3296f670f3789ebbb050ba1', 0, 1, 0, '2021-01-08 22:00:51', '2021-01-08 22:00:51'),
+(4, 'danangrahmanda@gmail.com', '4a695374e3296f670f3789ebbb050ba1', 0, 1, 0, '2021-01-08 22:05:06', '2021-01-08 22:05:06'),
+(5, 'darifrahmanda@gmail.com', '4a695374e3296f670f3789ebbb050ba1', 0, 1, 0, '2021-01-08 22:06:02', '2021-01-08 22:06:02'),
+(6, 'isel@mail.com', '9c0e98885486450aeece88107a8f2e67', 0, 1, 0, '2021-01-08 22:07:23', '2021-01-08 22:07:23'),
+(7, 'isel@mail.com', '9c0e98885486450aeece88107a8f2e67', 0, 1, 0, '2021-01-08 22:07:32', '2021-01-08 22:07:32'),
+(8, 'ddaassww@mail.com', '0c3c41103f0f42a196fdc5a1c2b6e8f9', 0, 1, 0, '2021-01-08 22:10:37', '2021-01-08 22:10:37'),
+(9, 'danangrahmanda@gmail.com', '4a695374e3296f670f3789ebbb050ba1', 0, 1, 0, '2021-01-08 22:12:33', '2021-01-08 22:12:33'),
+(10, 'danangrahmanda@gmail.com', '4a695374e3296f670f3789ebbb050ba1', 0, 0, 0, '2021-01-08 22:14:27', '2021-01-08 23:35:25'),
+(11, 'riselda@mail.com', 'ddea45ec4b7741086ab7b6d951f1ca69', 0, 1, 0, '2021-01-09 02:36:23', '2021-01-09 02:36:23');
 
 -- --------------------------------------------------------
 
@@ -564,7 +708,10 @@ INSERT INTO `users_level` (`id`, `level`, `created_at`, `updated_at`) VALUES
 (1, 'admin', NULL, NULL),
 (2, 'manager marketing', NULL, NULL),
 (3, 'marketing', NULL, NULL),
-(4, 'front office', NULL, NULL);
+(4, 'front office', NULL, NULL),
+(5, 'instansi', NULL, NULL),
+(6, 'pemeriksa', NULL, NULL),
+(7, 'dokter', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -596,8 +743,7 @@ ALTER TABLE `customers`
 -- Indexes for table `customers_overload`
 --
 ALTER TABLE `customers_overload`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `customer_unique` (`customer_unique`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `data_layanan_test`
@@ -618,6 +764,12 @@ ALTER TABLE `data_pembayaran`
 -- Indexes for table `dokter`
 --
 ALTER TABLE `dokter`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `faskes`
+--
+ALTER TABLE `faskes`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -663,6 +815,12 @@ ALTER TABLE `kuota_customer`
   ADD PRIMARY KEY (`id`,`updated_at`);
 
 --
+-- Indexes for table `lokasi_input`
+--
+ALTER TABLE `lokasi_input`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `marketing`
 --
 ALTER TABLE `marketing`
@@ -672,6 +830,18 @@ ALTER TABLE `marketing`
 -- Indexes for table `menu`
 --
 ALTER TABLE `menu`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `nav`
+--
+ALTER TABLE `nav`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `pemeriksa`
+--
+ALTER TABLE `pemeriksa`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -713,13 +883,13 @@ ALTER TABLE `users_login`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `customers_overload`
 --
 ALTER TABLE `customers_overload`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `data_layanan_test`
@@ -731,13 +901,19 @@ ALTER TABLE `data_layanan_test`
 -- AUTO_INCREMENT for table `data_pembayaran`
 --
 ALTER TABLE `data_pembayaran`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `dokter`
 --
 ALTER TABLE `dokter`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `faskes`
+--
+ALTER TABLE `faskes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `instansi`
@@ -755,7 +931,7 @@ ALTER TABLE `jenis_layanan`
 -- AUTO_INCREMENT for table `jenis_pemeriksaan`
 --
 ALTER TABLE `jenis_pemeriksaan`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `jenis_test`
@@ -773,13 +949,19 @@ ALTER TABLE `kehadiran`
 -- AUTO_INCREMENT for table `kota`
 --
 ALTER TABLE `kota`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `kuota_customer`
 --
 ALTER TABLE `kuota_customer`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
+
+--
+-- AUTO_INCREMENT for table `lokasi_input`
+--
+ALTER TABLE `lokasi_input`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `marketing`
@@ -794,6 +976,18 @@ ALTER TABLE `menu`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `nav`
+--
+ALTER TABLE `nav`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pemeriksa`
+--
+ALTER TABLE `pemeriksa`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `system_parameter`
 --
 ALTER TABLE `system_parameter`
@@ -803,7 +997,7 @@ ALTER TABLE `system_parameter`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users_detail`
@@ -815,7 +1009,7 @@ ALTER TABLE `users_detail`
 -- AUTO_INCREMENT for table `users_level`
 --
 ALTER TABLE `users_level`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users_login`
