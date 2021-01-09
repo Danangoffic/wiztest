@@ -34,9 +34,9 @@ class Database extends \CodeIgniter\Database\Config
 	public $default = [
 		'DSN'      => '',
 		'hostname' => 'localhost',
-		'username' => 'root',
-		'password' => '',
-		'database' => 'wizlab',
+		'username' => 'u5753798_quicktest',
+		'password' => 'Quick123',
+		'database' => 'u5753798_quicktest',
 		'DBDriver' => 'MySQLi',
 		'DBPrefix' => '',
 		'pConnect' => false,
