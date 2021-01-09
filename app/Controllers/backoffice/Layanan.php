@@ -143,7 +143,7 @@ class Layanan extends ResourceController
                 $updateKehadiran = array('kehadiran' => '1');
                 $this->customer->update($id_customer, $updateKehadiran);
                 $newCustomerData = $this->customer->find($id_customer);
-                $jenisTestData = $this->
+                // $jenisTestData = $this->
             }
         }
     }
