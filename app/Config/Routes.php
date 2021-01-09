@@ -76,6 +76,12 @@ $routes->get('/backoffice/frontoffice/home_service', 'backoffice\Home_service::i
 
 $routes->get('/backoffice/dokter/(:num)', 'backoffice\Dokter::detail/$1');
 $routes->post('/backoffice/dokter/save', 'backoffice\Dokter::save');
+
+$routes->get('/backoffice/faskes', 'backoffice\Faskes::index');
+$routes->get('/backoffice/faskes/(:segment)', 'backoffice\Faskes::$1');
+$routes->post('/backoffice/faskes/(:segment)', 'backoffice\Faskes::$1');
+$routes->get('/backoffice/faskes/(:segment)/(:num)', 'backoffice\Faskes::$1/$2');
+$routes->post('/backoffice/faskes/(:segment)/(:num)', 'backoffice\Faskes::$1/$2');
 /**
  * --------------------------------------------------------------------
  * Additional Routing
