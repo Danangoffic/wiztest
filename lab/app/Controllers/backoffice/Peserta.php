@@ -275,7 +275,7 @@ class Peserta extends Controller
         $jam_kunjungan = $dataJamKunjungan['jam'];
         // var_dump($this->request->getPost());
         // exit();
-        $customer_UNIQUE = $this->customerPublic->getOrderId($layanan_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
+        // $customer_UNIQUE = $this->customerPublic->getOrderId($layanan_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
         // echo db_connect()->showLastQuery();
         // exit();
         // dd($customer_UNIQUE);
@@ -298,7 +298,7 @@ class Peserta extends Controller
                 'jenis_pemeriksaan' => $id_pemeriksaan,
                 'jenis_layanan' => $id_layanan,
                 'faskes_asal' => $faskes_asal,
-                'customer_unique' => $customer_UNIQUE,
+                // 'customer_unique' => $customer_UNIQUE,
                 'jenis_kelamin' => $jenis_kelamin,
                 'tempat_lahir' => $tempat_lahir,
                 'tanggal_lahir' => $tgl_lahir,
@@ -313,36 +313,33 @@ class Peserta extends Controller
                 'tgl_kunjungan' => $tgl_kunjungan,
                 'status_pembayaran' => $this->request->getPost('status_pembayaran')
             ];
-            $insert = $this->customerModel->insert($DataInsertCustomer);
+            $update = $this->customerModel->update($id_customer, $DataInsertCustomer);
             $insert_id = null;
-            if ($insert) {
-                $insert_id = $this->customerModel->getInsertID();
+            if ($update) {
+                $detail_test = $this->testModel->find($id_test);
+                $dataInsertPembayaran = [
+                    'id_customer' => $insert_id,
+                    'nama' => $nama,
+                    'jenis_test' => $layanan_test,
+                    'nama_test' => $detail_test['nama_test'],
+                    'status_pembayaran' => $this->request->getPost('status_pembayaran')
+                ];
+                $update_payment = db_connect()->table('data_pembayaran')->update($dataInsertPembayaran, ['id_customer' => $id_customer]);
+                if ($update_payment) {
+                    $this->session->setFlashdata('success', 'Berhasil ubah data peserta tes');
+                    return redirect()->to('/backoffice/peserta');
+                } else {
+                    $this->session->setFlashdata('error', 'Gagal ubah data peserta tes');
+                    return redirect()->to('/backoffice/peserta/edit/' . $id_customer)->withInput();
+                }
             } else {
-                // return $this->failValidationError();
-            }
-            $InvoiceCustomer = $this->customerPublic->getInvoiceNumber($insert_id);
-            $this->customerModel->update($insert_id, ['invoice_number' => $InvoiceCustomer]);
-            $detail_test = $this->testModel->find($id_test);
-            $dataInsertPembayaran = [
-                'id_customer' => $insert_id,
-                'nama' => $nama,
-                'jenis_test' => $layanan_test,
-                'nama_test' => $detail_test['nama_test'],
-                'status_pembayaran' => 'unpaid'
-            ];
-            $insertPembayaran = $this->customerPublic->PembayaranModel->insert($dataInsertPembayaran);
-            $id_pembayaran = $this->customerPublic->PembayaranModel->getInsertID();
-            if ($id_pembayaran) {
-                $this->session->setFlashdata('success', 'Berhasil tambahkan data peserta tes');
-                return redirect()->to('/backoffice/peserta');
-            } else {
-                $this->session->setFlashdata('error', 'Gagal tambahkan data peserta tes');
-                return redirect()->to('/backoffice/peserta/create')->withInput();
+                $this->session->setFlashdata('error', 'Gagal ubah data peserta tes');
+                return redirect()->to('/backoffice/peserta/edit/' . $id_customer)->withInput();
             }
         } catch (\Throwable $th) {
             //throw $th;
-            $this->session->setFlashdata('error', 'Gagal tambahkan data peserta tes karena ' . $th->getMessage() . ' line : ' . $th->getLine() . ' file : ' . $th->getFile());
-            return redirect()->to('/backoffice/peserta/create')->withInput();
+            $this->session->setFlashdata('error', 'Gagal ubah data peserta tes karena ' . $th->getMessage() . ' line : ' . $th->getLine() . ' file : ' . $th->getFile());
+            return redirect()->to('/backoffice/peserta/edit/' . $id_customer)->withInput();
         }
     }
 
@@ -364,6 +361,39 @@ class Peserta extends Controller
     public function peserta_hadir(int $id_peserta)
     {
         # code...
+    }
+
+    public function hadirkan_peserta(int $id_peserta)
+    {
+        if ($this->updateHadirkanPeserta($id_peserta)) {
+            $this->session->setFlashdata('success', 'Berhasil update data peserta untuk hadir');
+            return redirect()->to('/backoffice/peserta/' . $id_peserta);
+        } else {
+            $this->session->setFlashdata('error', 'Gagal update data peserta untuk hadir');
+            return redirect()->to('/backoffice/peserta/' . $id_peserta);
+        }
+    }
+
+    public function updateHadirkanPeserta($id_peserta)
+    {
+        $customerDetail = $this->customerModel->find($id_peserta);
+        if ($customerDetail) {
+            $statusKehadiran = $customerDetail['kehadiran'];
+            $statusPembayaran = $customerDetail['status_pembayaran'];
+            if ($statusKehadiran == 0 && ($statusPembayaran == 'paid' || $statusPembayaran == 'invoice')) {
+                $dataCustomer = array(
+                    'kehadiran' => '1'
+                );
+                $updateCustomer = $this->customerModel->update($id_peserta, $dataCustomer);
+                if ($updateCustomer) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
     }
 
     public function validasi_peserta()

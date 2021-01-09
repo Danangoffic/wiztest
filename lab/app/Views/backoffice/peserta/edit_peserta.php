@@ -27,7 +27,7 @@
                         <h5 class="card-heading"><?= $title; ?></h5>
                     </div>
                     <div class="card-body row">
-                        <form action="update/<?= $id; ?>" method="post" class="col-8">
+                        <form action="<?= base_url('backoffice/peserta/update/' . $id); ?>" method="post" class="col-8">
                             <input type="hidden" name="id_customer" value="<?= $id; ?>">
                             <div class="form-group row">
                                 <label for="tgl_kunjungan" class="col-2">Waktu Kunjungan <span class="text-danger">*</span></label>
@@ -65,6 +65,12 @@
                                 </div>
                             </div>
                             <div class="form-group row">
+                                <label for="" class="col-2">Nomor Registrasi</label>
+                                <div class="col-10">
+                                    <input type="text" name="" id="" class="form-control" readonly value="<?= $data['customer_unique']; ?>">
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label for="nama_pemeriksa" class="col-2">Nama Pemeriksa <span class="text-danger">*</span></label>
                                 <div class="col-10">
                                     <select name="nama_pemeriksa" id="nama_pemeriksa" class="form-control">
@@ -90,6 +96,20 @@
                                             $nama_test = $DetailTest['nama_test'];
                                         ?>
                                             <option value="<?= $value['id']; ?>" <?= ($data['jenis_test'] == $value['id']) ? 'selected' : ''; ?>><?= $nama_test; ?> (<?= $namaLayanan; ?>)</option>
+                                        <?php
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="jenis_layanan" class="col-2">Jenis Layanan</label>
+                                <div class="col-10">
+                                    <select name="jenis_layanan" id="jenis_layanan" class="form-control">
+                                        <?php
+                                        foreach ($jenis_pemeriksaan as $key => $value) {
+                                        ?>
+                                            <option value="<?= $value['id']; ?>" <?= ($data['jenis_pemeriksaan'] == $value['id']) ? 'selected' : ''; ?>><?= $value['nama_pemeriksaan']; ?></option>
                                         <?php
                                         }
                                         ?>
