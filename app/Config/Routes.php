@@ -89,6 +89,11 @@ $routes->get('/backoffice/frontoffice', 'backoffice\Frontoffice::index');
 $routes->get('/backoffice/frontoffice/(:segment)', 'backoffice\Frontoffice::$1');
 $routes->get('/backoffice/frontoffice/(:segment)/(:num)', 'backoffice\Frontoffice::$1/$2');
 $routes->post('/backoffice/frontoffice/(:segment)/(:num)', 'backoffice\Frontoffice::$1/$2');
+
+$routes->get('/backoffice/peserta', 'backoffice\Peserta::index');
+$routes->get('/backoffice/peserta/(:segment)', 'backoffice\Peserta::$1');
+$routes->get('/backoffice/peserta/(:segment)/(:num)', 'backoffice\Peserta::$1/$2');
+$routes->post('/backoffice/peserta/(:segment)/(:num)', 'backoffice\Peserta::$1/$2');
 /**
  * --------------------------------------------------------------------
  * Additional Routing
