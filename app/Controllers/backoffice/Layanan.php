@@ -2,25 +2,31 @@
 
 namespace App\Controllers\backoffice;
 
+use App\Models\CustomerModel;
 use App\Models\LayananModel;
 use App\Models\LayananTestModel;
+use App\Models\PemeriksaanModel;
 use App\Models\TestModel;
 use CodeIgniter\Controller;
+use CodeIgniter\RESTful\ResourceController;
 // use Dompdf\Cpdf;
 use Dompdf\Dompdf;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Layanan extends Controller
+class Layanan extends ResourceController
 {
     public $session;
     public $codeBarCode;
     public $dompdf;
+    public $pdf;
+    protected $customer;
     public function __construct()
     {
         $this->codeBarCode = "code128";;
         $this->session = session();
         $this->dompdf = new Dompdf();
+        $this->customer = new CustomerModel();
     }
     public function index()
     {
@@ -53,7 +59,23 @@ class Layanan extends Controller
 
     public function printPDFCustomer($id)
     {
-        view('backoffice/layanan/invoice_pdf');
+        $data = array(
+            'session' => session(),
+            'page' => 'invoice',
+            'title' => 'Invoice'
+        );
+        // $pdf = new PdfExtender;
+        $html = view('backoffice/layanan/invoice_pdf_print', $data);
+        $this->dompdf->loadHtml($html);
+        // Render the PDF
+        $this->dompdf->render();
+        // Output the generated PDF to Browser
+        $this->dompdf->stream($this->filename, array("Attachment" => false));
+        // $pdf->setPaper('A4');
+        // $pdf->setFilename('Invoice.pdf');
+        // $pdf->load_view('backoffice/layanan/invoice_pdf_print', $data);
+        // $output = $this->dompdf->output();
+        // file_put_contents()
     }
 
     protected function file_get_contents_curl($url)
@@ -106,6 +128,24 @@ class Layanan extends Controller
     public function getUrlBarCode(string $value = "")
     {
         return $this->get_bar_code($value);
+    }
+
+    public function hadir_by_qr_code(string $customer)
+    {
+        $JENIS_TEST_MODEL = new LayananTestModel();
+        $PEMERIKSAAN_MODEL = new PemeriksaanModel();
+        $TEST_MODEL = new TestModel();
+        $id_customer = base64_decode($customer);
+        $customerData = $this->customer->find($id_customer);
+        if ($customerData) {
+            $kehadiran = $customerData['kehadiran'];
+            if ($kehadiran == 0 || $kehadiran == '0') {
+                $updateKehadiran = array('kehadiran' => '1');
+                $this->customer->update($id_customer, $updateKehadiran);
+                $newCustomerData = $this->customer->find($id_customer);
+                $jenisTestData = $this->
+            }
+        }
     }
 
     //--------------------------------------------------------------------
