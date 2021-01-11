@@ -99,6 +99,31 @@ $routes->get('/backoffice/peserta', 'backoffice\Peserta::index');
 $routes->get('/backoffice/peserta/(:segment)', 'backoffice\Peserta::$1');
 $routes->get('/backoffice/peserta/(:segment)/(:num)', 'backoffice\Peserta::$1/$2');
 $routes->post('/backoffice/peserta/(:segment)/(:num)', 'backoffice\Peserta::$1/$2');
+
+$routes->get('/backoffice/dokter', 'backoffice\Dokter::index');
+$routes->get('/backoffice/dokter/(:segment)', 'backoffice\Dokter::$1');
+$routes->get('/backoffice/dokter/(:segment)/(:num)', 'backoffice\Dokter::$1/$2');
+$routes->post('/backoffice/dokter/(:segment)/(:num)', 'backoffice\Dokter::$1/$2');
+
+$routes->get('/backoffice/laboratorium', 'backoffice\Laboratorium::index');
+$routes->get('/backoffice/laboratorium/(:segment)', 'backoffice\Laboratorium::$1');
+$routes->get('/backoffice/laboratorium/(:segment)/(:num)', 'backoffice\Laboratorium::$1/$2');
+$routes->post('/backoffice/laboratorium/(:segment)/(:num)', 'backoffice\Laboratorium::$1/$2');
+
+$routes->get('/backoffice/petugas', 'backoffice\Petugas::index');
+$routes->get('/backoffice/petugas/(:segment)', 'backoffice\Petugas::$1');
+$routes->get('/backoffice/petugas/(:segment)/(:num)', 'backoffice\Petugas::$1/$2');
+$routes->post('/backoffice/petugas/(:segment)/(:num)', 'backoffice\Petugas::$1/$2');
+
+$routes->get('/backoffice/kota', 'backoffice\Kota::index');
+$routes->get('/backoffice/kota/(:segment)', 'backoffice\Kota::$1');
+$routes->get('/backoffice/kota/(:segment)/(:num)', 'backoffice\Kota::$1/$2');
+$routes->post('/backoffice/kota/(:segment)/(:num)', 'backoffice\Kota::$1/$2');
+
+$routes->get('/backoffice/lokasi_input', 'backoffice\Lokasi_input::index');
+$routes->get('/backoffice/lokasi_input/(:segment)', 'backoffice\Lokasi_input::$1');
+$routes->get('/backoffice/lokasi_input/(:segment)/(:num)', 'backoffice\Lokasi_input::$1/$2');
+$routes->post('/backoffice/lokasi_input/(:segment)/(:num)', 'backoffice\Lokasi_input::$1/$2');
 /**
  * --------------------------------------------------------------------
  * Additional Routing
