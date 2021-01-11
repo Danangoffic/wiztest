@@ -148,6 +148,55 @@ class Layanan extends ResourceController
         }
     }
 
+    public function printbarcode(string $encoded_id_customer)
+    {
+        $decoded = base64_decode($encoded_id_customer);
+        $CustomerModel = new CustomerModel();
+        $detailCustomer = $CustomerModel->find(base64_decode($encoded_id_customer));
+        $url = base_url('api/peserta/' . $encoded_id_customer);
+        $img_url = $this->get_bar_code($url);
+        $type = pathinfo($img_url, PATHINFO_EXTENSION);
+        $data = file_get_contents($img_url);
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        // It will be called downloaded.pdf
+        $html = '<center><img importance="" width=\'200\' height=\'100\' src="' . $base64 . '" id=""></center>';
+        $fileHTMLVIEW = view('backoffice/layanan/print_barcode', ['base64' => $base64, 'url' => $url, 'detailCustomer' => $detailCustomer, 'original_img' => $img_url, 'html_img' => $html]);
+        return $fileHTMLVIEW;
+        exit();
+        // $htmlFile = base_url('backoffice/layanan/render_barcode/' . $encoded_id_customer, true);
+        $this->dompdf->loadHtml($fileHTMLVIEW);
+        $arraySize = array(0, 0, 250, 150);
+        $this->dompdf->setPaper($arraySize);
+        $this->dompdf->render();
+        $this->dompdf->stream('barcode.pdf', ['Attachment' => false]);
+        // readfile("fileinit.pdf");
+
+        // return view('backoffice/Layanan/print_barcode', ['img_url' => $img_url]);
+    }
+
+    public function coba_barcode($id_customer)
+    {
+        $CustomerModel = new CustomerModel();
+        $detailCustomer = $CustomerModel->find($id_customer);
+        $url = $detailCustomer['customer_unique'];
+        $this->codeBarCode = "code128";
+        $img_url = $this->get_bar_code(urlencode($url));
+        $type = pathinfo($img_url, PATHINFO_EXTENSION);
+        $data = file_get_contents($img_url);
+        $base64 = 'data:image/png' . ';base64,' . base64_encode($data);
+        // It will be called downloaded.pdf
+        $html = '<center><img importance="" width=\'200\' height=\'100\' src="' . $img_url . '" id=""></center>';
+        // $fileHTMLVIEW = view('backoffice/layanan/print_barcode', ['base64' => $base64, 'url' => $url, 'detailCustomer' => $detailCustomer, 'original_img' => $img_url, 'html_img' => $html]);
+        // return $fileHTMLVIEW;
+        // exit();
+        // $htmlFile = base_url('backoffice/layanan/render_barcode/' . $encoded_id_customer, true);
+        $this->dompdf->loadHtml($html);
+        $arraySize = array(0, 0, 250, 150);
+        $this->dompdf->setPaper($arraySize);
+        $this->dompdf->render();
+        $this->dompdf->stream('barcode.pdf', ['Attachment' => false]);
+    }
+
     //--------------------------------------------------------------------
 
 }

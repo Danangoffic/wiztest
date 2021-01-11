@@ -4,7 +4,11 @@ namespace App\Controllers\backoffice;
 
 use App\Models\CustomerModel;
 use App\Models\KuotaModel;
+use App\Models\LayananModel;
+use App\Models\LayananTestModel;
+use App\Models\MarketingModel;
 use App\Models\PemeriksaanModel;
+use App\Models\TestModel;
 use CodeIgniter\Controller;
 // use App\Controllers;
 // use CodeIgniter\Controller;
@@ -15,12 +19,22 @@ class Frontoffice extends Controller
     protected $customerModel;
     protected $pemeriksaanModel;
     protected $kuotaModal;
+    protected $instansi;
+    protected $marketing;
+    protected $layananTestModel;
+    protected $layananModel;
+    protected $testModel;
     public function __construct()
     {
         $this->customerModel = new CustomerModel();
         $this->pemeriksaanModel = new PemeriksaanModel();
         $this->kuotaModal = new KuotaModel();
         $this->session = session();
+        $this->instansi = new Instansi;
+        $this->marketing = new MarketingModel();
+        $this->layananTestModel = new LayananTestModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
     }
     public function index()
     {
@@ -35,14 +49,52 @@ class Frontoffice extends Controller
 
     public function walk_in()
     {
+        $filter = ($this->request->getVar('filtering')) ? $this->request->getVar('filtering') : '';
+        $Customer = array();
+        if ($filter == "on") {
+            $date1 = ($this->request->getVar('date1')) ? $this->request->getVar('date1') : '';
+            $date2 = ($this->request->getVar('date2')) ? $this->request->getVar('date2') : '';
+            $instansi = ($this->request->getVar('instansi')) ? $this->request->getVar('instansi') : '';
+            $marketing = ($this->request->getVar('marketing')) ? $this->request->getVar('marketing') : '';
+            $layanan_test = ($this->request->getVar('layanan_test')) ? $this->request->getVar('layanan_test') : '';
+            $queryFilter = 'SELECT * FROM customers';
+            $queryFilter .= " WHERE jenis_layanan = '1'";
 
-        $data_pemeriksaan = $this->pemeriksaanModel->where(['nama_pemeriksaan' => 'WALK IN'])->first();
-        $id_jenis_pemeriksaan = $data_pemeriksaan['id'];
-        $Customer = $this->customerModel->detailRegistrasi(false, $id_jenis_pemeriksaan)->getResultArray();
+            if ($date1 !== '' && $date2 !== '') {
+                $queryFilter .= " AND tgl_kunjungan BETWEEN '" . $date1 . "' AND '" . $date2 . "'";
+            } elseif ($date1 !== '') {
+                $queryFilter .= " AND tgl_kunjungan = '" . $date1 . "'";
+            } elseif ($date2 !== '') {
+                $queryFilter .= " AND tgl_kunjungan BETWEEN '" . date('Y-m-d') . "' AND '" . $date2 . "'";
+            }
+            if ($instansi !== '') {
+                $queryFilter .= " AND instansi = '$instansi'";
+            }
+            if ($marketing !== '') {
+                $queryFilter .= " AND id_marketing = '$marketing'";
+            }
+            if ($layanan_test !== '') {
+                $queryFilter .= " AND jenis_test = '$layanan_test'";
+            }
+            $queryFilter .= " ORDER BY id DESC";
+            $Customer = db_connect()->query($queryFilter)->getResultArray();
+        } else {
+            $Customer = db_connect()->table('customers')->select()->orderBy('id', 'DESC')->get()->getResultArray();
+        }
+        // $Customer = $this->customerModel->detailRegistrasi(false, $id_jenis_pemeriksaan)->getResultArray();
         $data = array(
             'title' => "Walk-In",
             'page' => "walk_in",
             'data_customer' => $Customer,
+            'instansi' => $this->instansi->instansiModel->findAll(),
+            'instansiModel' => $this->instansi->instansiModel,
+            'marketing' => $this->marketing->findAll(),
+            'marketingModel' => $this->marketing,
+            'layananTest' => $this->layananTestModel->findAll(),
+            'layananModel' => $this->layananModel,
+            'instansiModel' => $this->instansi->instansiModel,
+            'testModel' => $this->testModel,
+            'layananTestModel' => $this->layananTestModel,
             'session' => session()
         );
         return view('backoffice/frontoffice/walk_in', $data);

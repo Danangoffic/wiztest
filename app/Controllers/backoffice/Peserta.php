@@ -50,11 +50,35 @@ class Peserta extends Controller
     }
     public function index()
     {
-        $Customer = $this->customerModel->detailRegistrasi()->getResultArray();
+        $filter = ($this->request->getVar('filtering')) ? $this->request->getVar('filtering') : '';
+        $Customer = array();
+        if ($filter == "on") {
+            $date1 = ($this->request->getVar('date1')) ? $this->request->getVar('date1') : '';
+            $date2 = ($this->request->getVar('date2')) ? $this->request->getVar('date2') : '';
+            $queryFilter = 'SELECT * FROM customers';
+            $queryFilter .= " WHERE jenis_layanan = '1'";
+
+            if ($date1 !== '' && $date2 !== '') {
+                $queryFilter .= " AND (tgl_kunjungan BETWEEN '" . $date1 . "' AND '" . $date2 . "')";
+            } elseif ($date1 !== '') {
+                $queryFilter .= " AND tgl_kunjungan = '" . $date1 . "'";
+            } elseif ($date2 !== '') {
+                $queryFilter .= " AND tgl_kunjungan BETWEEN '" . date('Y-m-d') . "' AND '" . $date2 . "'";
+            }
+            $queryFilter .= " ORDER BY id DESC";
+            $Customer = db_connect()->query($queryFilter)->getResultArray();
+        } else {
+            $Customer = db_connect()->table('customers')->select()->orderBy('id', 'DESC')->get()->getResultArray();
+        }
         $data = array(
             'title' => "Registrasi",
             'page' => "registrasi",
             'data_customer' => $Customer,
+            'instansiModel' => $this->instansiModel,
+            'marketingModel' => $this->marketingModel,
+            'layananModel' => $this->layananModel,
+            'testModel' => $this->testModel,
+            'layananTestModel' => $this->layananTestModel,
             'session' => session()
         );
         return view('backoffice/registrasi/index', $data);
@@ -385,7 +409,9 @@ class Peserta extends Controller
                     'kehadiran' => '1'
                 );
                 $updateCustomer = $this->customerModel->update($id_peserta, $dataCustomer);
-                if ($updateCustomer) {
+                $insertDataHadir = array('id_customer' => $id_peserta);
+                $insertKehadiran = db_connect()->table('kehadiran')->insert($insertDataHadir);
+                if ($updateCustomer && $insertKehadiran) {
                     return true;
                 } else {
                     $this->session->setFlashdata('error', 'Gagal update data peserta');

@@ -158,45 +158,47 @@ class Dokter extends Controller
 
     public function update(int $id_dokter)
     {
-        $validation_input = $this->validate([
-            'nama' => [
-                'rules' => 'required',
-                'errors' => '{field} lengkap dokter harus diisi'
-            ],
-            'img_ttd' => [
-                'rules' => 'max_size[img_ttd,1024]|is_image[img_ttd]|mime_in[img_ttd,image/jpg,image/jpeg,image/png]',
-                'errors' => [
-                    'max_size' => 'Ukuran gambar terlalu besar',
-                    'is_image' => 'Yang anda pilih bukan gambar',
-                    'mime_in' => 'Yang anda pilih bukan gambar',
-                ]
-            ]
-        ]);
-        if (!$validation_input) {
-            return redirect()->to('/backoffice/dokter/create')->withInput();
-        }
-        $img_ttd = $this->request->getFile('img_ttd');
 
-        if ($img_ttd->getError() == 4) {
-            $namattd = $this->request->getPost('img_ttd_old');
-        } else {
-            //generate name with random name
-            $namattd = $img_ttd->getRandomName();
-            //move file ke folder img with new name
-            $img_ttd->move('assets/dokter', $namattd);
-            if ($this->request->getPost('img_ttd_old') !== "") {
-                unlink('assets/dokter/' . $this->request->getPost('img_ttd_old'));
-            }
-        }
-        $url_qrcode = $this->layananC->getUrlQRCode(base_url('assets/dokter/' . $namattd));
         $data_dokter = $this->dokterModel->find($id_dokter);
         $id_user_dokter = $data_dokter['id_user'];
         if ($id_user_dokter !== '' || $id_user_dokter !== null) {
+            $validation_input = $this->validate([
+                'nama' => [
+                    'rules' => 'required',
+                    'errors' => '{field} lengkap dokter harus diisi'
+                ],
+                'img_ttd' => [
+                    'rules' => 'max_size[img_ttd,1024]|is_image[img_ttd]|mime_in[img_ttd,image/jpg,image/jpeg,image/png]',
+                    'errors' => [
+                        'max_size' => 'Ukuran gambar terlalu besar',
+                        'is_image' => 'Yang anda pilih bukan gambar',
+                        'mime_in' => 'Yang anda pilih bukan gambar',
+                    ]
+                ]
+            ]);
+            if (!$validation_input) {
+                return redirect()->to('/backoffice/dokter/create')->withInput();
+            }
             $email = $this->request->getPost('email');
-            $password = $this->request->getPost('password');
+            $password = ($this->request->getPost('password')) ? $this->request->getPost('password') : '';
             $nama = $this->request->getPost('nama');
             $phone = $this->request->getPost('phone');
             $user_id = null;
+            $img_ttd = $this->request->getFile('img_ttd');
+
+            if ($img_ttd->getError() == 4) {
+                $namattd = $this->request->getPost('old_img_ttd');
+            } else {
+                //generate name with random name
+                $namattd = str_replace('.', '', str_replace(',', '', str_replace(' ', '_', $nama))) . $img_ttd->getRandomName();
+                //move file ke folder img with new name
+                $img_ttd->move('assets/dokter', $namattd);
+                if ($this->request->getPost('old_img_ttd') || $this->request->getPost('old_img_ttd') !== "" || $this->request->getPost('old_img_ttd') !== null) {
+                    unlink('assets/dokter/' . $this->request->getPost('old_img_ttd'));
+                }
+            }
+            $url_qrcode = $this->layananC->getUrlQRCode(base_url('assets/dokter/' . $namattd));
+            $update_user = array();
             if ($email != '' && $password != '') {
                 $update_user = array(
                     'email' => $email,
@@ -204,8 +206,14 @@ class Dokter extends Controller
                     'created_by' => session('id'),
                     'updated_by' => session('id')
                 );
-                $this->userC->userModel->update($id_user_dokter, $update_user);
+            } else if ($password == '') {
+                $update_user = array(
+                    'email' => $email,
+                    'created_by' => session('id'),
+                    'updated_by' => session('id')
+                );
             }
+            $this->userC->userModel->update($id_user_dokter, $update_user);
         }
 
         // $url_qrcode = $this->layananC->getUrlQRCode(base_url('backoffice/dokter/'))

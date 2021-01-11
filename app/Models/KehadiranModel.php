@@ -13,10 +13,8 @@ class KehadiranModel extends Model
     // protected $useSoftDeletes = true;
 
     protected $allowedFields = [
-        'jenis_test',
         'id_customer',
         'id_petugas',
-        'biaya'
     ];
 
     protected $useTimestamps = true;

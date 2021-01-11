@@ -316,7 +316,146 @@ class Customer extends ResourceController
         return $this->respond($result_data, 200, 'success');
     }
 
+    public function update_data_customer_registration()
+    {
+    }
 
+    public function get_server_key()
+    {
+        $order_id = $this->request->getVar('order_id');
+        try {
+            $db_init = db_connect()->table('customers')->select()->where('customer_unique', $order_id)->get();
+            $data_customer = $db_init->getResultArray();
+            $total_data = count($data_customer);
+            if ($total_data > 0) {
+                $db_server_key = db_connect()->table('system_parameter')->select()->where('vgroup', 'MIDTRANS_KEY')->where('parameter', 'SERVER_KEY')->get();
+                $result_server_key = $db_server_key->getRowArray();
+                $server_key = $result_server_key['value'];
+                $respondData = array(
+                    'statusMessage' => 'success',
+                    'server_key' => $server_key
+                );
+                return $this->respond($respondData, 200, 'success');
+            } else {
+                $respondData = array(
+                    'statusMessage' => 'order id tidak ditemukan'
+                );
+                return $this->respond($respondData, 401, 'failed');
+            }
+        } catch (\Throwable $th) {
+            $respondData = array(
+                'statusMessage' => 'Gagal karena' . $th->getMessage()
+            );
+            return $this->respond($respondData, 500, 'failed');
+        }
+    }
+
+    public function get_qr_by_order_id()
+    {
+        $layananC = new Layanan;
+        $order_id = $this->request->getVar('order_id');
+        try {
+            $db_init = db_connect()->table('customers')->select()->where('customer_unique', $order_id)->get();
+            $data_customer = $db_init->getResultArray();
+            $total_data = count($data_customer);
+            if ($total_data > 0) {
+                $id_customer = $data_customer['id'];
+                $url = base_url('api/hadir/' . base64_encode($id_customer));
+                $qr_url = $layananC->getUrlQRCode($url);
+                $respondData = array(
+                    'statusMessage' => 'success',
+                    'url_img' => $qr_url
+                );
+                return $this->respond($respondData, 200, 'success');
+            } else {
+                $respondData = array(
+                    'statusMessage' => 'order id tidak ditemukan'
+                );
+                return $this->respond($respondData, 401, 'failed');
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+
+    public function findOrderId()
+    {
+        $layananC = new Layanan;
+        $order_id = $this->request->getVar('order_id');
+        try {
+            $db_init = db_connect()->table('customers')->select()->where('customer_unique', $order_id)->get();
+            $data_customer = $db_init->getResultArray();
+            $total_data = count($data_customer);
+            if ($total_data > 0) {
+                $id_customer = $data_customer['id'];
+                $url = base_url('api/hadir/' . base64_encode($id_customer));
+                $qr_url = $layananC->getUrlQRCode($url);
+                $respondData = array(
+                    'statusMessage' => 'success',
+                    'url_img' => $qr_url
+                );
+                return $this->respond($respondData, 200, 'success');
+            } else {
+                $respondData = array(
+                    'statusMessage' => 'order id tidak ditemukan'
+                );
+                return $this->respond($respondData, 401, 'failed');
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+
+    public function encode_key()
+    {
+        $key = $this->request->getVar('key');
+        $result_encoded = base64_encode($key . ':');
+        echo $result_encoded;
+    }
+
+    public function midtrans_notification()
+    {
+        $db_server_key = db_connect()->table('system_parameter')->select()->where('vgroup', 'MIDTRANS_KEY')->where('parameter', 'SERVER_KEY')->get();
+        $result_server_key = $db_server_key->getRowArray();
+        $server_key = $result_server_key['value'];
+        \Midtrans\Config::$isProduction = false;
+        \Midtrans\Config::$serverKey = $server_key;
+        $notif = new \Midtrans\Notification();
+
+        $transaction = $notif->transaction_status;
+        $type = $notif->payment_type;
+        $order_id = $notif->order_id;
+        $fraud = $notif->fraud_status;
+
+        if ($transaction == 'capture') {
+            // For credit card transaction, we need to check whether transaction is challenge by FDS or not
+            if ($type == 'credit_card') {
+                if ($fraud == 'challenge') {
+                    // TODO set payment status in merchant's database to 'Challenge by FDS'
+                    // TODO merchant should decide whether this transaction is authorized or not in MAP
+                    echo "Transaction order_id: " . $order_id . " is challenged by FDS";
+                } else {
+                    // TODO set payment status in merchant's database to 'Success'
+                    echo "Transaction order_id: " . $order_id . " successfully captured using " . $type;
+                }
+            }
+        } else if ($transaction == 'settlement') {
+            // TODO set payment status in merchant's database to 'Settlement'
+            echo "Transaction order_id: " . $order_id . " successfully transfered using " . $type;
+        } else if ($transaction == 'pending') {
+            // TODO set payment status in merchant's database to 'Pending'
+            echo "Waiting customer to finish transaction order_id: " . $order_id . " using " . $type;
+        } else if ($transaction == 'deny') {
+            // TODO set payment status in merchant's database to 'Denied'
+            echo "Payment using " . $type . " for transaction order_id: " . $order_id . " is denied.";
+        } else if ($transaction == 'expire') {
+            // TODO set payment status in merchant's database to 'expire'
+            echo "Payment using " . $type . " for transaction order_id: " . $order_id . " is expired.";
+        } else if ($transaction == 'cancel') {
+            // TODO set payment status in merchant's database to 'Denied'
+            echo "Payment using " . $type . " for transaction order_id: " . $order_id . " is canceled.";
+        }
+    }
 
     //--------------------------------------------------------------------
 
