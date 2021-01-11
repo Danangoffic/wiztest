@@ -4,19 +4,16 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class PemeriksaModel extends Model
+class SampleModel extends Model
 {
-    protected $table      = 'petugas';
+    protected $table      = 'jenis_sample';
     // protected $primaryKey = 'id';
 
     // protected $returnType     = 'array';
     // protected $useSoftDeletes = true;
 
     protected $allowedFields = [
-        'nama',
-        'phone',
-        'alamat',
-        'email',
+        'nama_sample',
         'created_by',
         'updated_by'
     ];

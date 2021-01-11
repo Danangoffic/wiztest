@@ -2,13 +2,13 @@
 <?= $this->section('content'); ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-
-    <section class="content mt-3">
+    <section class="content-header mb-0"></section>
+    <section class="content mt-0">
         <div class="row">
             <div class="col-12">
-                <div class="card">
+                <div class="card card-primary">
                     <div class="card-header">
-                        <h5 class="card-heading"><?= $title; ?></h5>
+                        <h3 class="card-title"><?= $title; ?></h3>
                     </div>
                     <div class="card-body">
                         <a href="<?= base_url('backoffice/dokter/create'); ?>" class="btn btn-primary mb-3">Tambah Dokter</a>
@@ -35,10 +35,10 @@
                                         <td><?= $value['nama']; ?></td>
                                         <td><?= $value['phone']; ?></td>
                                         <td><?= $email; ?></td>
-                                        <td>
-                                            <img src="<?= $value['qrcode_ttd']; ?>" alt="">
+                                        <td class="text-center">
+                                            <img src="<?= $value['qrcode_ttd']; ?>" alt="" width="100" height="100">
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             <a href="<?= base_url('backoffice/dokter/edit/' . $value['id']); ?>" class="btn btn-success btn-sm">Edit</a>
                                             <a href="<?= base_url('backoffice/dokter/delete/' . $value['id']); ?>" class="btn btn-danger btn-sm">Hapus</a>
                                         </td>

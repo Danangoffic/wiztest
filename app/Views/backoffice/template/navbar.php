@@ -2,7 +2,7 @@
 
     <ul class="navbar-nav">
         <li class="nav-item">
-            <button class="btn btn-primary" data-widget="pushmenu"><i class="fa fa-arrow-left"></i></button>
+            <button class="btn btn-secondary" data-widget="pushmenu"><i class="fas fa-bars"></i></button>
         </li>
     </ul>
     <!-- Right navbar links -->

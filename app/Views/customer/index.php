@@ -204,6 +204,7 @@
 <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?= $midtrans_client_key; ?>"></script>
 <script>
     var id_jenis_test, nama_jenis_test, jam_kunjungan, token_client;
+    var midtransToken, invoice_number, transaction;
     $(document).ready(() => {
         getMenu();
         document.getElementById('registrasi').addEventListener('click', registrasi, false);
@@ -460,35 +461,137 @@
         //     },
         //     // error: e => console.error(e)
         // });
-        var midtransToken;
+
         $.post(url_post_registration, dataSend).then((data, status) => {
             if (status == "success") {
                 console.log('STATUS', status);
                 let midtrans_return = data.data.data;
                 midtransToken = midtrans_return.token;
-                let invoice_number = data.invoice_number;
-                let transaction = data.transaction;
+                invoice_number = data.invoice_number;
+                transaction = data.transaction;
                 console.log('midtrans return : ', midtrans_return);
                 console.log('invoice number : ', invoice_number);
                 console.log('transaction detail : ', transaction);
                 $("#registrasi, #backForm").addClass("disabled");
                 $("#registrasi").html(`Loading..<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
-                snap.pay(midtransToken, {
-                    onSuccess: result => {
-                        location.reload();
-                    },
-                    onPending: result => {
-                        location.reload();
-                    },
-                    onError: result => {
-                        location.reload();
-                    },
-                    onClose: () => {
-                        location.reload();
-                    }
-                });
+                showPayment(midtransToken);
             }
             // snap.show();
+        });
+    }
+
+    function updateData(result) {
+        $("#registrasi").removeClass('btn-primary').addClass('btn-success');
+        $("#registrasi").html(`Success <i class="fa check-circle"></i>`);
+        console.log('result', result);
+        var payent_type = result.payment_type;
+        var order_id = result.order_id;
+        var pdf_url = result.pdf_url;
+        var gross_amount = result.gross_amount;
+        var transaction_status = result.transaction_status;
+        var status_code = result.status_code;
+        var finish_url = result.finish_redirect_url;
+        var transaction_id = result.transaction_id;
+        var data_object = {
+            payent_type,
+            order_id,
+            pdf_url,
+            gross_amount,
+            transaction_status,
+            status_code,
+            finish_url,
+            transaction_id
+        };
+        let url_update = '<?= base_url('api/update_status'); ?>';
+        $.ajax({
+            url: url_update,
+            data: data_object,
+            type: 'post',
+            success: function(data, status, jqhr) {
+                if (transaction_status != 'pending') {
+                    let urlQR = data.qrcode_url;
+                    showToast('success', 'Pembayaran berhasil, silahkan tutup untuk cek QR Code Anda').then(result => {
+                        if (result.dismiss) {
+                            showImg(urlQR, 'QR Code', 'Order ID : <string>' + order_id + '</strong>');
+                        }
+                    });
+                } else if (transaction_status == 'pending') {
+                    showToast('info', 'Silahkan melakukan pembayaran')
+                }
+            }
+        })
+    }
+
+    function get_status_payment_customer(order_id) {
+        return get_encoded_server_key(order_id);
+    }
+
+    function get_encoded_server_key(order_id) {
+        $.post('<?= base_url('api/get_server_key'); ?>', {
+            order_id
+        }, function(data, status, xhr) {
+            if (data.statusMessage == 'success') {
+                let server_key = data.server_key;
+                status_payment(order_id, server_key);
+            } else {
+                console.error('failed to retrieve data');
+            }
+        });
+    }
+
+    function ShowQRCustomerByOrderId(order_id = '') {
+        $.ajax({
+            url: '<?= base_url('api/getQRByOrderId'); ?>',
+            type: 'post',
+            data: {
+                order_id
+            },
+            success: (data, status, xhr) => {
+                if (data.statusMessage == 'success') {
+                    showImg(data.url_img, 'QR Code');
+                }
+            },
+            error: (xhr, status, thrown) => {
+
+            }
+        })
+    }
+
+    function status_payment(order_id = '', encoded_server_key) {
+        $.ajax({
+            method: 'GET',
+            url: `https://api.sandbox.midtrans.com/v2/${order_id}/status`,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic ' + encoded_server_key
+            },
+            async: true,
+            success: (data, status, xhqr) => {
+                console.log(data);
+            },
+            error: (e) => console.log(e)
+        });
+    }
+
+    function cancelData(result) {
+        console.log('result', result);
+    }
+
+    function showPayment(midtransToken) {
+        snap.pay(midtransToken, {
+            onSuccess: result => {
+                updateData(result);
+            },
+            onPending: result => {
+                updateData(result);
+            },
+            onError: result => {
+                cancelData(result);
+            },
+            onClose: () => {
+                cancelData(result);
+            }
         });
     }
 
@@ -501,6 +604,27 @@
             icon: "error",
             confirmButtonText: 'Ok',
             confirmButtonColor: "#D33",
+        });
+    }
+
+    function showToast(type = 'info', text) {
+        return Swal.fire(
+            text,
+            '',
+            type
+        );
+    }
+
+    fun
+
+    function showImg(urlImg = "", title = 'Notification', footer = '') {
+        return Swal.fire({
+            title: title,
+            imageUrl: urlImg,
+            imageHeight: 400,
+            imageWeight: 400,
+            imageAlt: 'QRCODE',
+            footer: footer
         });
     }
 

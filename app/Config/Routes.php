@@ -41,6 +41,10 @@ $routes->get('/detail_form2', 'Customer::detail_form2');
 $routes->get('/cek_jadwal', 'Customer::jadwal_available');
 $routes->get('/menu', 'Customer::getMenu');
 $routes->post('/api/registration', 'Customer::registrasi');
+$routes->post('/api/get_server_key', 'Customer::get_server_key');
+$routes->post('/api/update_status', 'Customer::update_data_customer_registration');
+$routes->post('/api/getQRByOrderId', 'Customer::get_qr_by_order_id');
+$routes->post('/api/midtrans_notification', 'Customer::midtrans_notification');
 
 $routes->get('detail_form2', 'Customer::detail_form2');
 
@@ -61,6 +65,7 @@ $routes->get('/backoffice/instansi/delete/(:num)', 'backoffice\Instansi::delete_
 $routes->post('/backoffice/instansi/deleting', 'backoffice\Instansi::instansi/doDelete');
 
 $routes->get('/backoffice/registrasi', 'backoffice\Peserta::index');
+$routes->post('/backoffice/registrasi', 'backoffice\Peserta::index');
 $routes->get('/backoffice/peserta/create', 'backoffice\Peserta::create_peserta');
 $routes->get('/backoffice/peserta/save', 'backoffice\Peserta::save_peserta');
 $routes->get('/backoffice/peserta/(:num)', 'backoffice\Peserta::detail_peserta/$1');

@@ -2,10 +2,9 @@
 <?= $this->section('content'); ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-
-    <section class="content mt-3">
+    <section class="content-header">
         <div class="row">
-            <div class="col-12">
+            <div class="col-md-12">
                 <?php
                 if (session()->getFlashdata('success')) {
                 ?>
@@ -22,17 +21,24 @@
                 <?php
                 }
                 ?>
-                <div class="card">
+            </div>
+        </div>
+    </section>
+    <section class="content mt-0">
+        <div class="row">
+            <div class="col-md-6">
+
+                <div class="card card-primary">
                     <div class="card-header">
-                        <h5 class="card-heading"><?= $title; ?></h5>
+                        <h3 class="card-title"><?= $title; ?></h3>
                     </div>
                     <div class="card-body">
                         <form action="<?= base_url('backoffice/dokter/update/' . $id); ?>" method="post" enctype="multipart/form-data">
                             <?= csrf_field(); ?>
                             <input type="hidden" name="img_ttd_old" <?= $data_dokter['img_ttd']; ?>>
                             <div class="form-group row">
-                                <label class="col-3" for="nama">Nama</label>
-                                <div class="col-9">
+                                <label class="col-md-4" for="nama">Nama</label>
+                                <div class="col-md-8">
                                     <input type="text" class="form-control" id="nama" name="nama" required autocomplete="off" placeholder="Nama Dokter" value="<?= $data_dokter['nama']; ?>">
                                     <div class="invalid-feedback">
                                         <?= $validation->getError('nama'); ?>
@@ -40,33 +46,34 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-3" for="phone">No HP</label>
-                                <div class="col-9">
+                                <label class="col-md-4" for="phone">No HP</label>
+                                <div class="col-md-8">
                                     <input type="tel|number" placeholder="No HP" name="phone" id="phone" class="form-control" required value="<?= $data_dokter['phone']; ?>">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-3" for="email">Email</label>
-                                <div class="col-9">
+                                <label class="col-md-4" for="email">Email</label>
+                                <div class="col-md-8">
                                     <input type="email" mode="email" placeholder="Email" name="email" id="email" class="form-control" required autocomplete="off" value="<?= $data_user['email']; ?>">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-3" for="password">Password</label>
-                                <div class="col-9">
-                                    <input type="password" mode="password" placeholder="Password" name="password" id="password" class="form-control" required autocomplete="off">
+                                <label class="col-md-4" for="password">Password</label>
+                                <div class="col-md-8">
+                                    <input type="password" mode="password" placeholder="Password" name="password" id="password" class="form-control" autocomplete="off">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="img_ttd" class="col-3">TTD</label>
-                                <div class="col-9">
+                                <label for="img_ttd" class="col-md-4">TTD</label>
+                                <div class="col-md-8">
                                     <input type="file" name="img_ttd" id="img_ttd" class="form-control" accept="image/*">
                                     <div class="invalid-feedback">
                                         <?= $validation->getError('img_ttd'); ?>
                                     </div>
                                 </div>
-                                <div class="col-9 offset-md-3">
-                                    <img src="<?= base_url('assets/dokter/' . $data_dokter['img_ttd']); ?>" alt="">
+                                <div class="col-md-8 offset-md-4 mt-3">
+                                    <img src="<?= base_url('assets/dokter/' . $data_dokter['img_ttd']); ?>" alt="" width="200" height="200">
+                                    <input type="hidden" name="old_img_ttd" value="<?= $data_dokter['img_ttd']; ?>">
                                 </div>
                             </div>
                             <div class="form-group">
