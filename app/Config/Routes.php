@@ -45,6 +45,7 @@ $routes->post('/api/get_server_key', 'Customer::get_server_key');
 $routes->post('/api/update_status', 'Customer::update_data_customer_registration');
 $routes->post('/api/getQRByOrderId', 'Customer::get_qr_by_order_id');
 $routes->post('/api/midtrans_notification', 'Customer::midtrans_notification');
+// $routes->add('/notification', 'Notification::index');
 
 $routes->get('detail_form2', 'Customer::detail_form2');
 
@@ -124,6 +125,16 @@ $routes->get('/backoffice/lokasi_input', 'backoffice\Lokasi_input::index');
 $routes->get('/backoffice/lokasi_input/(:segment)', 'backoffice\Lokasi_input::$1');
 $routes->get('/backoffice/lokasi_input/(:segment)/(:num)', 'backoffice\Lokasi_input::$1/$2');
 $routes->post('/backoffice/lokasi_input/(:segment)/(:num)', 'backoffice\Lokasi_input::$1/$2');
+
+$routes->get('/backoffice/laporan', 'backoffice\Laporan::index');
+$routes->get('/backoffice/laporan/(:segment)', 'backoffice\Laporan::$1');
+$routes->get('/backoffice/laporan/(:segment)/(:num)', 'backoffice\Laporan::$1/$2');
+$routes->post('/backoffice/laporan/(:segment)/(:num)', 'backoffice\Laporan::$1/$2');
+
+$routes->get('/backoffice/finance', 'backoffice\Finance::index');
+$routes->get('/backoffice/finance/(:segment)', 'backoffice\Finance::$1');
+$routes->get('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finance::$1/$2');
+$routes->post('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finance::$1/$2');
 /**
  * --------------------------------------------------------------------
  * Additional Routing

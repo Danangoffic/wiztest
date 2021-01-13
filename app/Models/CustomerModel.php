@@ -43,6 +43,14 @@ class CustomerModel extends Model
 
     protected $useTimestamps = true;
 
+    public function findCustomerCounter($jenis_layanan = '1', $tgl_kunjungan)
+    {
+        return db_connect()->table('customers')
+            ->select('count(*) as counter')
+            ->where('jenis_layanan', $jenis_layanan)
+            ->where('tgl_kunjungan', $tgl_kunjungan)->get();
+    }
+
     public function getCustomerAvailableByDate($jenis_test, $jenis_pemeriksaan, $jenis_layanan, $faskes_asal = '1', $tgl_kunjungan)
     {
         $query = $this->where([

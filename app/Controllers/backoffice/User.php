@@ -100,6 +100,7 @@ class User extends ResourceController
     public function logout()
     {
         session_destroy();
+        return redirect()->to('backoffice');
     }
 
     public function create()

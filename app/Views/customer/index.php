@@ -615,7 +615,7 @@
         );
     }
 
-    fun
+    // fun
 
     function showImg(urlImg = "", title = 'Notification', footer = '') {
         return Swal.fire({
