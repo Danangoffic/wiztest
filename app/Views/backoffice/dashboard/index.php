@@ -62,7 +62,7 @@
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <table class="table table-bordered table-condensed">
+                            <table class="table table-bordered table-condensed table-sm">
                                 <thead>
                                     <tr>
                                         <th class="text-center">APS</th>
@@ -109,14 +109,103 @@
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <table class="table table-bordered table-condensed">
+                            <table class="table table-bordered table-condensed table-sm">
                                 <thead>
                                     <tr>
                                         <th class="text-center">SEGMEN</th>
                                         <th class="text-center">JUMLAH</th>
                                     </tr>
                                 </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>APS</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>CORPORATE</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>RUJUKAN</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
                             </table>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-bordered table-condensed table-sm">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">RUJUKAN</th>
+                                        <th class="text-center">SAMEDAY</th>
+                                        <th class="text-center">BASIC</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+
+                                    ?>
+                                    <tr>
+                                        <td>SUB TOTAL</td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>TOTAL</td>
+                                        <td colspan="2" class="text-center"><strong></strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="table table-bordered table-condensed table-sm mt-5">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">MARKETING</th>
+                                        <th class="text-center">JUMLAH</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-condensed table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center align-middle" rowspan="2">CORPORATE</th>
+                                            <th class="text-center" colspan="2">WALK IN</th>
+                                            <th class="text-center" colspan="2">HOME SERVICE</th>
+                                            <th class="text-center align-middle" rowspan="2">TOTAL</th>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center ">SAME DAY</td>
+                                            <td class="text-center">BASIC</td>
+                                            <td class="text-center">SAME DAY</td>
+                                            <td class="text-center">BASIC</td>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
                         </div>
                     </div>
                 </div>

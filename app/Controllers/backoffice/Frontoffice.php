@@ -103,8 +103,8 @@ class Frontoffice extends Controller
     public function antrian_swab_walk_in()
     {
         $filterDate = ($this->request->getVar('filterDate')) ? $this->request->getPost('filterDate') : date('Y-m-d');
-        $kuotaSwabSameDay = $this->kuotaModal->findV2('1')->getResultArray();
-        $kuotaSwabBasic = $this->kuotaModal->findV2('2')->getResultArray();
+        $kuotaSwabSameDay = $this->customerModel->findCustomerCounter('1', $filterDate)->getFirstRow();
+        $kuotaSwabBasic =  $this->customerModel->findCustomerCounter('2', $filterDate)->getFirstRow();
         $data = array(
             'title' => "Antrian Swab Walk-In",
             'page' => "antrian_swab_walk_in",
