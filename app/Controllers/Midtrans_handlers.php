@@ -51,55 +51,112 @@ class Midtrans_handlers extends ResourceController
                     'production' => false
                 );
                 $this->midtrans->config($params);
-                $notif = $this->midtrans->status($result->order_id);
+                $NotifMidtrans = $this->midtrans->status($result->order_id);
+                // $NotifMidtrans->getResponse();
+                $transaction = $NotifMidtrans->transaction_status;
+                $type = $NotifMidtrans->payment_type;
+                $order_id = $NotifMidtrans->order_id;
+                $fraud = $NotifMidtrans->fraud_status;
+                $gross_amount = $NotifMidtrans->gross_amount;
+                // $status_code = $NotifMidtrans->status_code;
+                // $this->midtrans->config($params);
+                // $notif = $this->midtrans->status($result->order_id);
                 // $this->notif = $notif;
                 // $notif = $this->notif;
-                return $this->respond($notif);
-                exit();
-                $transaction = $notif['transaction_status'];
-                $type = $notif['payment_type'];
-                $order_id = $notif['order_id'];
-                $fraud = $notif['fraud_status'];
+                // return $this->respond($notif);
+                // exit();
+                // $transaction = $notif['transaction_status'];
+                // $type = $notif['payment_type'];
+                // $order_id = $notif['order_id'];
+                // $fraud = $notif['fraud_status'];
 
                 $responseMessage = "";
                 $responseStatus = "success";
                 $customer_check = $this->CustomerModel->where(['customer_unique' => $order_id])->first();
                 // return $customer_check;
                 if ($customer_check) {
-                    $payemnt_check = $this->PembayaranModel->find($customer_check['id']);
+                    $id_customer = $customer_check['id'];
+                    $payemnt_check = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
+                    // print_r($payemnt_check);
                     if ($payemnt_check) {
+                        $id_pembayaran = $payemnt_check['id'];
                         $arrayCustomerUpdate = array(
                             'status_pembayaran' => $transaction
                         );
                         $arrayPembayaranUpdate = array(
-                            'amount' => $notif->gross_amount,
+                            'amount' => $gross_amount,
                             'jenis_pembayaran' => $type,
                             'status_pembayaran' => $transaction
                         );
-                        $updateCustomer = $this->CustomerModel->update($customer_check['id'], $arrayCustomerUpdate);
-                        $updatePayment = $this->PembayaranModel->update($payemnt_check['id'], $arrayPembayaranUpdate);
+                        $updateCustomer = $this->CustomerModel->update($id_customer, $arrayCustomerUpdate);
+                        $updatePayment = $this->PembayaranModel->update($id_pembayaran, $arrayPembayaranUpdate);
                         if ($updateCustomer && $updatePayment) {
-                            $responseStatus = "success";
-                            $responseMessage = $this->midtrans_report();
+                            $responseStatus = $NotifMidtrans->status_message;
+                            $responseMessage = $NotifMidtrans->status_message;
+                            $arrayReturn = array(
+                                'statusMessage' => $responseStatus,
+                                'responseMessage' => $responseMessage,
+                                'paymentType' => $type,
+                                'orderId' => $order_id,
+                                'transactionStatus' => $transaction,
+                                'detailCustomer' => $customer_check,
+                                'detailPaymentCustomer' => $payemnt_check,
+                                'statusCode' => 200,
+                                'fraud' => $fraud,
+                                'midtrans_response' => $NotifMidtrans
+                            );
+                        } else {
+                            $responseStatus = $NotifMidtrans->status_message;
+                            $responseMessage = "Failed update customer";
+                            $arrayReturn = array(
+                                'statusMessage' => $responseStatus,
+                                'responseMessage' => $responseMessage,
+                                'paymentType' => $type,
+                                'orderId' => $order_id,
+                                'transactionStatus' => $transaction,
+                                'detailCustomer' => $customer_check,
+                                'detailPaymentCustomer' => $payemnt_check,
+                                'statusCode' => 200,
+                                'fraud' => $fraud,
+                                'midtrans_response' => $NotifMidtrans
+                            );
                         }
                     } else {
+                        throw new Exception("Error Processing Request", 1);
+
                         $responseStatus = "failed";
+                        $responseMessage = "Payment check is failed";
+                        $arrayReturn = array(
+                            'statusMessage' => $responseStatus,
+                            'responseMessage' => $responseMessage,
+                            'paymentType' => $type,
+                            'orderId' => $order_id,
+                            'transactionStatus' => $transaction,
+                            'detailCustomer' => $customer_check,
+                            'detailPaymentCustomer' => $payemnt_check,
+                            'statusCode' => 200,
+                            'fraud' => $fraud,
+                            'midtrans_response' => $NotifMidtrans
+                        );
                     }
                 } else {
                     $responseStatus = "failed";
+                    $responseMessage = "Customer check is failed";
+                    $arrayReturn = array(
+                        'statusMessage' => $responseStatus,
+                        'responseMessage' => $responseMessage,
+                        'paymentType' => $type,
+                        'orderId' => $order_id,
+                        'transactionStatus' => $transaction,
+                        'detailCustomer' => $customer_check,
+                        'statusCode' => 200,
+                        'fraud' => $fraud,
+                        'midtrans_response' => $NotifMidtrans
+                    );
                 }
 
 
-                $arrayReturn = array(
-                    'statusMessage' => $responseStatus,
-                    'responseMessage' => $responseMessage,
-                    'paymentType' => $type,
-                    'orderId' => $order_id,
-                    'transactionStatus' => $transaction,
-                    'detailCustomer' => $customer_check,
-                    'detailPaymentCustomer' => $payemnt_check,
-                    'statusCode' => $notif->status_code
-                );
+
                 // $responseNotif = $this->proses_notif($notif);
                 return $this->respond($arrayReturn, 200, 'success');
                 // $notif = $this->veritrans->status($result->order_id);
@@ -181,7 +238,7 @@ class Midtrans_handlers extends ResourceController
      * store response message from midtrans report
      * @return string responseMessage from midtrans status
      */
-    protected function midtrans_report(): string
+    public function midtrans_report(): string
     {
         $responseMessage = "";
         $notif = $this->notif;
@@ -280,5 +337,6 @@ class Midtrans_handlers extends ResourceController
 
     public function redirection_handler()
     {
+        // $name = $this->request->getGet('')
     }
 }

@@ -14,9 +14,7 @@ class PembayaranModel extends Model
 
     protected $allowedFields = [
         'id_customer',
-        'nama',
-        'jenis_test',
-        'nama_test',
+        'amount',
         'jenis_pembayaran',
         'status_pembayaran',
     ];
