@@ -312,6 +312,103 @@ class Customer extends ResourceController
 
     public function update_data_customer_registration()
     {
+        $payment_type = $this->request->getPost('payment_type');
+        $order_id = $this->request->getPost('order_id');
+        $pdf_url = $this->request->getPost('pdf_url');
+        $gross_amount = $this->request->getPost('gross_amount');
+        $transaction_status = $this->request->getPost('transaction_status');
+        $finish_url = $this->request->getPost('finish_url');
+        $transaction_id = $this->request->getPost('transaction_id');
+        $MidtransHandler = new backoffice\Midtrans;
+        $returnArray = array();
+        try {
+            $customerDetail = $this->customerModel->where(['customer_unique' => $order_id])->first();
+            // print_r($customerDetail);
+            // exit();
+            if ($customerDetail) {
+                $id_customer = $customerDetail['id'];
+                $payment_check  = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
+                if ($payment_check) {
+                    $id_payment = $payment_check['id'];
+                    $arrayCustomerUpdate = array(
+                        'status_pembayaran' => $transaction_status,
+                        'url_pdf' => $pdf_url
+                    );
+                    $arrayPembayaranUpdate = array(
+                        'amount' => $gross_amount,
+                        'jenis_pembayaran' => $payment_type,
+                        'status_pembayaran' => $transaction_status
+                    );
+                    $updateCustomer = $this->customerModel->update($id_customer, $arrayCustomerUpdate);
+                    $updatePayment = $this->PembayaranModel->update($id_payment, $arrayPembayaranUpdate);
+
+                    if ($updateCustomer && $updatePayment) {
+                        $get_qr = array();
+                        if ($transaction_status == "settlement" || $transaction_status == "capture") {
+                            $get_qr = $this->get_qr_by_order_id($order_id);
+                        }
+                        $responseStatus = "success";
+                        $midtransStatus = $MidtransHandler->getStatusByOrderId($order_id);
+                        $statusCode = 200;
+                        $newCustomerDetail = $this->customerModel->where(['customer_unique' => $order_id])->first();
+                        $newPaymentDetail = $this->PembayaranModel->update($payment_check['id'], $arrayPembayaranUpdate);
+                        $returnArray = array(
+                            'responseStatus' => $responseStatus,
+                            'responseMessage' => 'success',
+                            'statusMidtrans' => $midtransStatus,
+                            'statusCode' => $statusCode,
+                            'customer_detail' => $newCustomerDetail,
+                            'payment_detail' => $newPaymentDetail,
+                            'qr_detail' => $get_qr,
+                            'finish_url' => $finish_url
+                        );
+                        return $this->respondUpdated($returnArray, 'success');
+                    } else {
+                        $responseStatus = "failed";
+                        $responseMessage = "failed update customer";
+                        $statusCode = 400;
+                        $returnArray = array(
+                            'responseStatus' => $responseStatus,
+                            'responseMessage' => $responseMessage,
+                            'statusCode' => $statusCode,
+                            'finish_url' => $finish_url
+                        );
+                    }
+                } else {
+                    $responseStatus = "failed";
+                    $responseMessage = "failed update customer";
+                    $statusCode = 400;
+                    $returnArray = array(
+                        'responseStatus' => $responseStatus,
+                        'responseMessage' => $responseMessage,
+                        'statusCode' => $statusCode,
+                        'finish_url' => $finish_url
+                    );
+                }
+            } else {
+                $responseStatus = "failed";
+                $responseMessage = "failed update customer";
+                $statusCode = 400;
+                $returnArray = array(
+                    'responseStatus' => $responseStatus,
+                    'responseMessage' => $responseMessage,
+                    'statusCode' => $statusCode,
+                    'finish_url' => $finish_url
+                );
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+            $responseStatus = "failed";
+            $responseMessage = "failed update cause " . $th->getMessage() . ' code : ' . $th->getCode() . ' line : ' . $th->getLine();
+            $statusCode = 500;
+            $returnArray = array(
+                'responseStatus' => $responseStatus,
+                'responseMessage' => $responseMessage,
+                'statusCode' => $statusCode,
+                'finish_url' => $finish_url
+            );
+        }
+        return $this->respond($returnArray, $returnArray['statusCode'], $returnArray['responseMessage']);
     }
 
     public function get_server_key()
@@ -344,10 +441,10 @@ class Customer extends ResourceController
         }
     }
 
-    public function get_qr_by_order_id()
+    public function get_qr_by_order_id($order_id)
     {
         $layananC = new Layanan;
-        $order_id = $this->request->getVar('order_id');
+        // $order_id = $this->request->getVar('order_id');
         try {
             $db_init = db_connect()->table('customers')->select()->where('customer_unique', $order_id)->get();
             $data_customer = $db_init->getResultArray();
@@ -357,18 +454,20 @@ class Customer extends ResourceController
                 $url = base_url('api/hadir/' . base64_encode($id_customer));
                 $qr_url = $layananC->getUrlQRCode($url);
                 $respondData = array(
-                    'statusMessage' => 'success',
+                    'responseMessage' => 'success',
                     'url_img' => $qr_url
                 );
                 return $this->respond($respondData, 200, 'success');
             } else {
                 $respondData = array(
-                    'statusMessage' => 'order id tidak ditemukan'
+                    'responseMessage' => 'not found',
+                    'url_img' => null
                 );
-                return $this->respond($respondData, 401, 'failed');
+                return $this->respond($respondData, 404, 'failed');
             }
         } catch (\Throwable $th) {
             //throw $th;
+            return $this->failServerError();
         }
     }
 

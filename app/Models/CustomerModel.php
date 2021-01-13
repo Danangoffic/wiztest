@@ -38,7 +38,8 @@ class CustomerModel extends Model
         'tgl_kunjungan',
         'status_pembayaran',
         'token',
-        'catatan'
+        'catatan',
+        'url_pdf'
     ];
 
     protected $useTimestamps = true;

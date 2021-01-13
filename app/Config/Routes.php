@@ -46,6 +46,7 @@ $routes->post('/api/update_status', 'Customer::update_data_customer_registration
 $routes->post('/api/getQRByOrderId', 'Customer::get_qr_by_order_id');
 // $routes->post('/api/midtrans_notification', 'Customer::midtrans_notification');
 $routes->add('/api/notification', 'Midtrans_handlers::index');
+$routes->add('/api/redirection-handler', 'Midtrans_handlers::redirection_handler');
 
 $routes->get('detail_form2', 'Customer::detail_form2');
 

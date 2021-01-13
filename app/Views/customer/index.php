@@ -508,18 +508,33 @@
             data: data_object,
             type: 'post',
             success: function(data, status, jqhr) {
-                if (transaction_status != 'pending') {
-                    let urlQR = data.qrcode_url;
+                if (transaction_status == 'settlement' || transaction_status == "capture") {
                     showToast('success', 'Pembayaran berhasil, silahkan tutup untuk cek QR Code Anda').then(result => {
                         if (result.dismiss) {
-                            showImg(urlQR, 'QR Code', 'Order ID : <string>' + order_id + '</strong>');
+                            let qr_detail = data.qr_detail;
+                            if (qr_detail.responseMessage == "success") {
+                                let urlQR = qr_detail.url_img;
+                                showImg(urlQR, 'QR Code', 'Order ID : <string>' + order_id + '</strong>').then(reloadAfterDismiss);
+                            } else {
+                                window.location.reload();
+                            }
                         }
                     });
                 } else if (transaction_status == 'pending') {
-                    showToast('info', 'Silahkan melakukan pembayaran')
+                    showToast('info', 'Silahkan melakukan pembayaran').then(reloadAfterDismiss)
+                } else if (transaction_status == "deny" || transaction_status == "cancel") {
+                    showError('Maaf, pembayaran ditolak').then(reloadAfterDismiss);
+                } else if (transaction_status == "expire") {
+                    showError('Maaf, pembayaran sudah melewati batas waktunya').then(reloadAfterDismiss);
                 }
             }
         })
+    }
+
+    function reloadAfterDismiss(res) {
+        if (res.dismiss) {
+            window.location.reload();
+        }
     }
 
     function get_status_payment_customer(order_id) {
@@ -625,6 +640,8 @@
             imageWeight: 400,
             imageAlt: 'QRCODE',
             footer: footer
+            // type: 'success',
+            // text: "Berhasil M"
         });
     }
 

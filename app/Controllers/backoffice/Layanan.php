@@ -109,6 +109,13 @@ class Layanan extends ResourceController
         return $url;
     }
 
+    public function print_pdf(int $id_customer = 0)
+    {
+        if ($id_customer == 0) {
+            return redirect()->back();
+        }
+    }
+
     /*
     *$value = value of channel to use like url or name
     *$renamingFile = rename file like channel name, url name
