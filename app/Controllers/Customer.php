@@ -164,9 +164,6 @@ class Customer extends ResourceController
                     'phone' => $phone,
                     'Address' => $alamat
                 ),
-                'callbacks' => array(
-                    'finis' => base_url()
-                )
             );
 
 
@@ -189,9 +186,6 @@ class Customer extends ResourceController
             $PembayaranModel = new PembayaranModel();
             $dataInsertPembayaran = [
                 'id_customer' => $insert_id,
-                'nama' => $nama,
-                'jenis_test' => $jenis_test,
-                'nama_test' => $DetailLayananTest['nama_test'],
                 'status_pembayaran' => 'unpaid'
             ];
             $insertPembayaran = $PembayaranModel->insert($dataInsertPembayaran);
