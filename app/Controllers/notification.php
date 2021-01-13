@@ -35,24 +35,89 @@ class Notification extends ResourceController
 
 		// $this->veritrans->config($params);
 		// echo 'test notification handler';
-		$json_result = file_get_contents('php://input');
-		$result = json_decode($json_result);
+		try {
+			$json_result = file_get_contents('php://input');
+			$result = json_decode($json_result);
 
-		if ($result !== null) {
-			$data_key = db_connect()->table('system_parameter')->where(['vgroup' => 'MIDTRANS_KEY', 'parameter' => 'SERVER_KEY'])->get()->getFirstRow();
-			$serverKey = $data_key->value;
-			$params = array(
-				'server_key' => $serverKey,
-				'production' => false
-			);
-			$this->midtrans->config($params);
-			$notif = $this->midtrans->status($result->order_id);
-			$this->notif = $notif;
-			return $this->respond($this->proses_notif(), 200, 'success');
-			// $notif = $this->veritrans->status($result->order_id);
+			if ($result !== null) {
+				$data_key = db_connect()->table('system_parameter')->where(['vgroup' => 'MIDTRANS_KEY', 'parameter' => 'SERVER_KEY'])->get()->getFirstRow();
+
+				/**
+				 * @param string $serverKey is encoded, plase decode with base64_decode to store into midtrans server key configuration
+				 */
+				$serverKey = $data_key->value;
+				$params = array(
+					'server_key' => base64_decode($serverKey),
+					'production' => false
+				);
+				$this->midtrans->config($params);
+				$notif = $this->midtrans->status($result->order_id);
+				// $this->notif = $notif;
+				// $notif = $this->notif;
+				return $this->respond($notif);
+				exit();
+				$transaction = $notif['transaction_status'];
+				$type = $notif['payment_type'];
+				$order_id = $notif['order_id'];
+				$fraud = $notif['fraud_status'];
+
+				$responseMessage = "";
+				$responseStatus = "success";
+				$customer_check = $this->CustomerModel->where(['customer_unique' => $order_id])->first();
+				// return $customer_check;
+				if ($customer_check) {
+					$payemnt_check = $this->PembayaranModel->find($customer_check['id']);
+					if ($payemnt_check) {
+						$arrayCustomerUpdate = array(
+							'status_pembayaran' => $transaction
+						);
+						$arrayPembayaranUpdate = array(
+							'amount' => $notif->gross_amount,
+							'jenis_pembayaran' => $type,
+							'status_pembayaran' => $transaction
+						);
+						$updateCustomer = $this->CustomerModel->update($customer_check['id'], $arrayCustomerUpdate);
+						$updatePayment = $this->PembayaranModel->update($payemnt_check['id'], $arrayPembayaranUpdate);
+						if ($updateCustomer && $updatePayment) {
+							$responseStatus = "success";
+							$responseMessage = $this->midtrans_report();
+						}
+					} else {
+						$responseStatus = "failed";
+					}
+				} else {
+					$responseStatus = "failed";
+				}
+
+
+				$arrayReturn = array(
+					'statusMessage' => $responseStatus,
+					'responseMessage' => $responseMessage,
+					'paymentType' => $type,
+					'orderId' => $order_id,
+					'transactionStatus' => $transaction,
+					'detailCustomer' => $customer_check,
+					'detailPaymentCustomer' => $payemnt_check,
+					'statusCode' => $notif->status_code
+				);
+				// $responseNotif = $this->proses_notif($notif);
+				return $this->respond($arrayReturn, 200, 'success');
+				// $notif = $this->veritrans->status($result->order_id);
+			}
+			// echo "result is null";
+			return $this->respond(array('statusMessage' => 'failed'), 400, 'failed');
+		} catch (\Throwable $th) {
+			//throw $th;
+			return $this->respond(array(
+				'line' => $th->getLine(),
+				'code' => $th->getCode(),
+				'message' => $th->getMessage(),
+				'file' => $th->getFile(),
+				'previous' => $th->getPrevious(),
+				'statusCode' => 500
+				// 'trace' => $th->getTrace()
+			), 500, 'server error');
 		}
-		// echo "result is null";
-		return $this->fail(array('responseMessage' => 'result is null', 'statusMessage' => 'failed'), 400, 'failed');
 	}
 
 	/**
@@ -62,9 +127,9 @@ class Notification extends ResourceController
 	 * 
 	 * @return $arrayReturn
 	 */
-	protected function proses_notif()
+	protected function proses_notif($notif)
 	{
-		$notif = $this->notif;
+		// $notif = $this->notif;
 		$transaction = $notif->transaction_status;
 		$type = $notif->payment_type;
 		$order_id = $notif->order_id;
@@ -73,6 +138,7 @@ class Notification extends ResourceController
 		$responseMessage = "";
 		$responseStatus = "success";
 		$customer_check = $this->CustomerModel->where(['customer_unique' => $order_id])->first();
+		// return $customer_check;
 		if ($customer_check) {
 			$payemnt_check = $this->PembayaranModel->find($customer_check['id']);
 			if ($payemnt_check) {
@@ -187,6 +253,28 @@ class Notification extends ResourceController
 		$emailMessage = view('send_email', array('detail_pembayaran' => $PaymentDetail, 'detail_customer' => $CustomerDetail, 'notif' => $this->notif));
 		$Email->sendMessage($emailMessage);
 		$Email->send();
+	}
+
+	public function load_email(string $order_id)
+	{
+		$data_key = db_connect()->table('system_parameter')->where(['vgroup' => 'MIDTRANS_KEY', 'parameter' => 'SERVER_KEY'])->get()->getFirstRow();
+
+		/**
+		 * @param string $serverKey is encoded, plase decode with base64_decode to store into midtrans server key configuration
+		 */
+		$serverKey = $data_key->value;
+		$params = array(
+			'server_key' => base64_decode($serverKey),
+			'production' => false
+		);
+		$this->midtrans->config($params);
+		$notif = $this->midtrans->status($order_id);
+		$CustomerDetail = $this->CustomerModel->where(['customer_unique' => $order_id])->first();
+		// $emailCustomer = $CustomerDetail['email'];
+		// echo db_connect()->showLastQuery();
+		$PaymentDetail = $this->PembayaranModel->where(['id_customer' => $CustomerDetail['id']])->first();
+		// dd($CustomerDetail);
+		return view('send_email', array('title' => 'Email', 'detail_pembayaran' => $PaymentDetail, 'detail_customer' => $CustomerDetail, 'notif' => $notif));
 	}
 
 
