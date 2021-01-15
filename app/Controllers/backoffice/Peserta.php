@@ -312,8 +312,8 @@ class Peserta extends Controller
             // echo "Urutan : " . $no_urutan;
 
             // var_dump($data);
-            $DataInsertCustomer = [
-                'nama' => $nama,
+            $DataInsertCustomer = array(
+                // 'nama' => $nama,
                 'email' => $email,
                 'nik' => $nik,
                 'phone' => $phone,
@@ -336,7 +336,7 @@ class Peserta extends Controller
                 'jam_kunjungan' => $jam_kunjungan,
                 'tgl_kunjungan' => $tgl_kunjungan,
                 'status_pembayaran' => $this->request->getPost('status_pembayaran')
-            ];
+            );
             $update = $this->customerModel->update($id_customer, $DataInsertCustomer);
             $insert_id = null;
             if ($update) {
@@ -395,6 +395,48 @@ class Peserta extends Controller
         } else {
             // $this->session->setFlashdata('error', 'Gagal update data peserta untuk hadir');
             return redirect()->to('/backoffice/peserta/' . $id_peserta);
+        }
+    }
+
+    public function kehadiran_by_scanning_qr($id_peserta)
+    {
+        $update_peserta_by_qr = $this->updated_by_qr($id_peserta);
+        if ($update_peserta_by_qr == "hadir") {
+            $customerDetail = $this->customerModel->find($id_peserta);
+            $nama_customer = $customerDetail['nama'];
+            $order_id = $customerDetail['customer_unique'];
+            $message = "Tanggal: " . date_format($customerDetail['tgl_kunjungan'], 'd-m-Y') . ", pukul " . date_format($customerDetail['jam_kunjungan'], 'H:i');
+        } else {
+            $message = $update_peserta_by_qr;
+        }
+    }
+
+    public function updated_by_qr($id_peserta)
+    {
+        $customerDetail = $this->customerModel->find($id_peserta);
+        if ($customerDetail) {
+            $statusKehadiran = $customerDetail['kehadiran'];
+            $statusPembayaran = $customerDetail['status_pembayaran'];
+            if ($statusKehadiran == 0 && ($statusPembayaran == 'paid' || $statusPembayaran == 'invoice')) {
+                $dataCustomer = array(
+                    'kehadiran' => '1'
+                );
+                $updateCustomer = $this->customerModel->update($id_peserta, $dataCustomer);
+                $insertDataHadir = array('id_customer' => $id_peserta);
+                $insertKehadiran = db_connect()->table('kehadiran')->insert($insertDataHadir);
+                if ($updateCustomer && $insertKehadiran) {
+                    return "hadir";
+                } else {
+                    $this->session->setFlashdata('error', 'Gagal update data peserta');
+                    return "gagal. peserta tidak ditemukan";
+                }
+            } else if ($statusKehadiran == 1 || $statusKehadiran == "1") {
+                return "sudah hadir";
+                $this->session->setFlashdata('error', 'Peserta belum melakukan pelunasan');
+                // return false;
+            }
+        } else {
+            return "gagal. peserta tidak ditemukan";
         }
     }
 

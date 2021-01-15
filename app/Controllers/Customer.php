@@ -6,14 +6,18 @@ use App\Controllers\backoffice\Layanan;
 use App\Controllers\backoffice\Midtrans as BackofficeMidtrans;
 use App\Controllers\backoffice\SystemParameter;
 use App\Models\CustomerModel;
+use App\Models\HasilLaboratoriumModel;
 use App\Models\KehadiranModel;
 use App\Models\KuotaModel;
 use App\Models\LayananModel;
 use App\Models\LayananTestModel;
 use App\Models\MarketingModel;
 use App\Models\MenuModel;
+use App\Models\PemanggilanModel;
 use App\Models\PembayaranModel;
 use App\Models\PemeriksaanModel;
+use App\Models\SampleModel;
+use App\Models\StatusHasilModel;
 use App\Models\TestModel;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
@@ -506,10 +510,149 @@ class Customer extends ResourceController
         echo $result_encoded;
     }
 
-    public function midtrans_notification()
+    public function check_order_id()
     {
-        $NotifController = new Notification;
-        return $NotifController->index();
+        // $NotifController = new Notification;
+        // return $NotifController->index();
+        $order_id = $this->request->getVar('order_id');
+        $typeSearch = $this->request->getVar('tos');
+        switch ($typeSearch) {
+            case 'hasil':
+                return $this->cari_hasil($order_id);
+                break;
+            case 'registrasi_detail':
+                return $this->cari_registrasi_detail($order_id);
+                break;
+            case 'reschedule':
+                return $this->cari_reshcedule($order_id);
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    public function cari_hasil($order_id)
+    {
+        $laboratoriumModel = new HasilLaboratoriumModel();
+        $layananTestModel = new LayananTestModel();
+        $testModel = new TestModel();
+        $layananModel = new LayananModel();
+        $sampleModel = new SampleModel();
+        $statusHasilModel = new StatusHasilModel();
+        $customer = new CustomerModel();
+
+        try {
+            $detailCustomer = $customer->where(['customer_unique' => $order_id])->first();
+            if (count($detailCustomer) == 0) {
+                return $this->fail('order id tidak ditemukan', 404, 'not found');
+            } else {
+                $id_customer = $detailCustomer['id'];
+                $value = $laboratoriumModel->where(['id_customer' => $id_customer])->first();
+                if (count($value) == 0) {
+                    return $this->failNotFound('Not found');
+                }
+                $result = array();
+                // foreach ($data_laboratorium as $key => $value) {
+                $id_jenis_layanan_test = $detailCustomer['jenis_test'];
+                $detailLayananTest = $layananTestModel->find($id_jenis_layanan_test);
+                $detailTest = $testModel->find($detailLayananTest['id_test']);
+                $detailLayanan = $layananModel->find($detailLayananTest['id_layanan']);
+                $detailSample = $sampleModel->find($value['id_sample']);
+                $statusCov = '';
+                $statusGene = '';
+                $statusOrf = '';
+                $statusIgg = '';
+                $statusIgm = '';
+                $statusKirim = '';
+                if ($value['status_cov'] !== "") {
+                    $detailHasilCov = $statusHasilModel->find($value['status_cov']);
+                    $statusCov = $detailHasilCov['nama_status'];
+                }
+                if ($value['status_gene'] !== "") {
+                    $detailHasilGene = $statusHasilModel->find($value['status_gene']);
+                    $statusGene = $detailHasilGene['nama_status'];
+                }
+                if ($value['status_orf'] !== "") {
+                    $detailHasilOrf = $statusHasilModel->find($value['status_orf']);
+                    $statusOrf = $detailHasilOrf['nama_status'];
+                }
+                if ($value['status_igg'] !== "") {
+                    $detailHasilIgg = $statusHasilModel->find($value['status_igg']);
+                    $statusIgg = $detailHasilIgg['nama_status'];
+                }
+                if ($value['status_igm'] !== "") {
+                    $detailHasilIgm = $statusHasilModel->find($value['status_igm']);
+                    $statusIgm = $detailHasilIgm['nama_status'];
+                }
+                if ($value['status_kirim'] !== "") {
+                    $detailHasilKirim = $statusHasilModel->find($value['status_kirim']);
+                    $statusKirim = $detailHasilKirim['nama_status'];
+                }
+                $ic = $value['detail_ic'];
+                $catatan = $value['catatan'];
+                $paket_pemeriksaan = $detailTest['nama_test'] . "(" . $detailLayanan['nama_layanan'] . ")";
+                $nama_sample = $detailSample['nama_sample'];
+                $result = array(
+                    'id_customer' => $value['id_customer'],
+                    'id_hasil' => $value['id'],
+                    'tgl_kunjungan' => $detailCustomer['tgl_kunjungan'],
+                    'registrasi' => $detailCustomer['customer_unique'] . ' - ' . substr($detailCustomer['created_at'], 0, 10),
+                    'paket_pemeriksaan' => $paket_pemeriksaan,
+                    'nama_customer' => $detailCustomer['nama'],
+                    'nik' => $detailCustomer['nik'],
+                    'waktu_sampling' => substr($value['waktu_ambil_sampling'], 0, 10),
+                    'waktu_periksa' => substr($value['waktu_periksa_sampling'], 0, 10),
+                    'waktu_selesa_periksa' => substr($value['waktu_selesai_periksa'], 0, 10),
+                    'status_cov' => $statusCov,
+                    'status_gene' => $statusGene,
+                    'status_orf' => $statusOrf,
+                    'status_igg' => $statusIgg,
+                    'status_igm' => $statusIgm,
+                    'ic' => $ic,
+                    'nama_sample' => $nama_sample,
+                    'catatan' => $catatan,
+                    'status_kirim' => $statusKirim,
+                    'id_jenis_layanan_test' => $id_jenis_layanan_test
+                );
+                return $this->respond($result, 200, 'success');
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+            return $this->failServerError();
+        }
+
+        // }
+    }
+
+    public function cari_registrasi_detail($order_id)
+    {
+        $PemanggilanModel = new PemanggilanModel();
+        try {
+            $detailCustomer = $this->customerModel->where(['customer_unique' => $order_id])->first();
+
+            if (count($detailCustomer) == 0) {
+
+                return $this->respond('nomor registrasi tidak ditemukan', 404, 'failed');
+            } else {
+                $id_customer = $detailCustomer['id'];
+                $pembayaran = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
+                $arrayResult = array(
+                    'detail_customer' => $detailCustomer,
+                    'detail_pembayaran' => $pembayaran,
+                    // 'detail_antrian' =>
+                );
+                return $this->respond($arrayResult, 200, 'success');
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+            return $this->failServerError();
+        }
+    }
+
+    public function cari_reshcedule($order_id)
+    {
+        # code...
     }
 
     //--------------------------------------------------------------------
