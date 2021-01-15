@@ -10,40 +10,53 @@
             /* margin: 0px; */
         }
 
-        body,
-        p {
-            margin: 0px;
+
+        @media print {
+            @page {
+                margin: 3cm;
+                /* max-height: 15cm;
+                max-width: 20cm; */
+                size: 80mm 80mm;
+            }
+
+            html,
+            body {
+                background-color: black;
+                visibility: hidden;
+            }
+
+            #barcodeTarget {
+                visibility: visible;
+                background-color: white;
+                /* margin: auto; */
+                margin-top: 4cm;
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                display: block;
+            }
         }
     </style>
 </head>
 
 <body>
     <center>
-        <?= $url; ?>
-        <p><?= $detailCustomer['nama']; ?></p>
-        <p><?= $detailCustomer['jenis_kelamin']; ?>/<?= $detailCustomer['tanggal_lahir']; ?></p>
-        <p><?= $detailCustomer['customer_unique']; ?></p>
-        <div id="barcodeTarget"></div>
+        <div id="barcodeTarget">
+            <center>
+                <strong></strong>
+                <img src="<?= $src_image; ?>" alt="">
+            </center>
+        </div>
     </center>
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-    <script src="<?= base_url('assets/jquery-barcode.min.js'); ?>"></script>
+    <!-- <script src="<?= base_url('assets/jquery-barcode.min.js'); ?>"></script> -->
     <script>
         $(window).load(function() {
-            var btype = "code128",
-                value = "<?= $detailCustomer['customer_unique']; ?>;<?= $detailCustomer['nama']; ?>";
-            var settings = {
-                output: "css",
-                bgColor: "#FFFFFF",
-                color: "#000000",
-                barWidth: 1,
-                barHeight: 25,
-                moduleSize: 25,
-                posX: 0,
-                posY: 0,
-                addQuietZone: true,
-                showHRI: false
-            };
-            $("#barcodeTarget").html("").show().barcode(value, btype, settings);
+            let html_img = document.getElementById('barcodeTarget').innerHTML;
+            let a = window;
+            a.print();
         });
     </script>
 </body>

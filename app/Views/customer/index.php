@@ -47,7 +47,34 @@
                     <div class="input-group mb-3">
                         <input type="text" name="noRegistration" class="form-control" id="noRegistration" aria-describedby="noRegistration" placeholder="Masukkan Nomor Registrasi">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="button" id="btnSearchReschedule">Cari</button>
+                            <button class="btn btn-primary" type="button" onclick="return getRescheduleNoRegistration()">Cari</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_cari_hasil" tabindex="-1" aria-labelledby="modal-rescheduleLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-cari-hasilLabel">Reschedule</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="input-group mb-3">
+                        <input type="text" name="noRegistrationHasil" class="form-control" id="noRegistrationHasil" aria-describedby="noRegistrationHasil" placeholder="Masukkan Nomor Registrasi">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button" onclick="return getHasilNoRegistation()">Cari</button>
                         </div>
                     </div>
                 </div>
@@ -75,7 +102,7 @@
                     <div class="input-group mb-3">
                         <input type="text" name="noRegistration2" class="form-control" id="noRegistration2" aria-describedby="noRegistration2" placeholder="Masukkan Nomor Registrasi">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="button" id="btnSearchCheckReg">Cari</button>
+                            <button class="btn btn-primary" type="button" onclick="return getCheckNoRegistration()">Cari</button>
                         </div>
                     </div>
 
@@ -208,6 +235,7 @@
     $(document).ready(() => {
         getMenu();
         document.getElementById('registrasi').addEventListener('click', registrasi, false);
+        document.getElementById('btnSearchCheckReg').addEventListener('click', getCheckNoRegistration, false);
         // document.getElementById('nextPageForm').addEventListener('click', toggleForm, false);
         // document.getElementById('backPageForm').addEventListener('click', toggleForm, false);
         $("#tgl_kunjungan").change(() => {
@@ -647,6 +675,93 @@
 
     function formatNumber(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function check_no_reg(order_id, tos) {
+        let url = "<?= base_url('api/check_no_reg'); ?>";
+        var requestData = $.ajax({
+            url,
+            type: "GET",
+            data: {
+                order_id,
+                tos
+            },
+            success: success_check_no_reg
+        });
+        return requestData;
+    }
+
+    function success_check_no_reg(data, status = "success", xhr) {
+
+    }
+
+    function getCheckNoRegistration() {
+        let order_id = $("#noRegistrationHasil").val();
+        if (order_id != "") {
+            let url = "<?= base_url('api/check_no_reg'); ?>";
+            // $("#noRegistration2").hide();
+            return check_no_reg(order_id, "registrasi_detail");
+            // $.ajax({
+            //     url,
+            //     type: "GET",
+            //     data: {
+            //         order_id,
+            //         tos: "registrasi_detail"
+            //     },
+            //     success: function(data, status, xhr) {
+
+            //     }
+            // });
+        }
+    }
+
+    function getHasilNoRegistation() {
+        let order_id = $("#noRegistration2").val();
+        if (order_id != "") {
+            let url = "<?= base_url('api/check_no_reg'); ?>";
+            // $("#noRegistration2").hide();
+            $.ajax({
+                url,
+                type: "GET",
+                data: {
+                    order_id,
+                    tos: "hasil"
+                },
+                success: function(data, status, xhr) {
+                    console.table(data);
+                    if (status == "ok") {
+                        let status_cov = data.status_cov,
+                            status_gen = data.status_gen,
+                            status_orf = data.status_orf,
+                            status_igg = data.status_igg,
+                            status_igm = data.status_igm,
+                            paket_pemeriksaan = data.paket_pemeriksaan,
+                            nama_customer = data.nama_customer,
+                            nik = data.nik,
+                            tgl_kunjungan = data.tgl_kunjungan;
+                    }
+                }
+            });
+        }
+    }
+
+    function getRescheduleNoRegistration() {
+        let order_id = $("#noRegistration").val();
+        if (order_id != "") {
+            let url = "<?= base_url('api/check_no_reg'); ?>";
+            // $("#noRegistration2").hide();
+            $.ajax({
+                url,
+                type: "GET",
+                data: {
+                    order_id,
+                    tos: "reschedule"
+                },
+                success: function(data, status, xhr) {
+
+                }
+            });
+        }
     }
 </script>
 <?= $this->endSection(); ?>

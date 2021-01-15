@@ -44,6 +44,7 @@ $routes->post('/api/registration', 'Customer::registrasi');
 $routes->post('/api/get_server_key', 'Customer::get_server_key');
 $routes->post('/api/update_status', 'Customer::update_data_customer_registration');
 $routes->post('/api/getQRByOrderId', 'Customer::get_qr_by_order_id');
+$routes->get('/api/hadir/(:num)', 'backoffice\Peserta::kehadiran_by_scanning_qr/$1');
 // $routes->post('/api/midtrans_notification', 'Customer::midtrans_notification');
 $routes->add('/api/notification', 'Midtrans_handlers::index');
 $routes->add('/api/redirection-handler', 'Midtrans_handlers::redirection_handler');
@@ -53,7 +54,7 @@ $routes->get('detail_form2', 'Customer::detail_form2');
 
 // $routes->get('/backoffice/peserta/edit/(:num)', 'backoffice\Registrasi::edit_peserta/$1');
 
-$routes->get('/backoffice/print/barcode/(:num)', 'backoffice\Layanan::print_barcode/$1');
+$routes->get('/backoffice/print/barcode/(:any)', 'backoffice\Layanan::printbarcode/$1');
 $routes->get('/backoffice/print/qrcode/(:num)', 'backoffice\Layanan::print_qrcode/$1');
 $routes->get('/backoffice/print/pdf/(:num)', 'backoffice\Layanan::print_pdf/$1');
 
@@ -136,6 +137,17 @@ $routes->get('/backoffice/finance', 'backoffice\Finance::index');
 $routes->get('/backoffice/finance/(:segment)', 'backoffice\Finance::$1');
 $routes->get('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finance::$1/$2');
 $routes->post('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finance::$1/$2');
+
+$routes->get('/backoffice/gudang', 'backoffice\Gudang::index');
+$routes->get('/backoffice/gudang/(:num)', 'backoffice\Gudang::detail/$1');
+$routes->get('/backoffice/gudang/(:segment)', 'backoffice\Gudang::$1');
+$routes->get('/backoffice/gudang/(:segment)/(:num)', 'backoffice\Gudang::$1/$2');
+$routes->post('/backoffice/gudang/(:segment)/(:num)', 'backoffice\Gudang::$1/$2');
+
+$routes->get('/backoffice/kategori_gudang', 'backoffice\Kategori_gudang::index');
+$routes->get('/backoffice/kategori_gudang/(:segment)', 'backoffice\Kategori_gudang::$1');
+$routes->get('/backoffice/kategori_gudang/(:segment)/(:num)', 'backoffice\Kategori_gudang::$1/$2');
+$routes->post('/backoffice/kategori_gudang/(:segment)/(:num)', 'backoffice\Kategori_gudang::$1/$2');
 /**
  * --------------------------------------------------------------------
  * Additional Routing

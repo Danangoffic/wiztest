@@ -2,7 +2,10 @@
 
 namespace App\Controllers;
 // use App\Controllers\BaseController;
+
+use App\Controllers\backoffice\Layanan;
 use App\Models\CustomerModel;
+use App\Models\PemanggilanModel;
 use App\Models\PembayaranModel;
 use CodeIgniter\Controller;
 use CodeIgniter\Email\Email;
@@ -32,7 +35,7 @@ class Midtrans_handlers extends ResourceController
 
     public function index()
     {
-
+        $PemanggilanModel = new PemanggilanModel();
         // $this->veritrans->config($params);
         // echo 'test notification handler';
         try {
@@ -76,6 +79,9 @@ class Midtrans_handlers extends ResourceController
                 // return $customer_check;
                 if ($customer_check) {
                     $id_customer = $customer_check['id'];
+                    $id_layanan_test = $customer_check['jenis_test'];
+                    $tgl_kunjungan = $customer_check['tgl_kunjungan'];
+                    $jam_kunjungan = $customer_check['jam_kunjungan'];
                     $payemnt_check = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
                     // print_r($payemnt_check);
                     if ($payemnt_check) {
@@ -88,9 +94,21 @@ class Midtrans_handlers extends ResourceController
                             'jenis_pembayaran' => $type,
                             'status_pembayaran' => $transaction
                         );
+                        $arrayInsertPemanggilan = array(
+                            'id_customer' => $id_customer,
+                            'id_layanan_test' => $id_layanan_test,
+                            'stataus_pemanggilan' => '11',
+                            'tgl_kunjungan' => $tgl_kunjungan,
+                            'jam_kunjungan' => $jam_kunjungan
+                        );
+
                         $updateCustomer = $this->CustomerModel->update($id_customer, $arrayCustomerUpdate);
                         $updatePayment = $this->PembayaranModel->update($id_pembayaran, $arrayPembayaranUpdate);
-                        if ($updateCustomer && $updatePayment) {
+                        $createPemanggilanCustomer = $PemanggilanModel->insert($arrayInsertPemanggilan);
+
+                        if ($updateCustomer && $updatePayment && $createPemanggilanCustomer) {
+
+
                             $responseStatus = $NotifMidtrans->status_message;
                             $responseMessage = $NotifMidtrans->status_message;
                             $arrayReturn = array(
@@ -105,6 +123,7 @@ class Midtrans_handlers extends ResourceController
                                 'fraud' => $fraud,
                                 'midtrans_response' => $NotifMidtrans
                             );
+                            $this->sendEmailCustomer($order_id, $midtrans_response);
                         } else {
                             $responseStatus = $NotifMidtrans->status_message;
                             $responseMessage = "Failed update customer";
@@ -122,7 +141,6 @@ class Midtrans_handlers extends ResourceController
                             );
                         }
                     } else {
-                        throw new Exception("Error Processing Request", 1);
 
                         $responseStatus = "failed";
                         $responseMessage = "Payment check is failed";
@@ -197,7 +215,7 @@ class Midtrans_handlers extends ResourceController
         $customer_check = $this->CustomerModel->where(['customer_unique' => $order_id])->first();
         // return $customer_check;
         if ($customer_check) {
-            $payemnt_check = $this->PembayaranModel->find($customer_check['id']);
+            $payemnt_check = $this->PembayaranModel->where(['id_customer' => $customer_check['id']]);
             if ($payemnt_check) {
                 $arrayCustomerUpdate = array(
                     'status_pembayaran' => $transaction
@@ -280,10 +298,11 @@ class Midtrans_handlers extends ResourceController
      * Send email to customer user 
      * 
      */
-    protected function sendEmailCustomer(string $order_id)
+    protected function sendEmailCustomer(string $order_id, $midtrans_response)
     {
         # code...
         $Email = \Config\Services::email();
+        $Layanan = new Layanan;
         $config["protocol"] = "smtp";
 
         //isi sesuai nama domain/mail server
@@ -301,14 +320,17 @@ class Midtrans_handlers extends ResourceController
 
         $CustomerDetail = $this->CustomerModel->where(['customer_unique' => $order_id])->first();
         $emailCustomer = $CustomerDetail['email'];
+        $id_customer = $CustomerDetail['id'];
+        $nama_customer = $CustomerDetail['nama'];
 
-        $Email->setFrom('info@quicktest.id', 'QuickTest.id INFO');
+        $Email->setFrom('info@danang.xyz', 'QuickTest.id INFO');
         $Email->setTo($emailCustomer);
-        $Email->setSubject("Payment Info Dari Pendaftaran Melalui Quictest.id");
-        $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $CustomerDetail['id']])->first();
+        $Email->setSubject("Informasi Pembayaran Dari Pendaftaran Test Melalui Quictest.id");
+        $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
 
-        $emailMessage = view('send_email', array('detail_pembayaran' => $PaymentDetail, 'detail_customer' => $CustomerDetail, 'notif' => $this->notif));
+        $emailMessage = view('send_email', array('detail_pembayaran' => $PaymentDetail, 'detail_customer' => $CustomerDetail, 'notif' => $midtrans_response, 'title' => 'Informasi Pembayaran'));
         $Email->sendMessage($emailMessage);
+        $Email->attach($Layanan->getImageQRCode(base_url('api/hadir/' . $id_customer), $nama_customer));
         $Email->send();
     }
 
