@@ -301,22 +301,24 @@ class Midtrans_handlers extends ResourceController
     protected function sendEmailCustomer(string $order_id, $midtrans_response)
     {
         # code...
-        $Email = \Config\Services::email();
+
         $Layanan = new Layanan;
-        $config["protocol"] = "smtp";
+        // $config["protocol"] = "smtp";
 
-        //isi sesuai nama domain/mail server
-        $config["SMTPHost"]  = "danangoffic.xyz";
+        // //isi sesuai nama domain/mail server
+        // $config["SMTPHost"]  = "mail.danangoffic.xyz";
 
-        //alamat email SMTP
-        $config["SMTPUser"]  = "info@danangoffic.xyz";
+        // //alamat email SMTP
+        // $config["SMTPUser"]  = "info@danangoffic.xyz";
 
-        //password email SMTP
-        $config["SMTPPass"]  = "info123";
+        // //password email SMTP
+        // $config["SMTPPass"]  = "infoDanang123";
 
-        $config["SMTPPort"]  = 465;
-        $config["SMTPCrypto"] = "ssl";
-        $Email->initialize($config);
+        // $config["SMTPPort"]  = 465;
+        // $config["SMTPCrypto"] = "ssl";
+        $Email = \Config\Services::email();
+
+        // $Email->initialize($config);
 
         $CustomerDetail = $this->CustomerModel->where(['customer_unique' => $order_id])->first();
         $emailCustomer = $CustomerDetail['email'];
@@ -324,14 +326,26 @@ class Midtrans_handlers extends ResourceController
         $nama_customer = $CustomerDetail['nama'];
 
         $Email->setFrom('info@danang.xyz', 'QuickTest.id INFO');
+        // $Email->setTo($emailCustomer);
+        // $Email->setFrom('johndoe@gmail.com', 'Confirm Registration');
+
+        // $Email->setSubject($subject);
+        // $Email->setMessage($message);
+
+
         $Email->setTo($emailCustomer);
         $Email->setSubject("Informasi Pembayaran Dari Pendaftaran Test Melalui Quictest.id");
         $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
 
         $emailMessage = view('send_email', array('detail_pembayaran' => $PaymentDetail, 'detail_customer' => $CustomerDetail, 'notif' => $midtrans_response, 'title' => 'Informasi Pembayaran'));
-        $Email->sendMessage($emailMessage);
+        $Email->setMessage($emailMessage);
         $Email->attach($Layanan->getImageQRCode(base_url('api/hadir/' . $id_customer), $nama_customer));
-        $Email->send();
+        if ($$Email->send()) {
+            echo "Email successfully sent";
+        } else {
+            $data = $email->printDebugger(['headers']);
+            print_r($data);
+        }
     }
 
     public function load_email(string $order_id)
