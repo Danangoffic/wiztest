@@ -285,7 +285,9 @@
 
     function getDetailForm2(id_jenis_test) {
         $.get('<?= base_url('detail_form2'); ?>', {
-            id_jenis_test: id_jenis_test
+            id_jenis_test: id_jenis_test,
+            id_pemeriksaan: 1,
+            segmen: 1
         }).then(e => {
             var jp = '';
             $.each(e.data_layanan, (i, v) => {
