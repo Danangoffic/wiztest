@@ -137,11 +137,11 @@ class Customer extends ResourceController
                 'instansi' => $instansi,
                 'status_test' => 'menunggu',
                 'tahap' => 1,
-                'kehadiran' => '0',
+                'kehadiran' => '22',
                 'no_antrian' => $no_urutan,
                 'jam_kunjungan' => $jam_kunjungan,
                 'tgl_kunjungan' => $tgl_kunjungan,
-                'status_pembayaran' => 'unpaid'
+                'status_pembayaran' => 'pending'
             ];
             $insert = $this->customerModel->insert($DataInsertCustomer);
             $insert_id = null;

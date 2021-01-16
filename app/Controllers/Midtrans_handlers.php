@@ -375,4 +375,29 @@ class Midtrans_handlers extends ResourceController
     {
         // $name = $this->request->getGet('')
     }
+
+
+    public function CobaSendEmail(string $nama)
+    {
+        # code...
+
+        $Layanan = new Layanan;
+        // $config["protocol"] = "smtp"
+
+        $Email = \Config\Services::email();
+        $Email->setFrom('info@danang.xyz', 'QuickTest.id INFO');
+
+        $Email->setTo("darifrahmanda@gmail.com");
+        $Email->setSubject("Informasi Pembayaran Dari Pendaftaran Test Melalui Quictest.id");
+
+        $emailMessage = view('test_send_email', array('title' => 'Informasi Pembayaran', 'nama' => $nama, 'layanan' => $Layanan));
+        $Email->setMessage($emailMessage);
+        // $Email->attach($Layanan->getImageQRCode(base_url('api/hadir/danang-arif-rahmanda'), "danang_arif_rahmanda.png"));
+        if ($Email->send()) {
+            echo "Email successfully sent";
+        } else {
+            $data = $Email->printDebugger(['headers']);
+            print_r($data);
+        }
+    }
 }
