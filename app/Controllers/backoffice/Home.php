@@ -2,6 +2,7 @@
 
 namespace App\Controllers\backoffice;
 
+use App\Models\CustomerModel;
 use App\Models\KehadiranModel;
 use App\Models\LayananModel;
 use App\Models\PemeriksaanModel;
@@ -15,12 +16,14 @@ class Home extends Controller
     protected $kehadiranModel;
     protected $layananModel;
     protected $pemeriksaanModel;
+    protected $customersModel;
     public function __construct()
     {
         $this->session = session();
         $this->kehadiranModel = new KehadiranModel();
         $this->layananModel = new LayananModel();
         $this->pemeriksaanModel = new PemeriksaanModel();
+        $this->customersModel = new CustomerModel();
     }
     public function index()
     {
@@ -32,7 +35,12 @@ class Home extends Controller
         $date1 = $this->request->getPost('date1') ? $this->request->getPost('date1') : $date_now;
         $date2 = $this->request->getPost('date2') ? $this->request->getPost('date2') : $date_now;
         $JenisLayanan = $this->layananModel->findAll();
-        $JenisPemeriksaan = $this->pemeriksaanModel->findAll();
+        $JenisPemeriksaan = $this->pemeriksaanModel->whereInSelection('nama_pemeriksaan', ['WALK IN', 'HOME SERVICE'])->getResultArray();
+
+        $data_customers_walkin_sameday_with_filtering = $this->customersModel->customer_jenis_test_filtering_date_between("count(*) as total_walkin_sameday_swab", '1', $date1, $date2);
+        $data_customers_walkin_basic_with_filtering = $this->customersModel->customer_jenis_test_filtering_date_between("count(*) as total_walkin_basic_swab", '2', $date1, $date2);
+        $data_customers_homeservice_basic_with_filtering = $this->customersModel->customer_jenis_test_filtering_date_between('2', $date1, $date2);
+        // $data_aps_
 
         // dd($this->session->get('nama'));
         $data = [

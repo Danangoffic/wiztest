@@ -75,7 +75,7 @@
                                     $subSameDay = 0;
                                     $subBasic = 0;
                                     $totalAll = 0;
-                                    foreach ($jenis_layanan as $key => $value) {
+                                    foreach ($jenis_pemeriksaan as $key => $value) {
                                         $dataSameDayCustomer = $kehadiran_model->getFilterByDateLayanan($date1, $date2, $key['id'], '1');
                                         $dataBasicCustomer = $kehadiran_model->getFilterByDateLayanan($date1, $date2, $key['id'], '2');
                                         $totalSameDay = ($dataSameDayCustomer) ? count($dataSameDayCustomer) : 0;
@@ -197,7 +197,6 @@
                                             <td class="text-center">BASIC</td>
                                             <td class="text-center">SAME DAY</td>
                                             <td class="text-center">BASIC</td>
-
                                         </tr>
                                     </thead>
                                     <tbody>
