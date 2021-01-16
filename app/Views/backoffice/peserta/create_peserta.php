@@ -3,10 +3,9 @@
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 
-    <section class="content-header mb-0"></section>
-    <section class="content mt-0">
+    <section class="content-header mb-0">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <?php
                 if (session()->getFlashdata('success')) {
                 ?>
@@ -23,12 +22,19 @@
                 <?php
                 }
                 ?>
+            </div>
+        </div>
+    </section>
+    <section class="content mt-0">
+        <div class="row">
+            <div class="col-md-6">
                 <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title"><?= $title; ?></h3>
                     </div>
                     <div class="card-body row">
                         <form action="save" method="post" class="col-md-12">
+                            <input type="hidden" name="status_peserta" value="20">
                             <div class="form-group row">
                                 <label for="tgl_kunjungan" class="col-md-3 mt-2">Waktu Kunjungan <span class="text-danger">*</span></label>
                                 <div class="col-md-5 mt-2">

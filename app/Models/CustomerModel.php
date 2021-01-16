@@ -19,6 +19,7 @@ class CustomerModel extends Model
         'faskes_asal',
         'customer_unique',
         'invoice_number',
+        'status_peserta',
         'email',
         'nama',
         'nik',
@@ -52,10 +53,10 @@ class CustomerModel extends Model
         return $this->db_this->table($this->table);
     }
 
-    public function customer_jenis_test_filtering_date_between($select = "*", $id_jenis_test, $date1, $date2)
+    public function customer_jenis_test_filtering_date_between($select = "*", $id_jenis_test, $id_jenis_layanan, $date1, $date2)
     {
-        $query = $this->db_this()->query("select {$select} from {$this->table} where jenis_test = '{$id_jenis_test}' AND tgl_kunjungan BETWEEH '{$date1}' AND '{$date2}'");
-        return $query->getResultArray();
+        $query = $this->db_this()->query("select {$select} from {$this->table} where jenis_test = '{$id_jenis_test}' AND jenis_layanan = '{$id_jenis_layanan}' AND tgl_kunjungan BETWEEN '{$date1}' AND '{$date2}'");
+        return $query->getFirstRow();
     }
 
 

@@ -107,8 +107,8 @@
                     <div class="card-header">
                         <h3 class="card-title">Data Peserta</h3>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
+                    <div class="card-body p-0">
+                        <div class="table-responsive mb-0">
                             <table class="table table-bordered table-condensed">
                                 <thead>
                                     <tr>
@@ -130,6 +130,8 @@
                                     <tr>
                                         <?php
                                         $jam_kunjungan = substr($data_customer->jam_kunjungan, 0, 5);
+                                        $getStatus = $status_hadir->find($data_customer->kehadiran);
+                                        $status_kehadiran = $getStatus['nama_status'];
                                         ?>
                                         <td><?= $data_customer->customer_unique; ?></td>
                                         <td><?= $data_customer->tgl_kunjungan . ', ' . $jam_kunjungan; ?></td>
@@ -141,7 +143,7 @@
                                         <td><?= $data_customer->tanggal_lahir; ?></td>
                                         <td><?= $data_customer->phone; ?></td>
                                         <td><?= $transactionStatus; ?></td>
-                                        <td><?= ($data_customer->kehadiran == 0 || $data_customer->kehadiran == "0") ? "Belum Hadir" : "Hadir"; ?></td>
+                                        <td><?= $status_kehadiran; ?></td>
                                         <td width="10%">
                                             <a href="<?= base_url('backoffice/layanan/printbarcode/' . base64_encode($data_customer->id)); ?>" class="btn btn-primary btn-sm mt-2" id="print_barcode">Barcode</a>
                                             <a href="<?= base_url('backoffice/peserta/edit/' . $data_customer->id); ?>" class="btn btn-primary btn-sm mt-2" id="edit">Edit</a>

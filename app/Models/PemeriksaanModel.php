@@ -25,7 +25,7 @@ class PemeriksaanModel extends Model
 
     public function whereInSelection($col, $val)
     {
-        return $this->this_db_table->whereIn($col, $val)->get();
+        return $this->this_db_table()->whereIn($col, $val)->orderBy('id', 'ASC')->get();
     }
 
     public function this_db_table($select = false)

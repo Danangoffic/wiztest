@@ -56,7 +56,7 @@
                 <div class="col-12">
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Data Registrasi</h3>
+                            <h3 class="card-title">Data <?= $title; ?></h3>
                         </div>
                         <div class="card-body">
                             <a href="<?= base_url('backoffice/peserta/create'); ?>" class="btn btn-primary mb-3">Tambah Peserta</a>
@@ -98,7 +98,9 @@
                                             $create_tgl_lahir = date_create($key['tgl_lahir']);
                                             $tgl_registrasi = date_format($create_tgl_registrasi, 'd-m-Y');
                                             $tgl_lahir = date_format($create_tgl_lahir, 'd-m-Y');
-                                            $status_hadir = ($value['kehadiran'] == '0') ? "Belum Hadir" : "Hadir";
+                                            $getStatus = db_connect()->table('status_hasil')->where('id', $value['kehadiran'])->get()->getFirstRow();
+                                            // $detail_status_hadir = $status_hadir->find($value['kehadiran']);
+                                            $status_hadir = ucwords($getStatus->nama_status);
                                         ?>
                                             <tr>
                                                 <td><?= $no; ?></td>
