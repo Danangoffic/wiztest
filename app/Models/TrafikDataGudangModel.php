@@ -4,16 +4,18 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class PemeriksaanModel extends Model
+class TrafikDataGudangModel extends Model
 {
-    protected $table      = 'jenis_pemeriksaan';
+    protected $table      = 'data_trafik_gudang';
     // protected $primaryKey = 'id';
 
     // protected $returnType     = 'array';
     // protected $useSoftDeletes = true;
 
     protected $allowedFields = [
-        'nama_pemeriksaan',
+        'id_barang_gudang',
+        'id_peminjaman',
+        'qty',
         'created_by',
         'updated_by'
     ];
@@ -22,16 +24,4 @@ class PemeriksaanModel extends Model
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at';
-
-    public function whereInSelection($col, $val)
-    {
-        return $this->this_db_table->whereIn($col, $val)->get();
-    }
-
-    public function this_db_table($select = false)
-    {
-        $db_this = db_connect()->table($this->table);
-        if ($select) $db_this->select($select);
-        return $db_this;
-    }
 }

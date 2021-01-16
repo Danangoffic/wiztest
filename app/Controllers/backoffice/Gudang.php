@@ -234,4 +234,56 @@ class Gudang extends Controller
     {
         # code...
     }
+
+
+
+
+    public function keluar_barang()
+    {
+        // session_destroy();
+        if (!$this->session->has('logged_in')) {
+            return redirect()->to('/backoffice/login');
+        }
+        $data = array(
+            'title' => 'Trace Barang Keluar',
+            'page' => 'gudang',
+            'barang' => $this->gudangModel->findAll(),
+            'statusModel' => $this->statusModel,
+            'kategori' => $this->kategoriBarangModel,
+            // 'gudang' => $this->gudangModel,
+            'validation' => \Config\Services::validation(),
+            'session' => session()
+        );
+        // dd($this->session->get('nama'));
+        return view('backoffice/gudang/pinjam/keluar_barang', $data);
+    }
+
+    public function save_keluar_barang()
+    {
+        # code...
+    }
+
+    public function masuk_barang()
+    {
+        // session_destroy();
+        if (!$this->session->has('logged_in')) {
+            return redirect()->to('/backoffice/login');
+        }
+        $data = array(
+            'title' => 'Tambah Data Gudang',
+            'page' => 'gudang',
+            'statusModel' => $this->statusModel,
+            'kategori' => $this->kategoriBarangModel,
+            // 'gudang' => $this->gudangModel,
+            'validation' => \Config\Services::validation(),
+            'session' => session()
+        );
+        // dd($this->session->get('nama'));
+        return view('backoffice/pinjam/masuk_barang', $data);
+    }
+
+    public function save_masuk_barang()
+    {
+        # code...
+    }
 }

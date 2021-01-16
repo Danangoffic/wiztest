@@ -42,6 +42,24 @@ class CustomerModel extends Model
         'url_pdf'
     ];
 
+    public function db_this()
+    {
+        return db_connect();
+    }
+
+    public function db_table()
+    {
+        return $this->db_this->table($this->table);
+    }
+
+    public function customer_jenis_test_filtering_date_between($select = "*", $id_jenis_test, $date1, $date2)
+    {
+        $query = $this->db_this()->query("select {$select} from {$this->table} where jenis_test = '{$id_jenis_test}' AND tgl_kunjungan BETWEEH '{$date1}' AND '{$date2}'");
+        return $query->getResultArray();
+    }
+
+
+
     protected $useTimestamps = true;
 
     public function findCustomerCounter($jenis_layanan = '1', $tgl_kunjungan)
