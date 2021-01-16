@@ -272,9 +272,11 @@ class Customer extends ResourceController
     {
 
         $id_jenis_test = $this->request->getVar('id_jenis_test');
+        $id_pemeriksaan = $this->request->getVar('id_pemeriksaan');
+        $segmen = $this->request->getVar('segmen');
         try {
             $LayananModel = new LayananTestModel();
-            $dataLayanan = $LayananModel->getDetailLayananTestByIdJenisTest($id_jenis_test)->getResultArray();
+            $dataLayanan = $LayananModel->getDetailLayananTestByIdJenisTest($id_jenis_test, $id_pemeriksaan, $segmen)->getResultArray();
             $result = ['data_layanan' => $dataLayanan];
             if ($dataLayanan) {
                 return $this->respond($result, 200, 'success');

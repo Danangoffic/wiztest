@@ -24,13 +24,15 @@ class LayananTestModel extends Model
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at';
-    public function getDetailLayananTestByIdJenisTest($id_jenis_test)
+    public function getDetailLayananTestByIdJenisTest($id_jenis_test, $pemeriksaan, $segmen)
     {
         $builderDB = db_connect();
         $query = $builderDB->table('data_layanan_test a')->select('a.id, a.biaya, a.time_start, a.time_end, b.nama_layanan, c.nama_test')
             ->join('jenis_layanan b', 'b.id = a.id_layanan')
             ->join('jenis_test c', 'c.id = a.id_test')
-            ->where('a.id_test', $id_jenis_test);
+            ->where('a.id_test', $id_jenis_test)
+            ->where('a.id_pemeriksaan', $pemeriksaan)
+            ->where("a.id_segmen", $segmen);
         return $query->get();
     }
 
