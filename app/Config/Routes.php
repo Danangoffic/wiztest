@@ -32,7 +32,7 @@ $routes->setAutoRoute(true);
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->get('/', 'Customer::index');
-$routes->get('/backoffice', 'backoffice\Home::index');
+$routes->add('/backoffice', 'backoffice\Home::index');
 $routes->get('/backoffice/login', 'backoffice\User::login');
 $routes->post('/backoffice/login', 'backoffice\User::doLogin');
 $routes->get('/backoffice/user', 'backoffice\User::detailById');
@@ -67,10 +67,10 @@ $routes->post('/backoffice/instansi/update/(:num)', 'backoffice\Instansi::update
 $routes->get('/backoffice/instansi/delete/(:num)', 'backoffice\Instansi::delete_instansi/$1');
 $routes->post('/backoffice/instansi/deleting', 'backoffice\Instansi::instansi/doDelete');
 
-$routes->get('/backoffice/registrasi', 'backoffice\Peserta::index');
-$routes->post('/backoffice/registrasi', 'backoffice\Peserta::index');
+$routes->add('/backoffice/registrasi', 'backoffice\Peserta::index');
+// $routes->post('/backoffice/registrasi', 'backoffice\Peserta::index');
 $routes->get('/backoffice/peserta/create', 'backoffice\Peserta::create_peserta');
-$routes->get('/backoffice/peserta/save', 'backoffice\Peserta::save_peserta');
+$routes->post('/backoffice/peserta/save', 'backoffice\Peserta::save_peserta');
 $routes->get('/backoffice/peserta/(:num)', 'backoffice\Peserta::detail_peserta/$1');
 $routes->get('/backoffice/peserta/hapus/(:num)', 'backoffice\Registrasi::hapus_peserta/$1');
 // $routes->get('/backoffice/peserta/edit/(:num)', 'backoffice\Peserta::edit/$1');

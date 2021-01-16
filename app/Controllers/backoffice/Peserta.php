@@ -12,6 +12,7 @@ use App\Models\LayananTestModel;
 use App\Models\MarketingModel;
 use App\Models\PemeriksaanModel;
 use App\Models\PemeriksaModel;
+use App\Models\StatusHasilModel;
 use App\Models\TestModel;
 use CodeIgniter\Controller;
 use CodeIgniter\Validation\Validation;
@@ -33,7 +34,7 @@ class Peserta extends Controller
     public $layananModel;
     public $pemeriksaModel;
     public $customerPublic;
-
+    public $statusHadir;
     public function __construct()
     {
         $this->session = session();
@@ -47,6 +48,7 @@ class Peserta extends Controller
         $this->testModel = new TestModel();
         $this->layananModel = new LayananModel();
         $this->customerPublic = new Customer;
+        $this->statusHadir = new StatusHasilModel();
     }
     public function index()
     {
@@ -71,7 +73,7 @@ class Peserta extends Controller
             $Customer = db_connect()->table('customers')->select()->orderBy('id', 'DESC')->get()->getResultArray();
         }
         $data = array(
-            'title' => "Registrasi",
+            'title' => "Registrasi 123",
             'page' => "registrasi",
             'data_customer' => $Customer,
             'instansiModel' => $this->instansiModel,
@@ -181,7 +183,8 @@ class Peserta extends Controller
                 'no_antrian' => $no_urutan,
                 'jam_kunjungan' => $jam_kunjungan,
                 'tgl_kunjungan' => $tgl_kunjungan,
-                'status_pembayaran' => $this->request->getPost('status_pembayaran')
+                'status_pembayaran' => $this->request->getPost('status_pembayaran'),
+                'status_peserta' => $this->request->getPost('status_peserta')
             ];
             $insert = $this->customerModel->insert($DataInsertCustomer);
             $insert_id = null;
@@ -233,7 +236,8 @@ class Peserta extends Controller
             'data_customer' => $Customer,
             'session' => session(),
             'id' => $id,
-            'detail_payment' => $DetailPayment
+            'detail_payment' => $DetailPayment,
+            'status_hadir' => $this->statusHadir
         );
         return view('backoffice/peserta/detail_peserta', $data);
     }
@@ -521,7 +525,7 @@ class Peserta extends Controller
             ]
         ]);
         if (!$validation) {
-            return redirect()->to('/backoffice/peserta/create')->withInput();
+            return redirect()->back()->withInput();
         } else {
             return true;
         }
