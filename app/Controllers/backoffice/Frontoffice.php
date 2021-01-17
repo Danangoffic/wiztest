@@ -8,6 +8,7 @@ use App\Models\LayananModel;
 use App\Models\LayananTestModel;
 use App\Models\MarketingModel;
 use App\Models\PemeriksaanModel;
+use App\Models\StatusHasilModel;
 use App\Models\TestModel;
 use CodeIgniter\Controller;
 // use App\Controllers;
@@ -24,6 +25,7 @@ class Frontoffice extends Controller
     protected $layananTestModel;
     protected $layananModel;
     protected $testModel;
+    protected $statusModel;
     public function __construct()
     {
         $this->customerModel = new CustomerModel();
@@ -35,6 +37,7 @@ class Frontoffice extends Controller
         $this->layananTestModel = new LayananTestModel();
         $this->layananModel = new LayananModel();
         $this->testModel = new TestModel();
+        $this->statusModel = new StatusHasilModel();
     }
     public function index()
     {
@@ -95,7 +98,8 @@ class Frontoffice extends Controller
             'instansiModel' => $this->instansi->instansiModel,
             'testModel' => $this->testModel,
             'layananTestModel' => $this->layananTestModel,
-            'session' => session()
+            'session' => session(),
+            'status_model' => $this->statusModel
         );
         return view('backoffice/frontoffice/walk_in', $data);
     }

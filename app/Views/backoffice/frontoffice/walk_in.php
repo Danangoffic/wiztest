@@ -153,7 +153,8 @@
                                         } elseif ($status_bayar == "settlement" || $status_bayar == "success") {
                                             $status_bayar = "<span class='badge bg-success'>" . $status_bayar . "</span>";
                                         }
-                                        $status_hadir = ($key['kehadiran'] == 0) ? "Belum Hadir" : "Hadir";
+                                        // $status_hadir_detail = $status_model->find($value['kehadiran']);
+                                        // $status_hadir = $status_hadir_detail['nama_status'];
                                         $Marketing = $marketingModel->find($value['id_marketing']);
                                         $nama_marketing = $Marketing['nama_marketing'];
                                         $detailLayananTest = $layananTestModel->find($value['jenis_test']);
