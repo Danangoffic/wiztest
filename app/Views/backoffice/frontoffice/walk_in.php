@@ -140,10 +140,10 @@
                                     // dd($data_customer);
                                     foreach ($data_customer as $key => $value) {
                                         // $DetailInstansi = new Ins
-                                        $create_tgl_registrasi = date_create($key['created_at']);
-                                        $create_tgl_lahir = date_create($key['tgl_lahir']);
-                                        $tgl_registrasi = date_format($create_tgl_registrasi, 'd-m-Y');
-                                        $tgl_lahir = date_format($create_tgl_lahir, 'd-m-Y');
+                                        // $create_tgl_registrasi = date_create($key['created_at']);
+                                        // $create_tgl_lahir = date_create($key['tgl_lahir']);
+                                        // $tgl_registrasi = date('d-m-Y', strtotime($key['created_at']));
+                                        // $tgl_lahir = date('d-m-Y', strtotime($key['tgl_lahir']));
 
                                         $status_bayar = $value['status_pembayaran'];
                                         if ($status_bayar == "pending" || $status_bayar == "refund") {
