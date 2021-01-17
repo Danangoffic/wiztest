@@ -94,10 +94,10 @@
                                             }
                                             $nama_marketing = $dataMarketing['nama_marketing'];
                                             $nama_instansi = $dataInstansi['nama'];
-                                            $create_tgl_registrasi = date_create($key['created_at']);
-                                            $create_tgl_lahir = date_create($key['tgl_lahir']);
-                                            $tgl_registrasi = date_format($create_tgl_registrasi, 'd-m-Y');
-                                            $tgl_lahir = date_format($create_tgl_lahir, 'd-m-Y');
+                                            $create_tgl_registrasi = strtotime($value['created_at']);
+                                            $create_tgl_lahir = strtotime($value['tanggal_lahir']);
+                                            $tgl_registrasi = date('d-m-Y', $create_tgl_registrasi);
+                                            $tgl_lahir = date('d-m-Y', $create_tgl_lahir);
                                             $getStatus = db_connect()->table('status_hasil')->where('id', $value['kehadiran'])->get()->getFirstRow();
                                             // $detail_status_hadir = $status_hadir->find($value['kehadiran']);
                                             $status_hadir = ucwords($getStatus->nama_status);
