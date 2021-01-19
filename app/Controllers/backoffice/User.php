@@ -210,7 +210,7 @@ class User extends ResourceController
             $user_detail = $this->userDetailModel->save([
                 'id_user' => $id_user,
                 'nama' => $nama,
-                'lokasi' => $lokasi,
+                'id_lokasi' => $lokasi,
                 'phone' => $phone,
                 // 'created_by' => $created_by,
                 // 'updated_by' => $created_by
@@ -237,12 +237,72 @@ class User extends ResourceController
 
     public function edit_user($id)
     {
-        # code...
+        $data = [
+            'kota' => $this->kotaModel->findAll(),
+            'level_user' => $this->userLevelModel->findAll(),
+            'title' => "Tambah Data User",
+            'page' => "user",
+            'session' => $this->session,
+            'user' => $this->userModel->find($id),
+            'user_detail' => $this->userDetailModel->where(['id_user' => $id])->first(),
+            'validation' => \Config\Services::validation()
+        ];
+        return view('backoffice/user/edit_user', $data);
     }
 
     public function update_user()
     {
-        # code...
+        $id_user = $this->request->getPost('id_user');
+        $id_detail_user = $this->request->getPost('id_detail_user');
+        $session_user = $this->session->get('id_user');
+        if(!$session_user){
+            $this->session->setFlashdata('error', 'Gagal ubah data user, anda belum login');
+            return redirect()->to('/backoffice/user')->withInput();
+        }
+        try {
+            $user = $this->userModel->find($id_user);
+            $detail_user = $this->userDetailModel->find($id_detail_user);
+            if(is_array($user) && is_array($detail_user)){
+                $password = $this->request->getPost('password');
+                $old_password = $this->request->getPost('old_password');
+                $nama = $this->request->getPost('nama');
+                $id_lokasi = $this->request->getPost('lokasi');
+                $level = $this->request->getPost('level');
+                $email = $this->request->getPost('email');
+                $phone = $this->request->getPost('phone');
+                $user_array = [
+                    'email' => $email,
+                    'user_level' => $level,
+                    'updated_by' => $session_user
+                ];
+                if(!$password || $password == "" || $password == null){
+                    $user_array['password'] = $old_password;
+                }else{
+                    $user_array['password'] = md5($password);
+                }
+                $detail_user_array = array(
+                    'nama' => $nama,
+                    'phone' => $phone,
+                    'id_lokasi' => $id_lokasi
+                );
+                $update1 = $this->userModel->update($id_user, $user_array);
+                $update2 = $this->userDetailModel->update($id_detail_user, $detail_user_array);
+                if($update1 && $update2){
+                    $this->session->setFlashdata('success', 'Berhasil ubah data user');
+                    return redirect()->to('/backoffice/user');
+                }else{
+                    $this->session->setFlashdata('error', 'Gagal ubah data user');
+                    return redirect()->to('/backoffice/user/edit_user/' . $id)->withInput();
+                }
+            }else{
+                $this->session->setFlashdata('error', 'Gagal ubah data user karena user tidak ditemukan');
+                return redirect()->to('/backoffice/user/edit_user/' . $id)->withInput();
+            }
+        } catch (\Throwable $th) {
+            $this->session->setFlashdata('error', 'Gagal tambah data user ' . $th->getMessage());
+            return redirect()->to('/backoffice/user/edit_user/' . $id)->withInput();
+        }
+        
     }
 
     public function delete_user($id)

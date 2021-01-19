@@ -46,10 +46,7 @@
 <script>
     $(document).ready(function() {
         $("#filter-card").collapse();
-        $("select").select2({
-            theme: 'bootstrap4',
-            allowClear: true
-        });
+        
 
     });
 

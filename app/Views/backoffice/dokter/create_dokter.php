@@ -37,6 +37,7 @@
                     <div class="card-body">
                         <form action="<?= base_url('backoffice/dokter/save'); ?>" method="post" enctype="multipart/form-data">
                             <?= csrf_field(); ?>
+                            <input type="hidden" name="level_user" value="7">
                             <div class="form-group row">
                                 <label class="col-md-4" for="nama">Nama</label>
                                 <div class="col-md-8">
@@ -85,15 +86,13 @@
     </section>
 </div>
 
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/dataTables.responsive.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/dataTables.buttons.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js'); ?>"></script>
+
 <script>
     $(document).ready(() => {
-        $("#data_customer").DataTable();
+        $("select").select2({
+            theme: 'bootstrap4',
+            allowClear: true
+        });
     });
 </script>
 <?= $this->endSection(); ?>

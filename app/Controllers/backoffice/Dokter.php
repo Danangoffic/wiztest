@@ -21,13 +21,15 @@ class Dokter extends Controller
     protected $kotaModel;
     protected $userC;
     protected $layananC;
+    protected $detailUserModel;
     public function __construct()
     {
         $this->dokterModel = new DokterModel();
         $this->userC = new User;
         $this->layananC = new Layanan;
+        $this->detailUserModel = new UserDetailModel();
         // $this->kotaModel = new KotaModel();
-        $this->session = session();
+        $this->session = \Config\Services::session();
     }
     public function index()
     {
@@ -107,6 +109,18 @@ class Dokter extends Controller
             $inserting_user = $this->userC->userModel->insert($insert_user);
             if ($inserting_user) {
                 $user_id = $this->userC->userModel->getInsertID();
+                $detail_array = array(
+                    'nama' => $nama,
+                    'phone' => $phone,
+                    'id_lokasi' => '1',
+                    'id_user' => $user_id
+                );
+                $insert_detail = $this->detailUserModel->insert($detail_array);
+                if(!$insert_detail){
+                    $this->userC->userModel->delete($user_id);
+                    $this->session->setFlashdata('error', 'Gagal Tambahkan data dokter');
+                    return redirect()->to('/backoffice/dokter/create')->withInput();
+                }
             }
         }
         // $url_qrcode = $this->layananC->getUrlQRCode(base_url('backoffice/dokter/'))

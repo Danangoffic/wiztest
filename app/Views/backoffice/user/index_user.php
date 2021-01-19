@@ -5,7 +5,7 @@
     <section class="content-header mb-0">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12">
+                <div class="">
                     <?php
                     if (session()->getFlashdata('success')) {
                     ?>
@@ -56,13 +56,14 @@
                                 $no = 1;
                                 foreach ($users as $key => $value) {
                                     $detail_user = $user_detail->find($value['id']);
+                                    // echo db_connect()->showLastQuery();exit();
                                     $data_level = $user_level->find($value['user_level']);
                                     $level_user = $data_level['level'];
                                     $nama_user = $detail_user['nama'];
                                     $phone_user = $detail_user['phone'];
                                     $id_lokasi_user = $detail_user['id_lokasi'];
-                                    $detail_lokasi = $lokasi_input->find($id_lokasi_user);
-                                    $data_lokasi_user = $kota_user->find($detail_lokasi['id_kota']);
+                                    // $detail_lokasi = $lokasi_input->find($id_lokasi_user);
+                                    $data_lokasi_user = $kota_user->find($id_lokasi_user);
                                     $nama_lokasi = $data_lokasi_user['nama_kota'];
                                     $city_user = $data_lokasi_user['city'];
                                     $province_user = $data_lokasi_user['province'];
@@ -76,8 +77,8 @@
                                         <td><?= $nama_lokasi; ?></td>
                                         <td><?= $level_user; ?></td>
                                         <td class="text-center">
-                                            <a href="<?= base_url('backoffice/user/edit/' . $value['id']); ?>" class="btn btn-success btn-sm">Edit</a>
-                                            <!-- <a href="<?= base_url('backoffice/user/delete/' . $value['id']); ?>" class="btn btn-danger btn-sm">Hapus</a> -->
+                                            <a href="<?= base_url('backoffice/user/edit_user/' . $value['id']); ?>" class="btn btn-success btn-sm">Edit</a>
+                                            <!-- <a href="<?= base_url('backoffice/user/edit_user/' . $value['id']); ?>" class="btn btn-danger btn-sm">Hapus</a> -->
                                         </td>
                                     </tr>
                                 <?php
