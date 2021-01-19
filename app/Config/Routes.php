@@ -35,8 +35,8 @@ $routes->get('/', 'Customer::index');
 $routes->add('/backoffice', 'backoffice\Home::index');
 $routes->get('/backoffice/login', 'backoffice\User::login');
 $routes->post('/backoffice/login', 'backoffice\User::doLogin');
-$routes->get('/backoffice/user', 'backoffice\User::detailById');
-$routes->post('/backoffice/user', 'backoffice\User::doCreate');
+
+
 $routes->get('/detail_form2', 'Customer::detail_form2');
 $routes->get('/cek_jadwal', 'Customer::jadwal_available');
 $routes->get('/menu', 'Customer::getMenu');
@@ -149,6 +149,18 @@ $routes->get('/backoffice/kategori_gudang', 'backoffice\Kategori_gudang::index')
 $routes->get('/backoffice/kategori_gudang/(:segment)', 'backoffice\Kategori_gudang::$1');
 $routes->get('/backoffice/kategori_gudang/(:segment)/(:num)', 'backoffice\Kategori_gudang::$1/$2');
 $routes->post('/backoffice/kategori_gudang/(:segment)/(:num)', 'backoffice\Kategori_gudang::$1/$2');
+
+$routes->get('/backoffice/settings', 'backoffice\Settings::index');
+$routes->get('/backoffice/settings/(:segment)', 'backoffice\Settings::$1');
+$routes->get('/backoffice/settings/(:segment)/(:num)', 'backoffice\Settings::$1/$2');
+$routes->post('/backoffice/settings/(:segment)/(:num)', 'backoffice\Settings::$1/$2');
+
+$routes->get('/backoffice/user', 'backoffice\User::index');
+$routes->get('/backoffice/user/(:segment)', 'backoffice\User::$1');
+$routes->post('/backoffice/user/(:segment)', 'backoffice\User::$1');
+$routes->get('/backoffice/user/(:segment)/(:num)', 'backoffice\User::$1/$2');
+$routes->post('/backoffice/user/(:segment)/(:num)', 'backoffice\User::$1/$2');
+
 /**
  * --------------------------------------------------------------------
  * Additional Routing

@@ -246,7 +246,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="<?= base_url('backoffice/setting'); ?>" class="nav-link">
+                            <a href="<?= base_url('backoffice/settings'); ?>" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Pengaturan</p>
                             </a>

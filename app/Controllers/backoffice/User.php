@@ -2,25 +2,51 @@
 
 namespace App\Controllers\backoffice;
 
+use App\Models\KotaModel;
+use App\Models\LokasiPenginputanModel;
+use App\Models\UserDetailModel;
+use App\Models\UserLevelModel;
 use CodeIgniter\RESTful\ResourceController;
 
 use App\Models\UserModel;
 use CodeIgniter\Controller;
-use PDO;
+use CodeIgniter\Validation\Validation;
+use Config\Validation as ConfigValidation;
 
 class User extends ResourceController
 {
     public $session;
     public $userModel;
+    protected $userDetailModel;
+    protected $userLevelModel;
+    protected $lokasiModel;
+    protected $kotaModel;
     public function __construct()
     {
         $this->session = \Config\Services::session();
         $this->userModel = new UserModel();
+        $this->userDetailModel = new UserDetailModel();
+        $this->userLevelModel = new UserLevelModel();
+        $this->lokasiModel = new LokasiPenginputanModel();
+        $this->kotaModel = new KotaModel();
         // if()
     }
     public function index()
     {
-        return view('welcome_message');
+        if (!$this->session->get('id_user')) {
+            return redirect()->to('/backoffice/login');
+        }
+        $data = [
+            'users' => $this->userModel->findAll(),
+            'user_detail' => $this->userDetailModel,
+            'user_level' => $this->userLevelModel,
+            'lokasi_input' => $this->lokasiModel,
+            'kota_user' => $this->kotaModel,
+            'title' => "Data User",
+            'page' => 'user',
+            'session' => $this->session
+        ];
+        return view('backoffice/user/index_user', $data);
     }
 
     public function detailById()
@@ -100,62 +126,102 @@ class User extends ResourceController
     public function logout()
     {
         session_destroy();
-        return redirect()->to('backoffice');
+        $this->session->setFlashdata('success', 'Berhasil keluar');
+        return redirect()->to('backoffice/login');
     }
 
-    public function create()
+    public function create_user()
     {
         # code...
         // $validation =  \Config\Services::validation();
-
+        $data = [
+            'kota' => $this->kotaModel->findAll(),
+            'level_user' => $this->userLevelModel->findAll(),
+            'title' => "Tambah Data User",
+            'page' => "user",
+            'session' => $this->session,
+            'validation' => \Config\Services::validation()
+        ];
+        return view('backoffice/user/create_user', $data);
     }
 
     // proses tambah user
-    public function doCreate()
+    public function save()
     {
         # code...
-        $input = $this->validate([
-            'email' => 'required|valid_email|is_unique[users.email]',
-            'password' => 'required|min_length[6]',
-            'user_level' => 'required',
-            'created_by' => 'required',
-            'nama' => 'required|min_length[5]',
-        ]);
+        // $inputValidation = ;
         // $input = $validate->setRules();
-        if (!$input) {
-            $result = [
-                'responseMessage' => 'failed',
-                'errors' => $this->validator->getErrors()
-            ];
-            return $this->respond($result, 400, 'Bad Request');
+        if (!$this->validate([
+            'email' => [
+                'rules' => 'required|valid_email|is_unique[users.email]',
+                'errors' => [
+                    'required' => 'Email wajib diisi',
+                    'valid_email' => '{field} wajib diisi dengan format email menggunakan tanda \'@\'',
+                    'is_unique' => '{field} sudah ada',
+                ]
+            ],
+            'password' => [
+                'rules' => 'required|min_length[6]',
+                'errors' => [
+                    'required' => '{field} wajib diisi',
+                    'min_length' => '{field} wajib diisi setidaknya 6 karakter'
+                ]
+            ],
+            'level' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} user wajib dipilih'
+                ]
+            ],
+            'nama' => [
+                'rules' => 'required|min_length[5]',
+                'errors' => [
+                    'required' => '{field} wajib diisi',
+                    'min_length' => '{field} wajib diisi setidaknya 5 karakter'
+                ]
+            ],
+        ])) {
+            // $result = [
+            //     'responseMessage' => 'failed',
+            //     'errors' => $this->validator->getErrors()
+            // ];
+            $this->session->setFlashdata('error', 'Gagal tambah data user');
+            return redirect()->to('/backoffice/user/create_user')->withInput();
             // return redirect()->to('/backoffice/registration')->withInput();
         }
         try {
+            $nama = $this->request->getPost('nama');
+            $email = $this->request->getPost('email');
+            $password = md5($this->request->getPost('password'));
+            $user_level = $this->request->getPost('level');
+            $phone = $this->request->getPost('phone');
+            $lokasi = $this->request->getPost('lokasi');
+            $created_by = $this->session->get('id_user');
 
             $saving_user = $this->userModel->save([
-                'email' => $this->request->getVar('email'),
-                'password' => md5($this->request->getVar('password')),
-                'user_level' => $this->request->getVar('user_level'),
-                'created_by' => $this->request->getVar('created_by')
+                'email' => $email,
+                'password' => $password,
+                'user_level' => $user_level,
+                'created_by' => $created_by,
+                'updated_by' => $created_by
+            ]);
+            $id_user = $this->userModel->getInsertID();
+
+            $user_detail = $this->userDetailModel->save([
+                'id_user' => $id_user,
+                'nama' => $nama,
+                'lokasi' => $lokasi,
+                'phone' => $phone,
+                // 'created_by' => $created_by,
+                // 'updated_by' => $created_by
             ]);
 
-            $id_created = $this->userModel->getInsertID();
-            $detailUser = ['id_user' => $id_created, 'nama' => $this->request->getVar('nama'), 'alamat' => $this->request->getVar('alamat'), 'created_at' => date('Y-m-d H:i:s')];
-            $saving_detail = $this->userModel->crud_users_detail('create', $id_created, $detailUser);
-            // dd($saving_detail);
-            $detail_user = $this->userModel->detailById($id_created);
-            if ($saving_user && $saving_detail && $detail_user) {
-                $result = [
-                    'responseMessage' => 'success',
-                    'data' => $detail_user
-                ];
-                return $this->respondCreated($result, 'success');
+            if ($saving_user && $user_detail) {
+                $this->session->setFlashdata('success', 'Berhasil tambah data user');
+                return redirect()->to('/backoffice/user');
             } else {
-                $result = [
-                    'responseMessage' => 'failed ',
-                    'data' => null
-                ];
-                return $this->respond($result, 400);
+                $this->session->setFlashdata('error', 'Gagal tambah data user ' . db_connect()->error());
+                return redirect()->to('/backoffice/user/create_user')->withInput();
             }
         } catch (\Throwable $th) {
             //throw $th;
@@ -163,17 +229,23 @@ class User extends ResourceController
                 'responseMessage' => 'error ' . $th->getMessage(),
                 'data' => null
             ];
-            return $this->respond($result, 500);
+            $this->session->setFlashdata('error', 'Gagal tambah data user ' . $th->getMessage());
+            return redirect()->to('/backoffice/user/create_user')->withInput();
+            // return $this->respond($result, 500);
         }
     }
 
-    public function updateUser()
+    public function edit_user($id)
     {
         # code...
     }
 
-    // proses update
-    public function doUpdate()
+    public function update_user()
+    {
+        # code...
+    }
+
+    public function delete_user($id)
     {
         # code...
     }

@@ -37,7 +37,7 @@ class Peserta extends Controller
     public $statusHadir;
     public function __construct()
     {
-        $this->session = session();
+        $this->session = \Config\Services::session();
         $this->customerModel = new CustomerModel();
         $this->pemeriksaModel = new PemeriksaModel();
         $this->jenisPemeriksaanModel = new PemeriksaanModel();
@@ -374,9 +374,9 @@ class Peserta extends Controller
     public function delete($id_customer)
     {
         $data = array(
-            'title' => "Tambah Customer",
+            'title' => "Hapus Customer",
             'page' => "registrasi",
-            'session' => session(),
+            'session' => $this->session,
         );
         return view('backoffice/peserta/delete_peserta', $data);
     }
