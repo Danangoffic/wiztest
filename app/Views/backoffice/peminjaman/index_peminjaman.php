@@ -35,12 +35,13 @@
                                     $no = 1;
                                     foreach ($data as $key => $value) {
                                         $id_status = $value['status_peminjaman'];
+                                        $detail_barang_pinjaman = $
                                         // $data_user = ($value['id_user'] !== "" || $value['id_user'] !== null) ? $userModel->find(['id' => $value['id_user']]) : '';
                                         // $data_marketing = ($value['pic_marketing'] !== "" || $value['pic_marketing'] !== null) ? $marketingModel->find($value['pic_marketing']) : '';
                                     ?>
                                         <tr>
                                             <td><?= $no++; ?></td>
-                                            <td><?= $value['nama']; ?></td>
+                                            <td><?= $value['nama_peminjam']; ?></td>
                                             <td><?= $value['phone']; ?></td>
                                             <td><?= $value['email']; ?></td>
                                             <td>

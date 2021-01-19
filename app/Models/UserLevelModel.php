@@ -4,22 +4,16 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class UserDetailModel extends Model
+class UserLevelModel extends Model
 {
-    protected $table      = 'users_detail';
+    protected $table      = 'users_level';
     // protected $primaryKey = 'id';
 
     // protected $returnType     = 'array';
     // protected $useSoftDeletes = true;
 
     protected $allowedFields = [
-        'id_user',
-        'id_lokasi',
-        'nama',
-        'alamat',
-        'phone',
-        'created_by',
-        'updated_by'
+        'level',
     ];
 
     protected $useTimestamps = true;
