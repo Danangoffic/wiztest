@@ -132,7 +132,7 @@ class Petugas extends Controller
             return redirect()->to('/backoffice/login');
         }
         $data = array(
-            'title' => 'Petugas Pemeriksa',
+            'title' => 'Hapus Petugas Pemeriksa',
             'page' => 'petugas',
             'data' => $this->pemeriksaModel->find($id_pemeriksa),
             'id' => $id_pemeriksa,

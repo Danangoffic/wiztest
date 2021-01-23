@@ -3,7 +3,7 @@
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 
-    <section class="content mt-3">
+    <section class="content">
 
         <!-- filtering box -->
         <div id="accordion">

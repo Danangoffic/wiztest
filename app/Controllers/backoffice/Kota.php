@@ -26,7 +26,7 @@ class Kota extends Controller
             return redirect()->to('/backoffice/login');
         }
         $data = array(
-            'title' => 'Kota',
+            'title' => 'Data Kota',
             'page' => 'kota',
             'data' => $this->kotaModel->findAll(),
             // 'kota' => $this->kotaModel,
@@ -43,7 +43,7 @@ class Kota extends Controller
             return redirect()->to('/backoffice/login');
         }
         $data = array(
-            'title' => 'Kota',
+            'title' => 'Tambah Data Kota',
             'page' => 'kota',
             // 'kota' => $this->kotaModel,
             'validation' => \Config\Services::validation(),
@@ -85,7 +85,7 @@ class Kota extends Controller
             return redirect()->to('/backoffice/login');
         }
         $data = array(
-            'title' => 'Kota',
+            'title' => 'Ubah Data Kota',
             'page' => 'kota',
             'data' => $this->kotaModel->find($id_kota),
             // 'kota' => $this->kotaModel,
@@ -134,7 +134,7 @@ class Kota extends Controller
             return redirect()->to('/backoffice/login');
         }
         $data = array(
-            'title' => 'Kota',
+            'title' => 'Hapus Data Kota',
             'page' => 'kota',
             'data' => $this->kotaModel->find($id_kota),
             // 'kota' => $this->kotaModel,

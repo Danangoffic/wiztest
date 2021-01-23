@@ -28,7 +28,7 @@ class Lokasi_input extends Controller
             return redirect()->to('/backoffice/login');
         }
         $data = array(
-            'title' => 'Lokasi Input',
+            'title' => 'Data Lokasi Input',
             'page' => 'lokasi_input',
             'data' => $this->lokasiInputModel->findAll(),
             'kota' => $this->kotaModel,
