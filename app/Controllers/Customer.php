@@ -838,20 +838,20 @@ class Customer extends ResourceController
         $MidtransToken = $Midtrans->getToken($params);
         $vars = array(
             'marketing' => array(
-                'id' => $marketing,
+                'id' => $detail_transaction['marketing'],
                 'nama' => $detail_transaction['dataMarketing']['nama_marketing']
             ),
-            'jam_kunjungan' => $jam_kunjungan,
-            'tgl_kunjungan' => $tgl_kunjungan,
-            'jenis_test' => $jenis_test,
-            'jenis_pemeriksaan' => $jenis_pemeriksaan,
+            'jam_kunjungan' => $detail_transaction['jam_kunjungan'],
+            'tgl_kunjungan' => $detail_transaction['tgl_kunjungan'],
+            'jenis_test' => $detail_transaction['jenis_test'],
+            'jenis_pemeriksaan' => $detail_transaction['jenis_pemeriksaan'],
             'jenis_layanan' => $detail_transaction['dataLayanan']['nama_layanan'],
             'antrain' => $detail_transaction['no_antrian']
         );
         array_push($params, $vars);
         $PembayaranModel = new PembayaranModel();
         $dataInsertPembayaran = [
-            'id_customer' => $insert_id,
+            'id_customer' => $detail_transaction['insert_id'],
             'status_pembayaran' => 'pending'
         ];
         $insertPembayaran = $PembayaranModel->insert($dataInsertPembayaran);
