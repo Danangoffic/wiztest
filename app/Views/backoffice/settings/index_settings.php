@@ -2,34 +2,7 @@
 <?= $this->section('content'); ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-    <section class="content-header mb-0">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <?php
-                    if (session()->getFlashdata('success')) {
-                    ?>
-                        <div class="alert alert-success alert-dismissible">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                            <h5><i class="icon fa fa-check"></i> Sukses!</h5>
-                            <p><?= session()->getFlashdata('success'); ?></p>
-                        </div>
-                    <?php
-                    }
-                    if (session()->getFlashdata('error')) {
-                    ?>
-                        <div class="alert alert-warning alert-dismissible">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                            <h5><i class="icon fa fa-close"></i> Gagal!</h5>
-                            <p><?= session()->getFlashdata('error'); ?></p>
-                        </div>
-                    <?php
-                    }
-                    ?>
-                </div>
-            </div>
-        </div>
-    </section>
+    <?= $this->include('backoffice/template/content-header'); ?>
     <section class="content">
         <div class="container-fluid">
             <div class="row">
@@ -72,7 +45,7 @@
         </div>
     </section>
     <section class="content">
-        <div class="conteiner-fluid">
+        <div class="container-fluid">
             <div class="row">
                 <?php
                 $no = 1;
@@ -89,7 +62,10 @@
                                     <h5 class="card-title">Kuota <?= $nama_test . "({$nama_layanan})"; ?></h5>
                                 </div>
                                 <div class="card-body">
-
+                                    <div class="row">
+                                        <div class="col-md-4 float-right font-weight-bold">Jam</div>
+                                        <div class="col-md-8"></div>
+                                    </div>
                                     <?php
                                     $each_kuota = $kuota_model->where(['jenis_test_layanan' => $LT['id']])->get()->getResultArray();
                                     // echo db_connect()->showLastQuery();
@@ -99,7 +75,7 @@
                                             <label for="" class="col-md-4 col-form-label"><?= $value['jam']; ?></label>
                                             <div class="col-md-8">
                                                 <input type="hidden" name="id[]" value="<?= $value['id']; ?>">
-                                                <input type="number" name="kuota<?php $value['id']; ?>" id="kuota<?= $no++ ?>" class="form-control" value="<?= $value['kuota']; ?>">
+                                                <input type="number" name="kuota<?php $value['id']; ?>" id="kuota<?= $no++ ?>" class="form-control form-control-sm" value="<?= $value['kuota']; ?>">
                                             </div>
                                         </div>
                                     <?php

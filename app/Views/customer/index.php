@@ -105,7 +105,32 @@
                             <button class="btn btn-primary" type="button" onclick="return getCheckNoRegistration()">Cari</button>
                         </div>
                     </div>
-
+                </div>
+                <div class="col-md-12">
+                    <div id="loading_check_no_registration hidden" class="row">
+                        <div class="spinner-grow text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-secondary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-success" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-danger" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-warning" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-info" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-light" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    <div id="data_result_check_registration"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -228,14 +253,21 @@
         </div>
     </div>
 </div>
+
+
 <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?= $midtrans_client_key; ?>"></script>
 <script>
     var id_jenis_test, nama_jenis_test, jam_kunjungan, token_client;
     var midtransToken, invoice_number, transaction;
+    $("#loading").show();
     $(document).ready(() => {
+
         getMenu();
+        $(".modal").on("hide.bs.modal", function(e) {
+            console.log(e);
+            window.location.reload();
+        });
         document.getElementById('registrasi').addEventListener('click', registrasi, false);
-        document.getElementById('btnSearchCheckReg').addEventListener('click', getCheckNoRegistration, false);
         // document.getElementById('nextPageForm').addEventListener('click', toggleForm, false);
         // document.getElementById('backPageForm').addEventListener('click', toggleForm, false);
         $("#tgl_kunjungan").change(() => {
@@ -246,6 +278,7 @@
                 getJadwal();
             }
         });
+
     });
 
     function getMenu() {
@@ -694,10 +727,11 @@
     }
 
     function success_check_no_reg(data, status = "success", xhr) {
-
+        $("#loading_check_no_registration").hide();
     }
 
     function getCheckNoRegistration() {
+        $("#loading_check_no_registration").show();
         let order_id = $("#noRegistrationHasil").val();
         if (order_id != "") {
             let url = "<?= base_url('api/check_no_reg'); ?>";

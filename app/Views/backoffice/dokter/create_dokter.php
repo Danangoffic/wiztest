@@ -56,13 +56,13 @@
                             <div class="form-group row">
                                 <label class="col-md-4" for="email">Email</label>
                                 <div class="col-md-8">
-                                    <input type="email" mode="email" placeholder="Email" name="email" id="email" class="form-control" required autocomplete="off">
+                                    <input type="email" placeholder="Email" name="email" id="email" class="form-control" value="" required inputmode="email" autocomplete="off" aria-autocomplete="none">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-md-4" for="password">Password</label>
                                 <div class="col-md-8">
-                                    <input type="password" mode="password" placeholder="Password" name="password" id="password" class="form-control" required autocomplete="off">
+                                    <input type="password" placeholder="Password" name="password" id="password" class="form-control" value="" required autocomplete="off" aria-autocomplete="none">
                                 </div>
                             </div>
                             <div class="form-group row">

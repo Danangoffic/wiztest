@@ -40,15 +40,19 @@ $routes->post('/backoffice/login', 'backoffice\User::doLogin');
 $routes->get('/detail_form2', 'Customer::detail_form2');
 $routes->get('/cek_jadwal', 'Customer::jadwal_available');
 $routes->get('/menu', 'Customer::getMenu');
+$routes->get('/select-test', 'Customer::getSelectedTest');
+$routes->get('/home-service', 'Customer::home_service');
 $routes->post('/api/registration', 'Customer::registrasi');
 $routes->post('/api/get_server_key', 'Customer::get_server_key');
 $routes->post('/api/update_status', 'Customer::update_data_customer_registration');
 $routes->post('/api/getQRByOrderId', 'Customer::get_qr_by_order_id');
 $routes->get('/api/hadir/(:num)', 'backoffice\Peserta::kehadiran_by_scanning_qr/$1');
+// $routes->get('/api/marketings', '')
 // $routes->post('/api/midtrans_notification', 'Customer::midtrans_notification');
 $routes->add('/api/notification', 'Midtrans_handlers::index');
 $routes->add('/api/redirection-handler', 'Midtrans_handlers::redirection_handler');
 $routes->add('/api/test-email/(:any)', 'Midtrans_handlers::CobaSendEmail/$1');
+$routes->get('/api/check_no_registration', 'Customer::validasi_no_registrasi');
 
 $routes->get('detail_form2', 'Customer::detail_form2');
 
@@ -84,6 +88,8 @@ $routes->get('/backoffice/pesert_overkuota/create', 'backoffice\Peserta_overkuot
 $routes->post('/backoffice/peserta_overkuota', 'backoffice\Peserta::save_customer_overkuota');
 
 $routes->get('/backoffice/frontoffice/home_service', 'backoffice\Home_service::index');
+$routes->add('/backoffice/frontoffice/(:segment)', 'backoffice\Frontoffice::$1');
+$routes->add('/backoffice/frontoffice/(:segment)/(:num)/(:any)/(:num)', 'backoffice\Frontoffice::$1/$2/$3/$4');
 
 $routes->get('/backoffice/dokter/(:num)', 'backoffice\Dokter::detail/$1');
 $routes->post('/backoffice/dokter/save', 'backoffice\Dokter::save');
