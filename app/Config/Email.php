@@ -48,21 +48,21 @@ class Email extends BaseConfig
 	 *
 	 * @var string
 	 */
-	public $SMTPHost = "ssl://mail.danangoffic.xyz";
+	public $SMTPHost = "ssl://quicktest.id";
 
 	/**
 	 * SMTP Username
 	 *
 	 * @var string
 	 */
-	public $SMTPUser = "info@danangoffic.xyz";
+	public $SMTPUser = "info@quicktest.id";
 
 	/**
 	 * SMTP Password
 	 *
 	 * @var string
 	 */
-	public $SMTPPass = "infoDanang123";
+	public $SMTPPass = "QuickTest123";
 
 	/**
 	 * SMTP Port

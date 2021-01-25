@@ -40,7 +40,9 @@ class CustomerModel extends Model
         'status_pembayaran',
         'token',
         'catatan',
-        'url_pdf'
+        'url_pdf',
+        'is_hs',
+        'id_hs'
     ];
 
     public function db_this()

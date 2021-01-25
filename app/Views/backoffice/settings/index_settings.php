@@ -75,7 +75,7 @@
                                             <label for="" class="col-md-4 col-form-label"><?= $value['jam']; ?></label>
                                             <div class="col-md-8">
                                                 <input type="hidden" name="id[]" value="<?= $value['id']; ?>">
-                                                <input type="number" name="kuota<?php $value['id']; ?>" id="kuota<?= $no++ ?>" class="form-control form-control-sm" value="<?= $value['kuota']; ?>">
+                                                <input type="number" name="kuota[<?= $value['id']; ?>]" id="kuota<?= $no++ ?>" class="form-control form-control-sm" value="<?= $value['kuota']; ?>">
                                             </div>
                                         </div>
                                     <?php
