@@ -80,7 +80,7 @@
     <script src="/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
     <script src="/assets/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
     <script src="/assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-    <!-- <script src="/assets/ClassyQR/js/jquery.classyqr.js"></script> -->
+
 </head>
 
 <body class="sidebar-mini sidebar-closed">
