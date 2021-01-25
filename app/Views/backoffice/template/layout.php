@@ -9,17 +9,17 @@
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="<?= base_url('assets/plugins/fontawesome-free/css/all.min.css'); ?>">
+    <link rel="stylesheet" href="/assets/plugins/fontawesome-free/css/all.min.css">
     <!-- icheck bootstrap -->
-    <link rel="stylesheet" href="<?= base_url('assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css'); ?>">
+    <link rel="stylesheet" href=/assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css>">
     <!-- Theme style -->
-    <link rel="stylesheet" href="<?= base_url('assets/dist/css/adminlte.min.css'); ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css'); ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css'); ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables-buttons/css/buttons.bootstrap44.min.css"'); ?>">
+    <link rel="stylesheet" href="/assets/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="/assets/plugins/datatables-buttons/css/buttons.bootstrap44.min.css">
 
-    <link rel="stylesheet" href="<?= base_url('assets/plugins/select2/css/select2.min.css'); ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css'); ?>">
+    <link rel="stylesheet" href="/assets/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 
     <style>
         .color-palette {
@@ -66,13 +66,13 @@
     </style>
 
     <!-- jQuery -->
-    <script src="<?= base_url('assets/plugins/jquery/jquery.min.js'); ?>"></script>
+    <script src="/assets/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
-    <script src="<?= base_url('assets/plugins/bootstrap/js/bootstrap.bundle.min.js'); ?>"></script>
+    <script src="/assets/plugins/bootstrap/js/bootstrap.bundle.min.js>"></script>
     <!-- AdminLTE App -->
-    <script src="<?= base_url('assets/dist/js/adminlte.min.js'); ?>"></script>
+    <script src="/assets/dist/js/adminlte.min.js"></script>
 
-    <script src="<?= base_url('assets/plugins/select2/js/select2.full.min.js'); ?>"></script>
+    <script src="/assets/plugins/select2/js/select2.full.min.js"></script>
 </head>
 
 <body class="sidebar-mini sidebar-closed">

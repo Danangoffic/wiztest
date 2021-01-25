@@ -167,6 +167,10 @@ $routes->post('/backoffice/user/(:segment)', 'backoffice\User::$1');
 $routes->get('/backoffice/user/(:segment)/(:num)', 'backoffice\User::$1/$2');
 $routes->post('/backoffice/user/(:segment)/(:num)', 'backoffice\User::$1/$2');
 
+$routes->add('/backoffice/finance/(:segment)', 'backoffice\Finance::$1');
+$routes->add('/backoffice/finance/print_invoice/(:segment)/(:any)', 'backoffice\Finanace::print_invoice/$1/$2');
+$routes->get('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finanace::$1/$2');
+
 /**
  * --------------------------------------------------------------------
  * Additional Routing

@@ -75,7 +75,11 @@ class User extends ResourceController
     public function login()
     {
         # code...
-        return view('backoffice/user/login');
+        $data = [
+            'session' => $this->session,
+            'validation' => \config\Services::validation()
+        ];
+        return view('backoffice/user/login', $data);
     }
 
     // proses login
@@ -95,31 +99,42 @@ class User extends ResourceController
         }
         try {
             //code...
-            $email = $this->request->getVar('email');
-            $password = md5($this->request->getVar('password'));
+            $email = $this->request->getPost('email');
+            $password = md5($this->request->getPost('password'));
             $getUser = $this->userModel->loginUser1($email, $password);
+
             if ($getUser) {
-                $session = session();
+
+                // $session = session();
                 $id = $getUser['id'];
                 $detail_user = $this->userModel->detailById($id)->getFirstRow();
                 // $dbCon = db_connect();
                 // echo $dbCon->showLastQuery();
                 // dd($detail_user);
-                $newdata = [
+                $user_level = $getUser['user_level'];
+                $newdata = array(
                     'email'     => $email,
                     'id_user' => $id,
                     'time' => date('YmdHis' . rand(100, 200)),
                     'nama' => $detail_user->nama,
-                    'logged_in' => TRUE
-                ];
-                $session->set($newdata);
-                return redirect()->to('/backoffice');
+                    'logged_in' => TRUE,
+                    'user_level' => $user_level
+                );
+                $this->session->set($newdata);
+                // echo $this->session->get('user_level');
+                // exit();
+                // dd($this->session->get('user_level'));
+                return redirect()->to(base_url('backoffice'));
+            } else {
+                $this->session->setFlashdata('error', 'Gagal login');
+                // echo "error " . $th->getMessage();
             }
         } catch (\Throwable $th) {
             //throw $th;
-            session()->setFlashdata('error', 'Gagal login');
-            echo "error " . $th->getMessage();
-            return redirect()->to('backoffice')->withInput();
+            $this->session->setFlashdata('error', 'Gagal login');
+            echo "error " . $th->getMessage() . " {$th->getFile()} {$th->getLine()} {$th->getCode()}";
+            exit();
+            return redirect()->to('/backoffice')->withInput();
         }
     }
 
@@ -255,14 +270,14 @@ class User extends ResourceController
         $id_user = $this->request->getPost('id_user');
         $id_detail_user = $this->request->getPost('id_detail_user');
         $session_user = $this->session->get('id_user');
-        if(!$session_user){
+        if (!$session_user) {
             $this->session->setFlashdata('error', 'Gagal ubah data user, anda belum login');
             return redirect()->to('/backoffice/user')->withInput();
         }
         try {
             $user = $this->userModel->find($id_user);
             $detail_user = $this->userDetailModel->find($id_detail_user);
-            if(is_array($user) && is_array($detail_user)){
+            if (is_array($user) && is_array($detail_user)) {
                 $password = $this->request->getPost('password');
                 $old_password = $this->request->getPost('old_password');
                 $nama = $this->request->getPost('nama');
@@ -275,9 +290,9 @@ class User extends ResourceController
                     'user_level' => $level,
                     'updated_by' => $session_user
                 ];
-                if(!$password || $password == "" || $password == null){
+                if (!$password || $password == "" || $password == null) {
                     $user_array['password'] = $old_password;
-                }else{
+                } else {
                     $user_array['password'] = md5($password);
                 }
                 $detail_user_array = array(
@@ -287,22 +302,21 @@ class User extends ResourceController
                 );
                 $update1 = $this->userModel->update($id_user, $user_array);
                 $update2 = $this->userDetailModel->update($id_detail_user, $detail_user_array);
-                if($update1 && $update2){
+                if ($update1 && $update2) {
                     $this->session->setFlashdata('success', 'Berhasil ubah data user');
                     return redirect()->to('/backoffice/user');
-                }else{
+                } else {
                     $this->session->setFlashdata('error', 'Gagal ubah data user');
-                    return redirect()->to('/backoffice/user/edit_user/' . $id)->withInput();
+                    return redirect()->to('/backoffice/user/edit_user/' . $id_user)->withInput();
                 }
-            }else{
+            } else {
                 $this->session->setFlashdata('error', 'Gagal ubah data user karena user tidak ditemukan');
-                return redirect()->to('/backoffice/user/edit_user/' . $id)->withInput();
+                return redirect()->to('/backoffice/user/edit_user/' . $id_user)->withInput();
             }
         } catch (\Throwable $th) {
             $this->session->setFlashdata('error', 'Gagal tambah data user ' . $th->getMessage());
-            return redirect()->to('/backoffice/user/edit_user/' . $id)->withInput();
+            return redirect()->to('/backoffice/user/edit_user/' . $id_user)->withInput();
         }
-        
     }
 
     public function delete_user($id)
