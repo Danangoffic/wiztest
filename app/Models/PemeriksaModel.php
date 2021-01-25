@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class PemeriksaModel extends Model
 {
-    protected $table      = 'pemeriksa';
+    protected $table      = 'petugas';
     // protected $primaryKey = 'id';
 
     // protected $returnType     = 'array';

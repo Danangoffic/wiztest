@@ -2,25 +2,51 @@
 
 namespace App\Controllers\backoffice;
 
+use App\Models\KotaModel;
+use App\Models\LokasiPenginputanModel;
+use App\Models\UserDetailModel;
+use App\Models\UserLevelModel;
 use CodeIgniter\RESTful\ResourceController;
 
 use App\Models\UserModel;
 use CodeIgniter\Controller;
-use PDO;
+use CodeIgniter\Validation\Validation;
+use Config\Validation as ConfigValidation;
 
 class User extends ResourceController
 {
     public $session;
     public $userModel;
+    protected $userDetailModel;
+    protected $userLevelModel;
+    protected $lokasiModel;
+    protected $kotaModel;
     public function __construct()
     {
         $this->session = \Config\Services::session();
         $this->userModel = new UserModel();
+        $this->userDetailModel = new UserDetailModel();
+        $this->userLevelModel = new UserLevelModel();
+        $this->lokasiModel = new LokasiPenginputanModel();
+        $this->kotaModel = new KotaModel();
         // if()
     }
     public function index()
     {
-        return view('welcome_message');
+        if (!$this->session->get('id_user')) {
+            return redirect()->to('/backoffice/login');
+        }
+        $data = [
+            'users' => $this->userModel->findAll(),
+            'user_detail' => $this->userDetailModel,
+            'user_level' => $this->userLevelModel,
+            'lokasi_input' => $this->lokasiModel,
+            'kota_user' => $this->kotaModel,
+            'title' => "Data User",
+            'page' => 'user',
+            'session' => $this->session
+        ];
+        return view('backoffice/user/index_user', $data);
     }
 
     public function detailById()
@@ -49,7 +75,11 @@ class User extends ResourceController
     public function login()
     {
         # code...
-        return view('backoffice/user/login');
+        $data = [
+            'session' => $this->session,
+            'validation' => \config\Services::validation()
+        ];
+        return view('backoffice/user/login', $data);
     }
 
     // proses login
@@ -69,92 +99,144 @@ class User extends ResourceController
         }
         try {
             //code...
-            $email = $this->request->getVar('email');
-            $password = md5($this->request->getVar('password'));
+            $email = $this->request->getPost('email');
+            $password = md5($this->request->getPost('password'));
             $getUser = $this->userModel->loginUser1($email, $password);
+
             if ($getUser) {
-                $session = session();
+
+                // $session = session();
                 $id = $getUser['id'];
                 $detail_user = $this->userModel->detailById($id)->getFirstRow();
                 // $dbCon = db_connect();
                 // echo $dbCon->showLastQuery();
                 // dd($detail_user);
-                $newdata = [
+                $user_level = $getUser['user_level'];
+                $newdata = array(
                     'email'     => $email,
                     'id_user' => $id,
                     'time' => date('YmdHis' . rand(100, 200)),
                     'nama' => $detail_user->nama,
-                    'logged_in' => TRUE
-                ];
-                $session->set($newdata);
-                return redirect()->to('/backoffice');
+                    'logged_in' => TRUE,
+                    'user_level' => $user_level
+                );
+                $this->session->set($newdata);
+                // echo $this->session->get('user_level');
+                // exit();
+                // dd($this->session->get('user_level'));
+                return redirect()->to(base_url('backoffice'));
+            } else {
+                $this->session->setFlashdata('error', 'Gagal login');
+                // echo "error " . $th->getMessage();
             }
         } catch (\Throwable $th) {
             //throw $th;
-            session()->setFlashdata('error', 'Gagal login');
-            echo "error " . $th->getMessage();
-            return redirect()->to('backoffice')->withInput();
+            $this->session->setFlashdata('error', 'Gagal login');
+            echo "error " . $th->getMessage() . " {$th->getFile()} {$th->getLine()} {$th->getCode()}";
+            exit();
+            return redirect()->to('/backoffice')->withInput();
         }
     }
 
     public function logout()
     {
         session_destroy();
+        $this->session->setFlashdata('success', 'Berhasil keluar');
+        return redirect()->to('backoffice/login');
     }
 
-    public function create()
+    public function create_user()
     {
         # code...
         // $validation =  \Config\Services::validation();
-
+        $data = [
+            'kota' => $this->kotaModel->findAll(),
+            'level_user' => $this->userLevelModel->findAll(),
+            'title' => "Tambah Data User",
+            'page' => "user",
+            'session' => $this->session,
+            'validation' => \Config\Services::validation()
+        ];
+        return view('backoffice/user/create_user', $data);
     }
 
     // proses tambah user
-    public function doCreate()
+    public function save()
     {
         # code...
-        $input = $this->validate([
-            'email' => 'required|valid_email|is_unique[users.email]',
-            'password' => 'required|min_length[6]',
-            'user_level' => 'required',
-            'created_by' => 'required',
-            'nama' => 'required|min_length[5]',
-        ]);
+        // $inputValidation = ;
         // $input = $validate->setRules();
-        if (!$input) {
-            $result = [
-                'responseMessage' => 'failed',
-                'errors' => $this->validator->getErrors()
-            ];
-            return $this->respond($result, 400, 'Bad Request');
+        if (!$this->validate([
+            'email' => [
+                'rules' => 'required|valid_email|is_unique[users.email]',
+                'errors' => [
+                    'required' => 'Email wajib diisi',
+                    'valid_email' => '{field} wajib diisi dengan format email menggunakan tanda \'@\'',
+                    'is_unique' => '{field} sudah ada',
+                ]
+            ],
+            'password' => [
+                'rules' => 'required|min_length[6]',
+                'errors' => [
+                    'required' => '{field} wajib diisi',
+                    'min_length' => '{field} wajib diisi setidaknya 6 karakter'
+                ]
+            ],
+            'level' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} user wajib dipilih'
+                ]
+            ],
+            'nama' => [
+                'rules' => 'required|min_length[5]',
+                'errors' => [
+                    'required' => '{field} wajib diisi',
+                    'min_length' => '{field} wajib diisi setidaknya 5 karakter'
+                ]
+            ],
+        ])) {
+            // $result = [
+            //     'responseMessage' => 'failed',
+            //     'errors' => $this->validator->getErrors()
+            // ];
+            $this->session->setFlashdata('error', 'Gagal tambah data user');
+            return redirect()->to('/backoffice/user/create_user')->withInput();
             // return redirect()->to('/backoffice/registration')->withInput();
         }
         try {
+            $nama = $this->request->getPost('nama');
+            $email = $this->request->getPost('email');
+            $password = md5($this->request->getPost('password'));
+            $user_level = $this->request->getPost('level');
+            $phone = $this->request->getPost('phone');
+            $lokasi = $this->request->getPost('lokasi');
+            $created_by = $this->session->get('id_user');
 
             $saving_user = $this->userModel->save([
-                'email' => $this->request->getVar('email'),
-                'password' => md5($this->request->getVar('password')),
-                'user_level' => $this->request->getVar('user_level'),
-                'created_by' => $this->request->getVar('created_by')
+                'email' => $email,
+                'password' => $password,
+                'user_level' => $user_level,
+                'created_by' => $created_by,
+                'updated_by' => $created_by
+            ]);
+            $id_user = $this->userModel->getInsertID();
+
+            $user_detail = $this->userDetailModel->save([
+                'id_user' => $id_user,
+                'nama' => $nama,
+                'id_lokasi' => $lokasi,
+                'phone' => $phone,
+                // 'created_by' => $created_by,
+                // 'updated_by' => $created_by
             ]);
 
-            $id_created = $this->userModel->getInsertID();
-            $detailUser = ['id_user' => $id_created, 'nama' => $this->request->getVar('nama'), 'alamat' => $this->request->getVar('alamat'), 'created_at' => date('Y-m-d H:i:s')];
-            $saving_detail = $this->userModel->crud_users_detail('create', $id_created, $detailUser);
-            // dd($saving_detail);
-            $detail_user = $this->userModel->detailById($id_created);
-            if ($saving_user && $saving_detail && $detail_user) {
-                $result = [
-                    'responseMessage' => 'success',
-                    'data' => $detail_user
-                ];
-                return $this->respondCreated($result, 'success');
+            if ($saving_user && $user_detail) {
+                $this->session->setFlashdata('success', 'Berhasil tambah data user');
+                return redirect()->to('/backoffice/user');
             } else {
-                $result = [
-                    'responseMessage' => 'failed ',
-                    'data' => null
-                ];
-                return $this->respond($result, 400);
+                $this->session->setFlashdata('error', 'Gagal tambah data user ' . db_connect()->error());
+                return redirect()->to('/backoffice/user/create_user')->withInput();
             }
         } catch (\Throwable $th) {
             //throw $th;
@@ -162,17 +244,82 @@ class User extends ResourceController
                 'responseMessage' => 'error ' . $th->getMessage(),
                 'data' => null
             ];
-            return $this->respond($result, 500);
+            $this->session->setFlashdata('error', 'Gagal tambah data user ' . $th->getMessage());
+            return redirect()->to('/backoffice/user/create_user')->withInput();
+            // return $this->respond($result, 500);
         }
     }
 
-    public function updateUser()
+    public function edit_user($id)
     {
-        # code...
+        $data = [
+            'kota' => $this->kotaModel->findAll(),
+            'level_user' => $this->userLevelModel->findAll(),
+            'title' => "Tambah Data User",
+            'page' => "user",
+            'session' => $this->session,
+            'user' => $this->userModel->find($id),
+            'user_detail' => $this->userDetailModel->where(['id_user' => $id])->first(),
+            'validation' => \Config\Services::validation()
+        ];
+        return view('backoffice/user/edit_user', $data);
     }
 
-    // proses update
-    public function doUpdate()
+    public function update_user()
+    {
+        $id_user = $this->request->getPost('id_user');
+        $id_detail_user = $this->request->getPost('id_detail_user');
+        $session_user = $this->session->get('id_user');
+        if (!$session_user) {
+            $this->session->setFlashdata('error', 'Gagal ubah data user, anda belum login');
+            return redirect()->to('/backoffice/user')->withInput();
+        }
+        try {
+            $user = $this->userModel->find($id_user);
+            $detail_user = $this->userDetailModel->find($id_detail_user);
+            if (is_array($user) && is_array($detail_user)) {
+                $password = $this->request->getPost('password');
+                $old_password = $this->request->getPost('old_password');
+                $nama = $this->request->getPost('nama');
+                $id_lokasi = $this->request->getPost('lokasi');
+                $level = $this->request->getPost('level');
+                $email = $this->request->getPost('email');
+                $phone = $this->request->getPost('phone');
+                $user_array = [
+                    'email' => $email,
+                    'user_level' => $level,
+                    'updated_by' => $session_user
+                ];
+                if (!$password || $password == "" || $password == null) {
+                    $user_array['password'] = $old_password;
+                } else {
+                    $user_array['password'] = md5($password);
+                }
+                $detail_user_array = array(
+                    'nama' => $nama,
+                    'phone' => $phone,
+                    'id_lokasi' => $id_lokasi
+                );
+                $update1 = $this->userModel->update($id_user, $user_array);
+                $update2 = $this->userDetailModel->update($id_detail_user, $detail_user_array);
+                if ($update1 && $update2) {
+                    $this->session->setFlashdata('success', 'Berhasil ubah data user');
+                    return redirect()->to('/backoffice/user');
+                } else {
+                    $this->session->setFlashdata('error', 'Gagal ubah data user');
+                    return redirect()->to('/backoffice/user/edit_user/' . $id_user)->withInput();
+                }
+            } else {
+                $this->session->setFlashdata('error', 'Gagal ubah data user karena user tidak ditemukan');
+                return redirect()->to('/backoffice/user/edit_user/' . $id_user)->withInput();
+            }
+        } catch (\Throwable $th) {
+            $this->session->setFlashdata('error', 'Gagal tambah data user ' . $th->getMessage());
+            return redirect()->to('/backoffice/user/edit_user/' . $id_user)->withInput();
+        }
+    }
+
+    public function delete_user($id)
     {
         # code...
     }

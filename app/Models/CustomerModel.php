@@ -19,6 +19,7 @@ class CustomerModel extends Model
         'faskes_asal',
         'customer_unique',
         'invoice_number',
+        'status_peserta',
         'email',
         'nama',
         'nik',
@@ -38,10 +39,37 @@ class CustomerModel extends Model
         'tgl_kunjungan',
         'status_pembayaran',
         'token',
-        'catatan'
+        'catatan',
+        'url_pdf'
     ];
 
+    public function db_this()
+    {
+        return db_connect();
+    }
+
+    public function db_table()
+    {
+        return $this->db_this->table($this->table);
+    }
+
+    public function customer_jenis_test_filtering_date_between($select = "*", $id_jenis_test, $id_jenis_layanan, $date1, $date2)
+    {
+        $query = $this->db_this()->query("select {$select} from {$this->table} where jenis_test = '{$id_jenis_test}' AND jenis_layanan = '{$id_jenis_layanan}' AND tgl_kunjungan BETWEEN '{$date1}' AND '{$date2}'");
+        return $query->getFirstRow();
+    }
+
+
+
     protected $useTimestamps = true;
+
+    public function findCustomerCounter($jenis_layanan = '1', $tgl_kunjungan)
+    {
+        return db_connect()->table('customers')
+            ->select('count(*) as counter')
+            ->where('jenis_layanan', $jenis_layanan)
+            ->where('tgl_kunjungan', $tgl_kunjungan)->get();
+    }
 
     public function getCustomerAvailableByDate($jenis_test, $jenis_pemeriksaan, $jenis_layanan, $faskes_asal = '1', $tgl_kunjungan)
     {
@@ -99,7 +127,7 @@ class CustomerModel extends Model
         return $builder->get();
     }
 
-    public function customersBooking($id_data_jenis_test, $tgl_kunjungan = false, $jam_kunjungan = false, $paymentStatus = 'paid', $kehadiran = '0')
+    public function customersBooking($id_data_jenis_test, $tgl_kunjungan = false, $jam_kunjungan = false, $paymentStatus = 'settlement', $kehadiran = '0')
     {
         $builder = db_connect()->table('customers a')
             ->select('a.*, b.nama_pemeriksaan, c.jam, hour(c.jam) as jam_, c.kuota')

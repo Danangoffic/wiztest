@@ -22,7 +22,7 @@ class Faskes extends Controller
         $this->faskesModel = new FaskesModel();
         $this->kotaModel = new KotaModel();
         $this->userC = new User;
-        $this->session = session();
+        $this->session = \Config\Services::session();
     }
     public function index()
     {
@@ -50,7 +50,7 @@ class Faskes extends Controller
             'title' => 'Tambah Data Faskes',
             'page' => 'faskes',
             'kota' => $this->kotaModel->findAll(),
-            'session' => session()
+            'session' => $this->session
         );
         // dd($this->session->get('nama'));
         return view('backoffice/faskes/create_faskes', $data);
@@ -97,10 +97,10 @@ class Faskes extends Controller
             return redirect()->to('/backoffice/login');
         }
         $data = array(
-            'title' => 'Tambah Data Faskes',
+            'title' => 'Ubah Data Faskes',
             'page' => 'faskes',
             'kota' => $this->kotaModel->findAll(),
-            'session' => session(),
+            'session' => $this->session,
             'data' => $this->faskesModel->find($id_faskes),
             'id' => $id_faskes
         );

@@ -3,6 +3,14 @@
         <div class="login-logo">
             <a href="../../index2.html"><b>Backoffice</b>TEST</a>
         </div>
+        <?php if ($session->getFlashdata('error')) : ?>
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h5><i class="icon fas fa-ban"></i> Alert!</h5>
+                <?= $session->getFlashdata('error'); ?>
+            </div>
+        <?php endif; ?>
+
         <!-- /.login-logo -->
         <div class="card">
             <div class="card-body login-card-body">
@@ -16,6 +24,7 @@
                                 <span class="fas fa-envelope"></span>
                             </div>
                         </div>
+                        <?= $validation->getError('email'); ?>
                     </div>
                     <div class="input-group mb-3">
                         <input type="password" class="form-control" placeholder="Password" autocomplete="off" name="password">

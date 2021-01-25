@@ -12,6 +12,7 @@ use App\Models\LayananTestModel;
 use App\Models\MarketingModel;
 use App\Models\PemeriksaanModel;
 use App\Models\PemeriksaModel;
+use App\Models\StatusHasilModel;
 use App\Models\TestModel;
 use CodeIgniter\Controller;
 use CodeIgniter\Validation\Validation;
@@ -33,10 +34,10 @@ class Peserta extends Controller
     public $layananModel;
     public $pemeriksaModel;
     public $customerPublic;
-
+    public $statusHadir;
     public function __construct()
     {
-        $this->session = session();
+        $this->session = \Config\Services::session();
         $this->customerModel = new CustomerModel();
         $this->pemeriksaModel = new PemeriksaModel();
         $this->jenisPemeriksaanModel = new PemeriksaanModel();
@@ -47,14 +48,39 @@ class Peserta extends Controller
         $this->testModel = new TestModel();
         $this->layananModel = new LayananModel();
         $this->customerPublic = new Customer;
+        $this->statusHadir = new StatusHasilModel();
     }
     public function index()
     {
-        $Customer = $this->customerModel->detailRegistrasi()->getResultArray();
+        $filter = ($this->request->getVar('filtering')) ? $this->request->getVar('filtering') : '';
+        $Customer = array();
+        if ($filter == "on") {
+            $date1 = ($this->request->getVar('date1')) ? $this->request->getVar('date1') : '';
+            $date2 = ($this->request->getVar('date2')) ? $this->request->getVar('date2') : '';
+            $queryFilter = 'SELECT * FROM customers';
+            $queryFilter .= " WHERE jenis_layanan = '1'";
+
+            if ($date1 !== '' && $date2 !== '') {
+                $queryFilter .= " AND (tgl_kunjungan BETWEEN '" . $date1 . "' AND '" . $date2 . "')";
+            } elseif ($date1 !== '') {
+                $queryFilter .= " AND tgl_kunjungan = '" . $date1 . "'";
+            } elseif ($date2 !== '') {
+                $queryFilter .= " AND tgl_kunjungan BETWEEN '" . date('Y-m-d') . "' AND '" . $date2 . "'";
+            }
+            $queryFilter .= " ORDER BY id DESC";
+            $Customer = db_connect()->query($queryFilter)->getResultArray();
+        } else {
+            $Customer = db_connect()->table('customers')->select()->orderBy('id', 'DESC')->get()->getResultArray();
+        }
         $data = array(
-            'title' => "Registrasi",
+            'title' => "Registrasi 123",
             'page' => "registrasi",
             'data_customer' => $Customer,
+            'instansiModel' => $this->instansiModel,
+            'marketingModel' => $this->marketingModel,
+            'layananModel' => $this->layananModel,
+            'testModel' => $this->testModel,
+            'layananTestModel' => $this->layananTestModel,
             'session' => session()
         );
         return view('backoffice/registrasi/index', $data);
@@ -157,7 +183,8 @@ class Peserta extends Controller
                 'no_antrian' => $no_urutan,
                 'jam_kunjungan' => $jam_kunjungan,
                 'tgl_kunjungan' => $tgl_kunjungan,
-                'status_pembayaran' => $this->request->getPost('status_pembayaran')
+                'status_pembayaran' => $this->request->getPost('status_pembayaran'),
+                'status_peserta' => $this->request->getPost('status_peserta')
             ];
             $insert = $this->customerModel->insert($DataInsertCustomer);
             $insert_id = null;
@@ -209,7 +236,8 @@ class Peserta extends Controller
             'data_customer' => $Customer,
             'session' => session(),
             'id' => $id,
-            'detail_payment' => $DetailPayment
+            'detail_payment' => $DetailPayment,
+            'status_hadir' => $this->statusHadir
         );
         return view('backoffice/peserta/detail_peserta', $data);
     }
@@ -288,8 +316,8 @@ class Peserta extends Controller
             // echo "Urutan : " . $no_urutan;
 
             // var_dump($data);
-            $DataInsertCustomer = [
-                'nama' => $nama,
+            $DataInsertCustomer = array(
+                // 'nama' => $nama,
                 'email' => $email,
                 'nik' => $nik,
                 'phone' => $phone,
@@ -312,7 +340,7 @@ class Peserta extends Controller
                 'jam_kunjungan' => $jam_kunjungan,
                 'tgl_kunjungan' => $tgl_kunjungan,
                 'status_pembayaran' => $this->request->getPost('status_pembayaran')
-            ];
+            );
             $update = $this->customerModel->update($id_customer, $DataInsertCustomer);
             $insert_id = null;
             if ($update) {
@@ -346,9 +374,9 @@ class Peserta extends Controller
     public function delete($id_customer)
     {
         $data = array(
-            'title' => "Tambah Customer",
+            'title' => "Hapus Customer",
             'page' => "registrasi",
-            'session' => session(),
+            'session' => $this->session,
         );
         return view('backoffice/peserta/delete_peserta', $data);
     }
@@ -374,6 +402,48 @@ class Peserta extends Controller
         }
     }
 
+    public function kehadiran_by_scanning_qr($id_peserta)
+    {
+        $update_peserta_by_qr = $this->updated_by_qr($id_peserta);
+        if ($update_peserta_by_qr == "hadir") {
+            $customerDetail = $this->customerModel->find($id_peserta);
+            $nama_customer = $customerDetail['nama'];
+            $order_id = $customerDetail['customer_unique'];
+            $message = "Tanggal: " . date_format($customerDetail['tgl_kunjungan'], 'd-m-Y') . ", pukul " . date_format($customerDetail['jam_kunjungan'], 'H:i');
+        } else {
+            $message = $update_peserta_by_qr;
+        }
+    }
+
+    public function updated_by_qr($id_peserta)
+    {
+        $customerDetail = $this->customerModel->find($id_peserta);
+        if ($customerDetail) {
+            $statusKehadiran = $customerDetail['kehadiran'];
+            $statusPembayaran = $customerDetail['status_pembayaran'];
+            if ($statusKehadiran == 0 && ($statusPembayaran == 'paid' || $statusPembayaran == 'invoice')) {
+                $dataCustomer = array(
+                    'kehadiran' => '1'
+                );
+                $updateCustomer = $this->customerModel->update($id_peserta, $dataCustomer);
+                $insertDataHadir = array('id_customer' => $id_peserta);
+                $insertKehadiran = db_connect()->table('kehadiran')->insert($insertDataHadir);
+                if ($updateCustomer && $insertKehadiran) {
+                    return "hadir";
+                } else {
+                    $this->session->setFlashdata('error', 'Gagal update data peserta');
+                    return "gagal. peserta tidak ditemukan";
+                }
+            } else if ($statusKehadiran == 1 || $statusKehadiran == "1") {
+                return "sudah hadir";
+                $this->session->setFlashdata('error', 'Peserta belum melakukan pelunasan');
+                // return false;
+            }
+        } else {
+            return "gagal. peserta tidak ditemukan";
+        }
+    }
+
     public function updateHadirkanPeserta($id_peserta)
     {
         $customerDetail = $this->customerModel->find($id_peserta);
@@ -385,7 +455,9 @@ class Peserta extends Controller
                     'kehadiran' => '1'
                 );
                 $updateCustomer = $this->customerModel->update($id_peserta, $dataCustomer);
-                if ($updateCustomer) {
+                $insertDataHadir = array('id_customer' => $id_peserta);
+                $insertKehadiran = db_connect()->table('kehadiran')->insert($insertDataHadir);
+                if ($updateCustomer && $insertKehadiran) {
                     return true;
                 } else {
                     $this->session->setFlashdata('error', 'Gagal update data peserta');
@@ -453,7 +525,7 @@ class Peserta extends Controller
             ]
         ]);
         if (!$validation) {
-            return redirect()->to('/backoffice/peserta/create')->withInput();
+            return redirect()->back()->withInput();
         } else {
             return true;
         }

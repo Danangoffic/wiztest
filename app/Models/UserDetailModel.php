@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class UserDetailModel extends Model
 {
-    protected $table      = 'user_detail';
+    protected $table      = 'users_detail';
     // protected $primaryKey = 'id';
 
     // protected $returnType     = 'array';
@@ -14,8 +14,12 @@ class UserDetailModel extends Model
 
     protected $allowedFields = [
         'id_user',
+        'id_lokasi',
         'nama',
         'alamat',
+        'phone',
+        'created_by',
+        'updated_by'
     ];
 
     protected $useTimestamps = true;

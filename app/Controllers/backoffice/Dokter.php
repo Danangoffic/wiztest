@@ -11,6 +11,8 @@ use App\Models\PemeriksaanModel;
 use CodeIgniter\Controller;
 use App\Controllers\backoffice\User;
 use App\Controllers\backoffice\Layanan;
+use App\Models\UserDetailModel;
+
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
@@ -21,13 +23,15 @@ class Dokter extends Controller
     protected $kotaModel;
     protected $userC;
     protected $layananC;
+    protected $detailUserModel;
     public function __construct()
     {
         $this->dokterModel = new DokterModel();
         $this->userC = new User;
         $this->layananC = new Layanan;
+        $this->detailUserModel = new UserDetailModel();
         // $this->kotaModel = new KotaModel();
-        $this->session = session();
+        $this->session = \Config\Services::session();
     }
     public function index()
     {
@@ -40,7 +44,7 @@ class Dokter extends Controller
             'page' => 'dokter',
             'data' => $this->dokterModel->findAll(),
             // 'kota' => $this->kotaModel,
-            'session' => session(),
+            'session' => $this->session,
             'user' => $this->userC->userModel
         );
         // dd($this->session->get('nama'));
@@ -73,6 +77,12 @@ class Dokter extends Controller
                 'rules' => 'required',
                 'errors' => '{field} lengkap dokter harus diisi'
             ],
+            'email' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} wajib diisi'
+                ]
+            ]
         ]);
         // dd($this->validator);
         if (!$validation_input) {
@@ -96,17 +106,31 @@ class Dokter extends Controller
         $password = $this->request->getpost('password');
         $nama = $this->request->getpost('nama');
         $phone = $this->request->getpost('phone');
+        $level_user = $this->request->getPost('level_user');
         $user_id = null;
         if ($email != '' && $password != '') {
             $insert_user = array(
                 'email' => $email,
                 'password' => md5($password),
+                'user_level' => $level_user,
                 'created_by' => $this->session->get('id_user'),
                 'updated_by' => $this->session->get('id_user')
             );
             $inserting_user = $this->userC->userModel->insert($insert_user);
             if ($inserting_user) {
                 $user_id = $this->userC->userModel->getInsertID();
+                $detail_array = array(
+                    'nama' => $nama,
+                    'phone' => $phone,
+                    'id_lokasi' => '1',
+                    'id_user' => $user_id
+                );
+                $insert_detail = $this->detailUserModel->insert($detail_array);
+                if (!$insert_detail) {
+                    $this->userC->userModel->delete($user_id);
+                    $this->session->setFlashdata('error', 'Gagal Tambahkan data dokter');
+                    return redirect()->to('/backoffice/dokter/create')->withInput();
+                }
             }
         }
         // $url_qrcode = $this->layananC->getUrlQRCode(base_url('backoffice/dokter/'))
@@ -158,7 +182,21 @@ class Dokter extends Controller
 
     public function update(int $id_dokter)
     {
+
+        $data_dokter = $this->dokterModel->find($id_dokter);
+        $id_user_dokter = $data_dokter['id_user'];
+        if ($id_user_dokter == '' || $id_user_dokter == null) {
+            $this->session->setFlashdata('error', 'Gagal mengubah data');
+            return redirect()->to('/backoffice/dokter/edit/' . $id_dokter)->withInput();
+        }
+
         $validation_input = $this->validate([
+            'email_dokter' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} wajib diisi'
+                ]
+            ],
             'nama' => [
                 'rules' => 'required',
                 'errors' => '{field} lengkap dokter harus diisi'
@@ -173,40 +211,44 @@ class Dokter extends Controller
             ]
         ]);
         if (!$validation_input) {
-            return redirect()->to('/backoffice/dokter/create')->withInput();
+            $this->session->setFlashdata('error', "Gagal mengubah data dokter");
+            return redirect()->to('/backoffice/dokter/edit/' . $id_dokter)->withInput();
         }
+        $email = $this->request->getPost('email_dokter');
+        $password = ($this->request->getPost('password_dokter')) ? $this->request->getPost('password_dokter') : '';
+        $nama = $this->request->getPost('nama');
+        $phone = $this->request->getPost('phone');
+        $user_id = null;
         $img_ttd = $this->request->getFile('img_ttd');
-
+        $old_img_ttd = $this->request->getPost('old_img_ttd');
         if ($img_ttd->getError() == 4) {
-            $namattd = $this->request->getPost('img_ttd_old');
+            $namattd = $old_img_ttd;
         } else {
             //generate name with random name
-            $namattd = $img_ttd->getRandomName();
+            $namattd = str_replace('.', '', str_replace(',', '', str_replace(' ', '_', $nama))) . $img_ttd->getRandomName();
             //move file ke folder img with new name
             $img_ttd->move('assets/dokter', $namattd);
-            if ($this->request->getPost('img_ttd_old') !== "") {
-                unlink('assets/dokter/' . $this->request->getPost('img_ttd_old'));
+            if ($old_img_ttd || $old_img_ttd !== "" || $old_img_ttd !== null) {
+                unlink('assets/dokter/' . $this->request->getPost('old_img_ttd'));
             }
         }
         $url_qrcode = $this->layananC->getUrlQRCode(base_url('assets/dokter/' . $namattd));
-        $data_dokter = $this->dokterModel->find($id_dokter);
-        $id_user_dokter = $data_dokter['id_user'];
-        if ($id_user_dokter !== '' || $id_user_dokter !== null) {
-            $email = $this->request->getPost('email');
-            $password = $this->request->getPost('password');
-            $nama = $this->request->getPost('nama');
-            $phone = $this->request->getPost('phone');
-            $user_id = null;
-            if ($email != '' && $password != '') {
-                $update_user = array(
-                    'email' => $email,
-                    'password' => md5($password),
-                    'created_by' => session('id'),
-                    'updated_by' => session('id')
-                );
-                $this->userC->userModel->update($id_user_dokter, $update_user);
-            }
+        $update_user = array();
+        if ($email != '' && $password != '') {
+            $update_user = array(
+                'email' => $email,
+                'password' => md5($password),
+                'created_by' => session('id'),
+                'updated_by' => session('id')
+            );
+        } else if ($email !== "" && $password == '') {
+            $update_user = array(
+                'email' => $email,
+                'created_by' => session('id'),
+                'updated_by' => session('id')
+            );
         }
+        $this->userC->userModel->update($id_user_dokter, $update_user);
 
         // $url_qrcode = $this->layananC->getUrlQRCode(base_url('backoffice/dokter/'))
         $data_dokter = array(
@@ -219,10 +261,10 @@ class Dokter extends Controller
         $update_dokter = $this->dokterModel->update($id_dokter, $data_dokter);
 
         if ($update_dokter) {
-            $this->session->setFlashdata('success', 'Berhasil tambah data dokter');
+            $this->session->setFlashdata('success', 'Berhasil ubah data dokter');
             return redirect()->to('/backoffice/dokter');
         } else {
-            $this->session->setFlashdata('error', 'Gagal tambah data dokter');
+            $this->session->setFlashdata('error', 'Gagal ubah data dokter');
             return redirect()->to('/backoffice/dokter')->withInput();
         }
     }
@@ -257,8 +299,10 @@ class Dokter extends Controller
                 $this->dokterModel->delete($id_dokter);
             }
             $source = 'assets/dokter/';
-            unlink($source . $findDataDokter['img_ttd']);
-            $this->userC->userModel->delete($user_dokter['id']);
+            if ($findDataDokter['img_ttd'] !== "")
+                unlink($findDataDokter['img_ttd'], $source);
+            $id_user_dokter = $user_dokter['id'];
+            $this->userC->userModel->delete($id_user_dokter);
             $this->session->setFlashdata('success', 'Berhasil menghapus data dokter');
             return redirect()->to('/backoffice/dokter');
         } else {

@@ -47,7 +47,34 @@
                     <div class="input-group mb-3">
                         <input type="text" name="noRegistration" class="form-control" id="noRegistration" aria-describedby="noRegistration" placeholder="Masukkan Nomor Registrasi">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="button" id="btnSearchReschedule">Cari</button>
+                            <button class="btn btn-primary" type="button" onclick="return getRescheduleNoRegistration()">Cari</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_cari_hasil" tabindex="-1" aria-labelledby="modal-rescheduleLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-cari-hasilLabel">Reschedule</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="input-group mb-3">
+                        <input type="text" name="noRegistrationHasil" class="form-control" id="noRegistrationHasil" aria-describedby="noRegistrationHasil" placeholder="Masukkan Nomor Registrasi">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button" onclick="return getHasilNoRegistation()">Cari</button>
                         </div>
                     </div>
                 </div>
@@ -75,10 +102,35 @@
                     <div class="input-group mb-3">
                         <input type="text" name="noRegistration2" class="form-control" id="noRegistration2" aria-describedby="noRegistration2" placeholder="Masukkan Nomor Registrasi">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="button" id="btnSearchCheckReg">Cari</button>
+                            <button class="btn btn-primary" type="button" onclick="return getCheckNoRegistration()">Cari</button>
                         </div>
                     </div>
-
+                </div>
+                <div class="col-md-12">
+                    <div id="loading_check_no_registration hidden" class="row">
+                        <div class="spinner-grow text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-secondary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-success" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-danger" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-warning" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-info" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <div class="spinner-grow text-light" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    <div id="data_result_check_registration"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -201,11 +253,20 @@
         </div>
     </div>
 </div>
+
+
 <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?= $midtrans_client_key; ?>"></script>
 <script>
     var id_jenis_test, nama_jenis_test, jam_kunjungan, token_client;
+    var midtransToken, invoice_number, transaction;
+    $("#loading").show();
     $(document).ready(() => {
+
         getMenu();
+        $(".modal").on("hide.bs.modal", function(e) {
+            console.log(e);
+            window.location.reload();
+        });
         document.getElementById('registrasi').addEventListener('click', registrasi, false);
         // document.getElementById('nextPageForm').addEventListener('click', toggleForm, false);
         // document.getElementById('backPageForm').addEventListener('click', toggleForm, false);
@@ -217,6 +278,7 @@
                 getJadwal();
             }
         });
+
     });
 
     function getMenu() {
@@ -256,7 +318,9 @@
 
     function getDetailForm2(id_jenis_test) {
         $.get('<?= base_url('detail_form2'); ?>', {
-            id_jenis_test: id_jenis_test
+            id_jenis_test: id_jenis_test,
+            id_pemeriksaan: 1,
+            segmen: 1
         }).then(e => {
             var jp = '';
             $.each(e.data_layanan, (i, v) => {
@@ -460,35 +524,152 @@
         //     },
         //     // error: e => console.error(e)
         // });
-        var midtransToken;
+
         $.post(url_post_registration, dataSend).then((data, status) => {
             if (status == "success") {
                 console.log('STATUS', status);
                 let midtrans_return = data.data.data;
                 midtransToken = midtrans_return.token;
-                let invoice_number = data.invoice_number;
-                let transaction = data.transaction;
+                invoice_number = data.invoice_number;
+                transaction = data.transaction;
                 console.log('midtrans return : ', midtrans_return);
                 console.log('invoice number : ', invoice_number);
                 console.log('transaction detail : ', transaction);
                 $("#registrasi, #backForm").addClass("disabled");
                 $("#registrasi").html(`Loading..<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
-                snap.pay(midtransToken, {
-                    onSuccess: result => {
-                        location.reload;
-                    },
-                    onPending: result => {
-                        location.reload;
-                    },
-                    onError: result => {
-                        location.reload;
-                    },
-                    onClose: () => {
-                        location.reload;
-                    }
-                });
+                showPayment(midtransToken);
             }
             // snap.show();
+        });
+    }
+
+    function updateData(result) {
+        $("#registrasi").removeClass('btn-primary').addClass('btn-success');
+        $("#registrasi").html(`Success <i class="fa check-circle"></i>`);
+        console.log('result', result);
+        var payent_type = result.payment_type;
+        var order_id = result.order_id;
+        var pdf_url = result.pdf_url;
+        var gross_amount = result.gross_amount;
+        var transaction_status = result.transaction_status;
+        var status_code = result.status_code;
+        var finish_url = result.finish_redirect_url;
+        var transaction_id = result.transaction_id;
+        var data_object = {
+            payent_type,
+            order_id,
+            pdf_url,
+            gross_amount,
+            transaction_status,
+            status_code,
+            finish_url,
+            transaction_id
+        };
+        let url_update = '<?= base_url('api/update_status'); ?>';
+        $.ajax({
+            url: url_update,
+            data: data_object,
+            type: 'post',
+            success: function(data, status, jqhr) {
+                if (transaction_status == 'settlement' || transaction_status == "capture") {
+                    showToast('success', 'Pembayaran berhasil, silahkan tutup untuk cek QR Code Anda').then(result => {
+                        if (result.dismiss) {
+                            let qr_detail = data.qr_detail;
+                            if (qr_detail.responseMessage == "success") {
+                                let urlQR = qr_detail.url_img;
+                                showImg(urlQR, 'QR Code', 'Order ID : <string>' + order_id + '</strong>').then(reloadAfterDismiss);
+                            } else {
+                                window.location.reload();
+                            }
+                        }
+                    });
+                } else if (transaction_status == 'pending') {
+                    showToast('info', 'Silahkan melakukan pembayaran').then(reloadAfterDismiss)
+                } else if (transaction_status == "deny" || transaction_status == "cancel") {
+                    showError('Maaf, pembayaran ditolak').then(reloadAfterDismiss);
+                } else if (transaction_status == "expire") {
+                    showError('Maaf, pembayaran sudah melewati batas waktunya').then(reloadAfterDismiss);
+                }
+            }
+        })
+    }
+
+    function reloadAfterDismiss(res) {
+        if (res.dismiss) {
+            window.location.reload();
+        }
+    }
+
+    function get_status_payment_customer(order_id) {
+        return get_encoded_server_key(order_id);
+    }
+
+    function get_encoded_server_key(order_id) {
+        $.post('<?= base_url('api/get_server_key'); ?>', {
+            order_id
+        }, function(data, status, xhr) {
+            if (data.statusMessage == 'success') {
+                let server_key = data.server_key;
+                status_payment(order_id, server_key);
+            } else {
+                console.error('failed to retrieve data');
+            }
+        });
+    }
+
+    function ShowQRCustomerByOrderId(order_id = '') {
+        $.ajax({
+            url: '<?= base_url('api/getQRByOrderId'); ?>',
+            type: 'post',
+            data: {
+                order_id
+            },
+            success: (data, status, xhr) => {
+                if (data.statusMessage == 'success') {
+                    showImg(data.url_img, 'QR Code');
+                }
+            },
+            error: (xhr, status, thrown) => {
+
+            }
+        })
+    }
+
+    function status_payment(order_id = '', encoded_server_key) {
+        $.ajax({
+            method: 'GET',
+            url: `https://api.sandbox.midtrans.com/v2/${order_id}/status`,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic ' + encoded_server_key
+            },
+            async: true,
+            success: (data, status, xhqr) => {
+                console.log(data);
+            },
+            error: (e) => console.log(e)
+        });
+    }
+
+    function cancelData(result) {
+        console.log('result', result);
+    }
+
+    function showPayment(midtransToken) {
+        snap.pay(midtransToken, {
+            onSuccess: result => {
+                updateData(result);
+            },
+            onPending: result => {
+                updateData(result);
+            },
+            onError: result => {
+                cancelData(result);
+            },
+            onClose: () => {
+                cancelData(result);
+            }
         });
     }
 
@@ -504,8 +685,119 @@
         });
     }
 
+    function showToast(type = 'info', text) {
+        return Swal.fire(
+            text,
+            '',
+            type
+        );
+    }
+
+    // fun
+
+    function showImg(urlImg = "", title = 'Notification', footer = '') {
+        return Swal.fire({
+            title: title,
+            imageUrl: urlImg,
+            imageHeight: 400,
+            imageWeight: 400,
+            imageAlt: 'QRCODE',
+            footer: footer
+            // type: 'success',
+            // text: "Berhasil M"
+        });
+    }
+
     function formatNumber(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function check_no_reg(order_id, tos) {
+        let url = "<?= base_url('api/check_no_reg'); ?>";
+        var requestData = $.ajax({
+            url,
+            type: "GET",
+            data: {
+                order_id,
+                tos
+            },
+            success: success_check_no_reg
+        });
+        return requestData;
+    }
+
+    function success_check_no_reg(data, status = "success", xhr) {
+        $("#loading_check_no_registration").hide();
+    }
+
+    function getCheckNoRegistration() {
+        $("#loading_check_no_registration").show();
+        let order_id = $("#noRegistrationHasil").val();
+        if (order_id != "") {
+            let url = "<?= base_url('api/check_no_reg'); ?>";
+            // $("#noRegistration2").hide();
+            return check_no_reg(order_id, "registrasi_detail");
+            // $.ajax({
+            //     url,
+            //     type: "GET",
+            //     data: {
+            //         order_id,
+            //         tos: "registrasi_detail"
+            //     },
+            //     success: function(data, status, xhr) {
+
+            //     }
+            // });
+        }
+    }
+
+    function getHasilNoRegistation() {
+        let order_id = $("#noRegistration2").val();
+        if (order_id != "") {
+            let url = "<?= base_url('api/check_no_reg'); ?>";
+            // $("#noRegistration2").hide();
+            $.ajax({
+                url,
+                type: "GET",
+                data: {
+                    order_id,
+                    tos: "hasil"
+                },
+                success: function(data, status, xhr) {
+                    console.table(data);
+                    if (status == "ok") {
+                        let status_cov = data.status_cov,
+                            status_gen = data.status_gen,
+                            status_orf = data.status_orf,
+                            status_igg = data.status_igg,
+                            status_igm = data.status_igm,
+                            paket_pemeriksaan = data.paket_pemeriksaan,
+                            nama_customer = data.nama_customer,
+                            nik = data.nik,
+                            tgl_kunjungan = data.tgl_kunjungan;
+                    }
+                }
+            });
+        }
+    }
+
+    function getRescheduleNoRegistration() {
+        let order_id = $("#noRegistration").val();
+        if (order_id != "") {
+            let url = "<?= base_url('api/check_no_reg'); ?>";
+            // $("#noRegistration2").hide();
+            $.ajax({
+                url,
+                type: "GET",
+                data: {
+                    order_id,
+                    tos: "reschedule"
+                },
+                success: function(data, status, xhr) {
+
+                }
+            });
+        }
     }
 </script>
 <?= $this->endSection(); ?>

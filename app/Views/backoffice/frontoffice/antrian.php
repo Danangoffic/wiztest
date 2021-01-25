@@ -2,114 +2,99 @@
 <?= $this->section('content'); ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
+    <section class="content-header pb-0">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <form action="<?= base_url('backoffice/frontoffice/antrian_swab_walk_in'); ?>" method="POST">
+                        <div class="card collapsed-card">
+                            <div class="card-header">
+                                <button type="button" class="btn btn-default" data-card-widget="collapse">
+                                    Filtering
+                                </button>
+                            </div>
 
-    <section class="content mt-3">
+                            <!-- <h5 class="card-header">Filter Tanggal Kunjungan</h5> -->
 
-        <div class="card">
-            <form action="<?= base_url('backoffice/frontoffice/antrian_swab_walk_in'); ?>" method="POST">
-                <div class="card-body bg-light">
-                    <div class="form-group row col-6">
-                        <label for="date1" class="col-form-label">Tanggal Kunjungan</label>
-                        <input type="date" class="form-control" id="date1" name="date1" value="<?= $filterDate; ?>" max="<?= date('Y-m-d'); ?>">
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Filter</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="row">
-            <div class="col-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-heading"><?= ucwords('Antrian Swab Sameday'); ?></h5>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered table-condensed table-hover" id="data_customer">
-                            <thead>
-                                <tr>
-                                    <th>Jam</th>
-                                    <th>Kuota</th>
-                                    <th>Jml Booking (tgl <?= $filterDate; ?>) </th>
-                                    <th>Antrain</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
+                            <input type="hidden" name="filtering" value="on">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="date" class="form-control" id="date1" name="date1" value="<?= (old('date1')) ? old('date1') : $filterDate; ?>" max="<?= date('Y-m-d'); ?>">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                            </div>
 
-                                use App\Models\CustomerModel;
-
-                                $no = 1;
-                                foreach ($kuotaSwabSameDay as $key => $value) {
-                                    // $DetailInstansi = new Ins
-                                    $customer_model =  new CustomerModel();
-                                    $jml_booking = $customer_model->customersBooking($value['jenis_test_layanan'], $filterDate, $value['jam'])->get()->getResultArray();
-                                    $jml_antrian = $customer_model->customersBooking($value['jenis_test_layanan'], $filterDate, $value['jam'], 'paid', '1')->get()->getResultArray();
-                                    // echo db_connect()->showLastQuery();
-                                    // exit();
-                                ?>
-                                    <tr>
-                                        <td><?= $value['jam_int']; ?></td>
-                                        <td><?= $value['kuota']; ?></td>
-                                        <td><?= count($jml_booking); ?></td>
-                                        <td><?= count($jml_antrian); ?></td>
-                                        <td>
-                                            <a href="<?= base_url('backoffice/antrian/' . $filterDate . '/' . $value['jam_int'] . '/' . $value['jenis_test_layanan']); ?>" class="btn btn-primary btn-sm">Detail</a>
-                                        </td>
-                                    </tr>
-                                <?php
-                                    $no++;
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-                    </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="col-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-heading"><?= ucwords('Antrian Swab Basic'); ?></h5>
+        </div>
+    </section>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <?php
+                foreach ($data_layanan_test as $key => $value) {
+                    $detail_layanan = $layanan_model->find($value['id_layanan']);
+                    $detail_test = $test_model->find($value['id_test']);
+                    $nama_layanan = $detail_layanan['nama_layanan'];
+                    $nama_test = $detail_test['nama_test'];
+                    $jenis_test_layanan = $value['id_layanan'];
+                ?>
+                    <div class="col-md-6">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <div class="card-title">Antrian <?= $nama_test . " " . $nama_layanan; ?> (Tanggal : <?= $filterDate; ?>)</div>
+                            </div>
+                            <div class="card-body p-0 pb-2">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-condensed table-hover" id="data_customer">
+                                        <thead>
+                                            <tr>
+                                                <th>Jam</th>
+                                                <th>Kuota</th>
+                                                <th>Jml Booking </th>
+                                                <th>Antrain</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $no = 1;
+                                            $kuota_swab = $kuota_model->where(['jenis_test_layanan' => $jenis_test_layanan])->get()->getResultArray();
+                                            foreach ($kuota_swab as $key => $value) {
+                                                // $DetailInstansi = new Ins
+                                                $jml_booking = $customer_model->customersBooking($value['jenis_test_layanan'], $filterDate, $value['jam'])->get()->getResultArray();
+                                                $jml_antrian = $customer_model->customersBooking($value['jenis_test_layanan'], $filterDate, $value['jam'], 'settlement', '1')->get()->getResultArray();
+                                                // echo db_connect()->showLastQuery();
+                                                // exit();
+                                            ?>
+                                                <tr>
+                                                    <td><?= $value['jam']; ?></td>
+                                                    <td class="text-center"><?= $value['kuota']; ?></td>
+                                                    <td class="text-center"><?= count($jml_booking); ?></td>
+                                                    <td class="text-center"><?= count($jml_antrian); ?></td>
+                                                    <td>
+                                                        <a href="<?= base_url("backoffice/frontoffice/detail_antrian/{$jenis_test_layanan}/{$filterDate}/"  . intval($value['jam'])); ?>" class="btn btn-primary btn-sm">Detail</a>
+                                                    </td>
+                                                </tr>
+                                            <?php
+                                                $no++;
+                                            }
+                                            ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <table class="table table-bordered table-condensed table-hover" id="data_customer2">
-                            <thead>
-                                <tr>
-                                    <th>Jam</th>
-                                    <th>Kuota</th>
-                                    <th>Jml Booking (tgl <?= $filterDate; ?>) </th>
-                                    <th>Antrain</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-
-                                $no = 1;
-                                foreach ($kuotaSwabBasic as $key => $value) {
-                                    $jml_booking = $customer_model->customersBooking($value['jenis_test_layanan'], $filterDate, $value['jam'])->get()->getResultArray();
-                                    $jml_antrian = $customer_model->customersBooking($value['jenis_test_layanan'], $filterDate, $value['jam'], 'paid', '1')->get()->getResultArray();
-                                    $booking = count($jml_booking);
-                                    $antriian = count($jml_antrian);
-                                ?>
-                                    <tr>
-                                        <td><?= $value['jam_int']; ?></td>
-                                        <td><?= $value['kuota']; ?></td>
-                                        <td><?= $booking; ?></td>
-                                        <td><?= $antriian; ?></td>
-                                        <td>
-                                            <a href="<?= base_url('backoffice/antrianbasic/' . $filterDate . '/' . $value['jam_int'] . '/' . $value['jenis_test_layanan']); ?>" class="btn btn-primary btn-sm">Detail</a>
-                                        </td>
-                                    </tr>
-                                <?php
-                                    $no++;
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <?php
+                }
+                ?>
             </div>
         </div>
     </section>
@@ -125,7 +110,10 @@
     $(document).ready(() => {
         $("#data_customer, #data_customer2").DataTable({
             searching: false,
-            ordering: false
+            ordering: false,
+            lengthChange: false,
+            processing: true,
+            info: false
         });
     });
 </script>

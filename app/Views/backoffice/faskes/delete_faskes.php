@@ -22,18 +22,19 @@
                 <?php
                 }
                 ?>
-                <div class="card">
+                <div class="card card-danger">
                     <div class="card-header">
-                        <h5 class="card-heading"><?= $title; ?></h5>
+                        <h5 class="card-title"><?= $title; ?></h5>
                     </div>
                     <div class="card-body">
-                        <h6>Apakah anda yakin untuk menghapus faskes asal <?= $data['nama_faskes']; ?>?</h6>
+                        <h5>Apakah anda yakin untuk menghapus faskes asal <?= $data['nama_faskes']; ?>?</h5>
+                        <br>
                         <form action="<?= base_url('backoffice/' . $page . '/do_delete/' . $id); ?>" method="post">
                             <?= csrf_field(); ?>
                             <input type="hidden" name="id_faskes" value="<?= $id; ?>">
                             <div class="form-group">
-                                <button class="btn btn-default" id="backButton" type="button" onclick="history.back()"><i class="fa fa-chevron-left"></i> Kembali</button>
-                                <button class="btn btn-danger" id="saveButton" type="submit"><i class="fa fa-save"></i> Hapus</button>
+                                <button class="btn btn-default mr-2" id="backButton" type="button" onclick="history.back()"><i class="fa fa-chevron-left"></i> Batal</button>
+                                <button class="btn btn-danger ml-2" id="saveButton" type="submit"><i class="fa fa-trash"></i> Hapus</button>
                             </div>
                         </form>
                     </div>

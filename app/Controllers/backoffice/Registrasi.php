@@ -25,7 +25,7 @@ class Registrasi extends Controller
         $this->instansiModel = new InstansiModel();
         $this->marketingModel = new MarketingModel();
         $this->kotaModel = new KotaModel();
-        $this->session = session();
+        $this->session = \Config\Services::session();
     }
     // public function index()
     // {

@@ -32,20 +32,34 @@ $routes->setAutoRoute(true);
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->get('/', 'Customer::index');
-$routes->get('/backoffice', 'backoffice\Home::index');
+$routes->add('/backoffice', 'backoffice\Home::index');
 $routes->get('/backoffice/login', 'backoffice\User::login');
 $routes->post('/backoffice/login', 'backoffice\User::doLogin');
-$routes->get('/backoffice/user', 'backoffice\User::detailById');
-$routes->post('/backoffice/user', 'backoffice\User::doCreate');
+
+
 $routes->get('/detail_form2', 'Customer::detail_form2');
 $routes->get('/cek_jadwal', 'Customer::jadwal_available');
 $routes->get('/menu', 'Customer::getMenu');
+$routes->get('/select-test', 'Customer::getSelectedTest');
+$routes->get('/home-service', 'Customer::home_service');
 $routes->post('/api/registration', 'Customer::registrasi');
+$routes->post('/api/get_server_key', 'Customer::get_server_key');
+$routes->post('/api/update_status', 'Customer::update_data_customer_registration');
+$routes->post('/api/getQRByOrderId', 'Customer::get_qr_by_order_id');
+$routes->get('/api/hadir/(:num)', 'backoffice\Peserta::kehadiran_by_scanning_qr/$1');
+// $routes->get('/api/marketings', '')
+// $routes->post('/api/midtrans_notification', 'Customer::midtrans_notification');
+$routes->add('/api/notification', 'Midtrans_handlers::index');
+$routes->add('/api/redirection-handler', 'Midtrans_handlers::redirection_handler');
+$routes->add('/api/test-email/(:any)', 'Midtrans_handlers::CobaSendEmail/$1');
+$routes->get('/api/check_no_registration', 'Customer::validasi_no_registrasi');
+
+$routes->get('detail_form2', 'Customer::detail_form2');
 
 
 // $routes->get('/backoffice/peserta/edit/(:num)', 'backoffice\Registrasi::edit_peserta/$1');
 
-$routes->get('/backoffice/print/barcode/(:num)', 'backoffice\Layanan::print_barcode/$1');
+$routes->get('/backoffice/print/barcode/(:any)', 'backoffice\Layanan::printbarcode/$1');
 $routes->get('/backoffice/print/qrcode/(:num)', 'backoffice\Layanan::print_qrcode/$1');
 $routes->get('/backoffice/print/pdf/(:num)', 'backoffice\Layanan::print_pdf/$1');
 
@@ -58,9 +72,10 @@ $routes->post('/backoffice/instansi/update/(:num)', 'backoffice\Instansi::update
 $routes->get('/backoffice/instansi/delete/(:num)', 'backoffice\Instansi::delete_instansi/$1');
 $routes->post('/backoffice/instansi/deleting', 'backoffice\Instansi::instansi/doDelete');
 
-$routes->get('/backoffice/registrasi', 'backoffice\Peserta::index');
+$routes->add('/backoffice/registrasi', 'backoffice\Peserta::index');
+// $routes->post('/backoffice/registrasi', 'backoffice\Peserta::index');
 $routes->get('/backoffice/peserta/create', 'backoffice\Peserta::create_peserta');
-$routes->get('/backoffice/peserta/save', 'backoffice\Peserta::save_peserta');
+$routes->post('/backoffice/peserta/save', 'backoffice\Peserta::save_peserta');
 $routes->get('/backoffice/peserta/(:num)', 'backoffice\Peserta::detail_peserta/$1');
 $routes->get('/backoffice/peserta/hapus/(:num)', 'backoffice\Registrasi::hapus_peserta/$1');
 // $routes->get('/backoffice/peserta/edit/(:num)', 'backoffice\Peserta::edit/$1');
@@ -73,9 +88,89 @@ $routes->get('/backoffice/pesert_overkuota/create', 'backoffice\Peserta_overkuot
 $routes->post('/backoffice/peserta_overkuota', 'backoffice\Peserta::save_customer_overkuota');
 
 $routes->get('/backoffice/frontoffice/home_service', 'backoffice\Home_service::index');
+$routes->add('/backoffice/frontoffice/(:segment)', 'backoffice\Frontoffice::$1');
+$routes->add('/backoffice/frontoffice/(:segment)/(:num)/(:any)/(:num)', 'backoffice\Frontoffice::$1/$2/$3/$4');
 
 $routes->get('/backoffice/dokter/(:num)', 'backoffice\Dokter::detail/$1');
 $routes->post('/backoffice/dokter/save', 'backoffice\Dokter::save');
+
+$routes->get('/backoffice/faskes', 'backoffice\Faskes::index');
+$routes->get('/backoffice/faskes/(:segment)', 'backoffice\Faskes::$1');
+$routes->post('/backoffice/faskes/(:segment)', 'backoffice\Faskes::$1');
+$routes->get('/backoffice/faskes/(:segment)/(:num)', 'backoffice\Faskes::$1/$2');
+$routes->post('/backoffice/faskes/(:segment)/(:num)', 'backoffice\Faskes::$1/$2');
+
+$routes->get('/backoffice/frontoffice', 'backoffice\Frontoffice::index');
+$routes->get('/backoffice/frontoffice/(:segment)', 'backoffice\Frontoffice::$1');
+$routes->get('/backoffice/frontoffice/(:segment)/(:num)', 'backoffice\Frontoffice::$1/$2');
+$routes->post('/backoffice/frontoffice/(:segment)/(:num)', 'backoffice\Frontoffice::$1/$2');
+
+$routes->get('/backoffice/peserta', 'backoffice\Peserta::index');
+$routes->get('/backoffice/peserta/(:segment)', 'backoffice\Peserta::$1');
+$routes->get('/backoffice/peserta/(:segment)/(:num)', 'backoffice\Peserta::$1/$2');
+$routes->post('/backoffice/peserta/(:segment)/(:num)', 'backoffice\Peserta::$1/$2');
+
+$routes->get('/backoffice/dokter', 'backoffice\Dokter::index');
+$routes->get('/backoffice/dokter/(:segment)', 'backoffice\Dokter::$1');
+$routes->get('/backoffice/dokter/(:segment)/(:num)', 'backoffice\Dokter::$1/$2');
+$routes->post('/backoffice/dokter/(:segment)/(:num)', 'backoffice\Dokter::$1/$2');
+
+$routes->get('/backoffice/laboratorium', 'backoffice\Laboratorium::index');
+$routes->get('/backoffice/laboratorium/(:segment)', 'backoffice\Laboratorium::$1');
+$routes->get('/backoffice/laboratorium/(:segment)/(:num)', 'backoffice\Laboratorium::$1/$2');
+$routes->post('/backoffice/laboratorium/(:segment)/(:num)', 'backoffice\Laboratorium::$1/$2');
+
+$routes->get('/backoffice/petugas', 'backoffice\Petugas::index');
+$routes->get('/backoffice/petugas/(:segment)', 'backoffice\Petugas::$1');
+$routes->get('/backoffice/petugas/(:segment)/(:num)', 'backoffice\Petugas::$1/$2');
+$routes->post('/backoffice/petugas/(:segment)/(:num)', 'backoffice\Petugas::$1/$2');
+
+$routes->get('/backoffice/kota', 'backoffice\Kota::index');
+$routes->get('/backoffice/kota/(:segment)', 'backoffice\Kota::$1');
+$routes->get('/backoffice/kota/(:segment)/(:num)', 'backoffice\Kota::$1/$2');
+$routes->post('/backoffice/kota/(:segment)/(:num)', 'backoffice\Kota::$1/$2');
+
+$routes->get('/backoffice/lokasi_input', 'backoffice\Lokasi_input::index');
+$routes->get('/backoffice/lokasi_input/(:segment)', 'backoffice\Lokasi_input::$1');
+$routes->get('/backoffice/lokasi_input/(:segment)/(:num)', 'backoffice\Lokasi_input::$1/$2');
+$routes->post('/backoffice/lokasi_input/(:segment)/(:num)', 'backoffice\Lokasi_input::$1/$2');
+
+$routes->get('/backoffice/laporan', 'backoffice\Laporan::index');
+$routes->get('/backoffice/laporan/(:segment)', 'backoffice\Laporan::$1');
+$routes->get('/backoffice/laporan/(:segment)/(:num)', 'backoffice\Laporan::$1/$2');
+$routes->post('/backoffice/laporan/(:segment)/(:num)', 'backoffice\Laporan::$1/$2');
+
+$routes->get('/backoffice/finance', 'backoffice\Finance::index');
+$routes->get('/backoffice/finance/(:segment)', 'backoffice\Finance::$1');
+$routes->get('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finance::$1/$2');
+$routes->post('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finance::$1/$2');
+
+$routes->get('/backoffice/gudang', 'backoffice\Gudang::index');
+$routes->get('/backoffice/gudang/(:num)', 'backoffice\Gudang::detail/$1');
+$routes->get('/backoffice/gudang/(:segment)', 'backoffice\Gudang::$1');
+$routes->get('/backoffice/gudang/(:segment)/(:num)', 'backoffice\Gudang::$1/$2');
+$routes->post('/backoffice/gudang/(:segment)/(:num)', 'backoffice\Gudang::$1/$2');
+
+$routes->get('/backoffice/kategori_gudang', 'backoffice\Kategori_gudang::index');
+$routes->get('/backoffice/kategori_gudang/(:segment)', 'backoffice\Kategori_gudang::$1');
+$routes->get('/backoffice/kategori_gudang/(:segment)/(:num)', 'backoffice\Kategori_gudang::$1/$2');
+$routes->post('/backoffice/kategori_gudang/(:segment)/(:num)', 'backoffice\Kategori_gudang::$1/$2');
+
+$routes->get('/backoffice/settings', 'backoffice\Settings::index');
+$routes->get('/backoffice/settings/(:segment)', 'backoffice\Settings::$1');
+$routes->get('/backoffice/settings/(:segment)/(:num)', 'backoffice\Settings::$1/$2');
+$routes->post('/backoffice/settings/(:segment)/(:num)', 'backoffice\Settings::$1/$2');
+
+$routes->get('/backoffice/user', 'backoffice\User::index');
+$routes->get('/backoffice/user/(:segment)', 'backoffice\User::$1');
+$routes->post('/backoffice/user/(:segment)', 'backoffice\User::$1');
+$routes->get('/backoffice/user/(:segment)/(:num)', 'backoffice\User::$1/$2');
+$routes->post('/backoffice/user/(:segment)/(:num)', 'backoffice\User::$1/$2');
+
+$routes->add('/backoffice/finance/(:segment)', 'backoffice\Finance::$1');
+$routes->add('/backoffice/finance/print_invoice/(:segment)/(:any)', 'backoffice\Finanace::print_invoice/$1/$2');
+$routes->get('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finanace::$1/$2');
+
 /**
  * --------------------------------------------------------------------
  * Additional Routing

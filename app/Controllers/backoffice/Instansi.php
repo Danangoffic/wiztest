@@ -18,16 +18,17 @@ class Instansi extends Controller
     public $session;
     protected $kotaModel;
     protected $marketingModel;
+    public $instansiModel;
     public function __construct()
     {
         $this->session = session();
         $this->kotaModel = new KotaModel();
         $this->marketingModel = new MarketingModel();
+        $this->instansiModel = new InstansiModel();
     }
     public function index()
     {
-        $InstansiModel = new InstansiModel();
-        $DataInstansi = $InstansiModel->findAll();
+        $DataInstansi = $this->instansiModel->findAll();
         $data = array(
             'title' => "Data Instansi",
             'page' => "instansi",

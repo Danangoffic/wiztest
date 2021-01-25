@@ -75,22 +75,25 @@ class Midtrans extends Controller
 
     public function getStatusByOrderId(string $OrderId)
     {
-
-        $Url = "https://api.sandbox.midtrans.com/v2/" . $OrderId . "/status";
-        $encoded = base64_encode($this->ServerKeySandbox . ":");
-        $curl = \Config\Services::curlrequest();
-
-        $curl->setHeader('Authorization', 'Basic ' . $encoded);
-        $curl->setHeader('Accept', 'application/json');
-        $curl->setHeader('Content-type', 'application/json');
-        // $curl->setMethod('GET');
-        $respond = $curl->request('GET', $Url);
-        // dd(json_decode($respond->getBody()));
+        $returnArray = array();
         try {
-            return json_decode($respond->getBody());
+            $db_param = db_connect()->table('system_parameter')->where(['vgroup' => 'MIDTRANS_KEY', 'parameter' => 'SERVER_KEY'])->get()->getFirstRow();
+            $EncodeduserNameKey = $db_param->value;
+            $decodedUsernameKey = base64_decode($EncodeduserNameKey);
+            $MidtransService = new \Midtrans;
+            $configMidtrans = array(
+                'server_key' => $decodedUsernameKey,
+                'production' => false
+            );
+            // echo "Selesai";
+            $MidtransService->config($configMidtrans);
+            $returnArray = $MidtransService->status($OrderId);
+
+            // return $StatusMidtrans;
         } catch (\Throwable $th) {
-            $return =  array('statusMessage' => 'failed. ' . $th->getMessage());
+            $returnArray = array('statusMessage' => 'failed. ' . $th->getMessage());
         }
+        return $returnArray;
     }
 
     // const SANDBOX_BASE_URL = 'https://api.sandbox.veritrans.co.id/v2';
