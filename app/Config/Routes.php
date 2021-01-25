@@ -51,7 +51,7 @@ $routes->get('/api/hadir/(:num)', 'backoffice\Peserta::kehadiran_by_scanning_qr/
 // $routes->post('/api/midtrans_notification', 'Customer::midtrans_notification');
 $routes->add('/api/notification', 'Midtrans_handlers::index');
 $routes->add('/api/redirection-handler', 'Midtrans_handlers::redirection_handler');
-$routes->add('/api/test-email/(:any)', 'Midtrans_handlers::CobaSendEmail/$1');
+$routes->add('/api/test-email/(:any)/(:any)/(:any)', 'Midtrans_handlers::CobaSendEmail/$1/$2/$3');
 $routes->get('/api/check_no_registration', 'Customer::validasi_no_registrasi');
 
 $routes->get('detail_form2', 'Customer::detail_form2');
@@ -87,9 +87,12 @@ $routes->get('/backoffice/peserta_hadir/(:num)', 'backoffice\Peserta::peserta_ha
 $routes->get('/backoffice/pesert_overkuota/create', 'backoffice\Peserta_overkuota::index');
 $routes->post('/backoffice/peserta_overkuota', 'backoffice\Peserta::save_customer_overkuota');
 
-$routes->get('/backoffice/frontoffice/home_service', 'backoffice\Home_service::index');
-$routes->add('/backoffice/frontoffice/(:segment)', 'backoffice\Frontoffice::$1');
-$routes->add('/backoffice/frontoffice/(:segment)/(:num)/(:any)/(:num)', 'backoffice\Frontoffice::$1/$2/$3/$4');
+$routes->get('/backoffice/home_service', 'backoffice\Home_service::index');
+$routes->add('/backoffice/home_service/(:num)', 'backoffice\Home_service::detail/$1');
+// $routes->add('/backoffice/frontoffice/(:segment)', 'backoffice\Frontoffice::$1');
+// $routes->add('/backoffice/frontoffice/(:segment)/(:num)/(:any)/(:num)', 'backoffice\Frontoffice::$1/$2/$3/$4');
+
+// $routes->get('/backoffice/home_service', '')
 
 $routes->get('/backoffice/dokter/(:num)', 'backoffice\Dokter::detail/$1');
 $routes->post('/backoffice/dokter/save', 'backoffice\Dokter::save');
@@ -170,6 +173,11 @@ $routes->post('/backoffice/user/(:segment)/(:num)', 'backoffice\User::$1/$2');
 $routes->add('/backoffice/finance/(:segment)', 'backoffice\Finance::$1');
 $routes->add('/backoffice/finance/print_invoice/(:segment)/(:any)', 'backoffice\Finanace::print_invoice/$1/$2');
 $routes->get('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finanace::$1/$2');
+
+$routes->get('/marketing', 'backoffice\Marketing::index');
+$routes->get('/marketing/(:num)', 'backoffice\Marketing::detail/$1');
+$routes->add('/marketing/(:segment)', 'backoffice\Marketing::$1');
+$routes->add('/marketing/(:segment)/(:num)', 'backoffice\Marketing::$1/$2');
 
 /**
  * --------------------------------------------------------------------

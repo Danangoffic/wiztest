@@ -149,7 +149,7 @@
                                             <a href="<?= base_url('backoffice/peserta/edit/' . $data_customer->id); ?>" class="btn btn-primary btn-sm mt-2" id="edit">Edit</a>
                                             <a href="<?= base_url('backoffice/peserta/hapus/' . $data_customer->id); ?>" class="btn btn-danger btn-sm mt-2" id="hapus">Hapus</a>
                                             <?php
-                                            if ($data_customer->kehadiran == 0) {
+                                            if ($data_customer->kehadiran == 22) {
                                             ?>
                                                 <a href="<?= base_url('backoffice/peserta/hadirkan_peserta/' . $data_customer->id); ?>" class="btn btn-primary btn-sm">Hadir</a>
                                             <?php

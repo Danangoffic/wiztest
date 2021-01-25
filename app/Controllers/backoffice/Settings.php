@@ -86,19 +86,19 @@ class Settings extends ResourceController
                 return redirect()->to('/backoffice/settings');
             }
             foreach ($ids as $key => $id_kuota) {
-                $kuota = $this->request->getPost('kuota' . $id_kuota);
-                $array_update = array('kuota' => $kuota);
-                if ($this->kuota_model->update($id_kuota, $array_update)) {
-                    $status_update = true;
-                }
+                // echo $id_kuota;
+                $kuota = $this->request->getPost("kuota");
+                $array_update = array('kuota' => $kuota[$id_kuota]);
+                $this->kuota_model->update($id_kuota, $array_update);
+                // echo db_connect()->showLastQuery() . "<br>";
+                // if ($this->kuota_model->update($id_kuota, $array_update)) {
+                //     $status_update = true;
+                // } else {
+                //     $status_update = false;
+                // }
             }
-            if ($status_update) {
-                $this->session->setFlashdata('success', "Berhasil update kuota test");
-                return redirect()->to('/backoffice/settings');
-            } else {
-                $this->session->setFlashdata('error', "Gagal update kuota test");
-                return redirect()->to('/backoffice/settings');
-            }
+            $this->session->setFlashdata('success', "Berhasil update kuota test");
+            return redirect()->to('/backoffice/settings');
         } catch (\Throwable $th) {
             $this->session->setFlashdata('error', "Gagal update kuota test");
             return redirect()->to('/backoffice/settings');

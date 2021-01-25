@@ -377,20 +377,30 @@ class Midtrans_handlers extends ResourceController
     }
 
 
-    public function CobaSendEmail(string $nama)
+    public function CobaSendEmail(string $email, $alias, $subject)
     {
         # code...
 
         $Layanan = new Layanan;
         // $config["protocol"] = "smtp"
-
+        // $config['protocol'] = 'sendmail';
+        // $config['mailPath'] = '/usr/sbin/sendmail';
+        // $config['charset']  = 'iso-8859-1';
+        // $config['wordWrap'] = true;
+        // $config['SMTPHost'] = "ssl://quicktest.id";
+        // $config['SMTPUser'] = "info@quicktest.id";
+        // $config['SMTPPass'] = "QuickTest123";
+        // $config['SMTPPort'] = "465";
+        // $config['mailType'] = "html";
         $Email = \Config\Services::email();
-        $Email->setFrom('info@danang.xyz', 'QuickTest.id INFO');
 
-        $Email->setTo("darifrahmanda@gmail.com");
-        $Email->setSubject("Informasi Pembayaran Dari Pendaftaran Test Melalui Quictest.id");
+        // $Email->initialize($config);
+        $Email->setFrom('info@quicktest.id', 'QuickTest.id INFO');
 
-        $emailMessage = view('test_send_email', array('title' => 'Informasi Pembayaran', 'nama' => $nama, 'layanan' => $Layanan));
+        $Email->setTo($email);
+        $Email->setSubject($subject);
+
+        $emailMessage = view('test_send_email', array('title' => 'Informasi Pembayaran', 'nama' => $alias, 'layanan' => $Layanan));
         $Email->setMessage($emailMessage);
         // $Email->attach($Layanan->getImageQRCode(base_url('api/hadir/danang-arif-rahmanda'), "danang_arif_rahmanda.png"));
         if ($Email->send()) {
