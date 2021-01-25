@@ -404,7 +404,8 @@ class Midtrans_handlers extends ResourceController
         $Email->setMessage($emailMessage);
         // $Email->attach($Layanan->getImageQRCode(base_url('api/hadir/danang-arif-rahmanda'), "danang_arif_rahmanda.png"));
         if ($Email->send()) {
-            echo "Email successfully sent";
+            echo "Email successfully sent to " . $email;
+            return $emailMessage;
         } else {
             $data = $Email->printDebugger(['headers']);
             print_r($data);
