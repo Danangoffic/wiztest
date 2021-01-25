@@ -2,7 +2,7 @@
 
 namespace App\Controllers\backoffice;
 
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 use CodeIgniter\HTTP\CURLRequest;
 use Midtrans as GlobalMidtrans;
 
@@ -10,7 +10,7 @@ use Midtrans as GlobalMidtrans;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Midtrans extends Controller
+class Midtrans extends BaseController
 {
     protected $sysParam;
     public $SNAP_SANDBOX_BASE_URL = 'https://app.sandbox.midtrans.com/snap/v1';

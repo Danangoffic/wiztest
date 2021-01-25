@@ -8,7 +8,7 @@ use App\Models\FaskesModel;
 use App\Models\KotaModel;
 use App\Models\KuotaModel;
 use App\Models\PemeriksaanModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 use App\Controllers\backoffice\User;
 use App\Controllers\backoffice\Layanan;
 use App\Models\UserDetailModel;
@@ -16,7 +16,7 @@ use App\Models\UserDetailModel;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Dokter extends Controller
+class Dokter extends BaseController
 {
     public $session;
     protected $dokterModel;

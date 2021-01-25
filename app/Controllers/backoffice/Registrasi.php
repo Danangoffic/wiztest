@@ -3,8 +3,8 @@
 namespace App\Controllers\backoffice;
 
 use App\Models\CustomerModel;
-use CodeIgniter\Controller;
 use App\Controllers\backofficeMidtrans;
+use App\Controllers\BaseController;
 use App\Models\InstansiModel;
 use App\Models\KotaModel;
 use App\Models\MarketingModel;
@@ -12,7 +12,7 @@ use App\Models\MarketingModel;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Registrasi extends Controller
+class Registrasi extends BaseController
 {
     public $session;
     protected $customerModel;

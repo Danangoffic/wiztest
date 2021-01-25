@@ -5,13 +5,13 @@ namespace App\Controllers\backoffice;
 use App\Models\LayananModel;
 use App\Models\LayananTestModel;
 use App\Models\TestModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 use Dompdf\Cpdf;
 use App\Controllers\backoffice\Peserta;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Peserta_overkuota extends Controller
+class Peserta_overkuota extends BaseController
 {
     public $session;
     protected $pesertaC;

@@ -14,7 +14,6 @@ use App\Models\PemeriksaModel;
 use App\Models\SampleModel;
 use App\Models\StatusHasilModel;
 use App\Models\TestModel;
-use CodeIgniter\Controller;
 use CodeIgniter\RESTful\ResourceController;
 // use Dompdf\Cpdf;
 use Dompdf\Dompdf;

@@ -11,11 +11,11 @@ use App\Models\MarketingModel;
 use App\Models\PemeriksaanModel;
 use App\Models\SegmenModel;
 use App\Models\TestModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Home extends Controller
+class Home extends BaseController
 {
     protected $session;
     protected $kehadiranModel;

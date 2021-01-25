@@ -7,7 +7,6 @@ use App\Models\LayananModel;
 use App\Models\LayananTestModel;
 use App\Models\PemeriksaanModel;
 use App\Models\TestModel;
-use CodeIgniter\Controller;
 use CodeIgniter\RESTful\ResourceController;
 // use Dompdf\Cpdf;
 use Dompdf\Dompdf;
