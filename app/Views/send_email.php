@@ -22,7 +22,7 @@
         $('#qrcode').ClassyQR({
             create: true,
             type: 'url',
-            text: noreg
+            text: "<?= base_url("api/hadir/"); ?>" + noreg
         });
     </script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/promise-polyfill"></script> -->
