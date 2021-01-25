@@ -15,7 +15,9 @@
 		"psr/log": "^1.1",
 		"midtrans/midtrans-php": "^2.3",
 		"dompdf/dompdf": "^1.0",
-		"tecnickcom/tcpdf": "^6.3"
+		"tecnickcom/tcpdf": "^6.3",
+		"phpmailer/phpmailer": "^6.2",
+		"phpoffice/phpspreadsheet": "^1.16"
 	},
 	"require-dev": {
 		"codeigniter4/codeigniter4-standard": "^1.0",

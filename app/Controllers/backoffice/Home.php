@@ -29,7 +29,7 @@ class Home extends Controller
     protected $jenisTestModel;
     public function __construct()
     {
-        $this->session = session();
+        $this->session = \Config\Services::session();
         $this->kehadiranModel = new KehadiranModel();
         $this->layananModel = new LayananModel();
         $this->pemeriksaanModel = new PemeriksaanModel();
@@ -43,7 +43,7 @@ class Home extends Controller
     public function index()
     {
         // session_destroy();
-        if (!$this->session->has('logged_in')) {
+        if (!$this->session->get('logged_in')) {
             return redirect()->to('/backoffice/login');
         }
         $date_now = date('Y-m-d');
