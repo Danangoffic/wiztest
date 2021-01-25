@@ -6,9 +6,9 @@ use App\Models\GudangModel;
 use App\Models\KategoriBarangModel;
 use App\Models\PeminjamanModel;
 use App\Models\TrafikDataGudangModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 
-class Peminjaman extends Controller
+class Peminjaman extends BaseController
 {
     protected $session;
     public $peminjamanModel;

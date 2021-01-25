@@ -3,11 +3,11 @@
 namespace App\Controllers\backoffice;
 
 use App\Models\KategoriBarangModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Kategori_gudang extends Controller
+class Kategori_gudang extends BaseController
 {
     protected $session;
     protected $kategoriBarangModel;

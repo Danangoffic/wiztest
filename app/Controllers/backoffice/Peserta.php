@@ -14,13 +14,13 @@ use App\Models\PemeriksaanModel;
 use App\Models\PemeriksaModel;
 use App\Models\StatusHasilModel;
 use App\Models\TestModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 use CodeIgniter\Validation\Validation;
 use Dompdf\Cpdf;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Peserta extends Controller
+class Peserta extends BaseController
 {
     public $session;
     public $customerModel;

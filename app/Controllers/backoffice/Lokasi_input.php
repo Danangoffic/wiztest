@@ -3,13 +3,13 @@
 namespace App\Controllers\backoffice;
 
 use App\Models\KotaModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 use App\Models\LokasiPenginputanModel;
 
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Lokasi_input extends Controller
+class Lokasi_input extends BaseController
 {
     public $session;
     public $lokasiInputModel;

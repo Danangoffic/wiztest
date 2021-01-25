@@ -5,13 +5,13 @@ namespace App\Controllers\backoffice;
 use App\Models\GudangModel;
 use App\Models\KategoriBarangModel;
 use App\Models\StatusHasilModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 use CodeIgniter\Validation\Validation;
 
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Gudang extends Controller
+class Gudang extends BaseController
 {
     public $session;
     protected $gudangModel;

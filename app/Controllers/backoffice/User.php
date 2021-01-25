@@ -9,9 +9,6 @@ use App\Models\UserLevelModel;
 use CodeIgniter\RESTful\ResourceController;
 
 use App\Models\UserModel;
-use CodeIgniter\Controller;
-use CodeIgniter\Validation\Validation;
-use Config\Validation as ConfigValidation;
 
 class User extends ResourceController
 {
