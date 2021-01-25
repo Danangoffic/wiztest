@@ -62,7 +62,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= base_url('backoffice/frontoffice/home_service'); ?>" class="nav-link <?= ($page == "home_service") ? 'active' : ''; ?>">
+                            <a href="<?= base_url('backoffice/home_service'); ?>" class="nav-link <?= ($page == "home_service") ? 'active' : ''; ?>">
                                 <i class="far fa-circle"></i>
                                 <small>Home Service</small>
                             </a>
@@ -141,7 +141,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= base_url('backoffice/marketing/list'); ?>" class="nav-link">
+                            <a href="<?= base_url('marketing'); ?>" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Data Marketing</p>
                             </a>

@@ -2,12 +2,12 @@
 
 namespace App\Controllers\backoffice;
 
+use App\Controllers\BaseController;
 use App\Models\SystemParameterModel;
-use CodeIgniter\Controller;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class SystemParameter extends Controller
+class SystemParameter extends BaseController
 {
 
 

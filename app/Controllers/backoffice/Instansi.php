@@ -8,12 +8,12 @@ use App\Models\LayananModel;
 use App\Models\LayananTestModel;
 use App\Models\MarketingModel;
 use App\Models\TestModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 use Dompdf\Cpdf;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Instansi extends Controller
+class Instansi extends BaseController
 {
     public $session;
     protected $kotaModel;

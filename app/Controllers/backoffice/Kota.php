@@ -3,13 +3,13 @@
 namespace App\Controllers\backoffice;
 
 use App\Models\KotaModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 use CodeIgniter\Validation\Validation;
 
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Kota extends Controller
+class Kota extends BaseController
 {
     public $session;
     protected $kotaModel;

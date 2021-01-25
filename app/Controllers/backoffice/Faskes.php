@@ -7,11 +7,11 @@ use App\Models\FaskesModel;
 use App\Models\KotaModel;
 use App\Models\KuotaModel;
 use App\Models\PemeriksaanModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Faskes extends Controller
+class Faskes extends BaseController
 {
     public $session;
     protected $faskesModel;

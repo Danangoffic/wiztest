@@ -46,18 +46,19 @@
         <div id="barcodeTarget">
             <center>
                 <strong></strong>
-                <img src="<?= $src_image; ?>" alt="">
+                <!-- <img src="<?= $html_img; ?>" alt=""> -->
+                <?= $html_img; ?>
             </center>
         </div>
     </center>
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
     <!-- <script src="<?= base_url('assets/jquery-barcode.min.js'); ?>"></script> -->
     <script>
-        $(window).load(function() {
-            let html_img = document.getElementById('barcodeTarget').innerHTML;
-            let a = window;
-            a.print();
-        });
+        // $(window).load(function() {
+        //     let html_img = document.getElementById('barcodeTarget').innerHTML;
+        //     let a = window;
+        //     a.print();
+        // });
     </script>
 </body>
 

@@ -14,7 +14,6 @@ use App\Models\PemeriksaModel;
 use App\Models\SampleModel;
 use App\Models\StatusHasilModel;
 use App\Models\TestModel;
-use CodeIgniter\Controller;
 use CodeIgniter\RESTful\ResourceController;
 // use Dompdf\Cpdf;
 use Dompdf\Dompdf;
@@ -78,7 +77,7 @@ class Laboratorium extends ResourceController
         $data = [
             'page' => 'laboratorium',
             'title' => 'Hasil Laboratorium',
-            'session' => session()
+            'session' => session(),
             // 'data' => $this->get_data_laboratorium()
         ];
         // dd($this->session->get('nama'));
@@ -105,34 +104,34 @@ class Laboratorium extends ResourceController
                 $statusIgg = '';
                 $statusIgm = '';
                 $statusKirim = '';
-                if ($value['status_cov'] !== "") {
+                if ($value['status_cov'] !== null) {
                     $detailHasilCov = $this->statusHasilModel->find($value['status_cov']);
-                    $statusCov = $detailHasilCov['nama_status'];
+                    $statusCov = ($detailHasilCov['nama_status']) ? $detailHasilCov['nama_status'] : '';
                 }
-                if ($value['status_gene'] !== "") {
+                if ($value['status_gene'] !== null) {
                     $detailHasilGene = $this->statusHasilModel->find($value['status_gene']);
-                    $statusGene = $detailHasilGene['nama_status'];
+                    $statusGene = ($detailHasilGene['nama_status']) ? $detailHasilGene['nama_status'] : '';
                 }
-                if ($value['status_orf'] !== "") {
+                if ($value['status_orf'] !== null) {
                     $detailHasilOrf = $this->statusHasilModel->find($value['status_orf']);
-                    $statusOrf = $detailHasilOrf['nama_status'];
+                    $statusOrf = ($detailHasilOrf['nama_status']) ? $detailHasilOrf['nama_status'] : '';
                 }
-                if ($value['status_igg'] !== "") {
+                if ($value['status_igg'] !== null) {
                     $detailHasilIgg = $this->statusHasilModel->find($value['status_igg']);
-                    $statusIgg = $detailHasilIgg['nama_status'];
+                    $statusIgg = ($detailHasilIgg['nama_status']) ? $detailHasilIgg['nama_status'] : '';
                 }
-                if ($value['status_igm'] !== "") {
+                if ($value['status_igm'] !== null) {
                     $detailHasilIgm = $this->statusHasilModel->find($value['status_igm']);
-                    $statusIgm = $detailHasilIgm['nama_status'];
+                    $statusIgm = ($detailHasilIgm['nama_status']) ? $detailHasilIgm['nama_status'] : '';
                 }
-                if ($value['status_kirim'] !== "") {
+                if ($value['status_kirim'] !== null) {
                     $detailHasilKirim = $this->statusHasilModel->find($value['status_kirim']);
-                    $statusKirim = $detailHasilKirim['nama_status'];
+                    $statusKirim = ($detailHasilKirim['nama_status']) ? $detailHasilKirim['nama_status'] : '';
                 }
                 $ic = $value['detail_ic'];
                 $catatan = $value['catatan'];
                 $paket_pemeriksaan = $detailTest['nama_test'] . "(" . $detailLayanan['nama_layanan'] . ")";
-                $nama_sample = $detailSample['nama_sample'];
+                $nama_sample = ($detailSample['nama_sample'] !== null) ? $detailSample['nama_sample'] : '';
                 $result[] = array(
                     'id_customer' => $value['id_customer'],
                     'id_hasil' => $value['id'],
@@ -158,7 +157,7 @@ class Laboratorium extends ResourceController
             return $this->respond(array('data' => $result), 200, 'success');
         } catch (\Throwable $th) {
             //throw $th;
-            return $this->failServerError();
+            return $this->failServerError($th->getMessage() . ' ' . $th->getCode());
         }
     }
 }

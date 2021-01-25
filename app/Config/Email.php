@@ -48,21 +48,21 @@ class Email extends BaseConfig
 	 *
 	 * @var string
 	 */
-	public $SMTPHost = "ssl://mail.danangoffic.xyz";
+	public $SMTPHost = "quicktest.id";
 
 	/**
 	 * SMTP Username
 	 *
 	 * @var string
 	 */
-	public $SMTPUser = "info@danangoffic.xyz";
+	public $SMTPUser = "info@quicktest.id";
 
 	/**
 	 * SMTP Password
 	 *
 	 * @var string
 	 */
-	public $SMTPPass = "infoDanang123";
+	public $SMTPPass = "QuickTest123";
 
 	/**
 	 * SMTP Port
@@ -132,7 +132,7 @@ class Email extends BaseConfig
 	 *
 	 * @var integer
 	 */
-	public $priority = 3;
+	public $priority = 1;
 
 	/**
 	 * Newline character. (Use “\r\n” to comply with RFC 822)

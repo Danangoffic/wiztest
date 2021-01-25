@@ -35,7 +35,7 @@
                                     $no = 1;
                                     foreach ($data as $key => $value) {
                                         $id_status = $value['status_peminjaman'];
-                                        $detail_barang_pinjaman = $
+                                        // $detail_barang_pinjaman = $
                                         // $data_user = ($value['id_user'] !== "" || $value['id_user'] !== null) ? $userModel->find(['id' => $value['id_user']]) : '';
                                         // $data_marketing = ($value['pic_marketing'] !== "" || $value['pic_marketing'] !== null) ? $marketingModel->find($value['pic_marketing']) : '';
                                     ?>

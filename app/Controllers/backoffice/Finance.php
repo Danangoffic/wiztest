@@ -6,11 +6,11 @@ use App\Models\CustomerModel;
 use App\Models\InstansiModel;
 use App\Models\MarketingModel;
 use App\Models\PembayaranModel;
-use CodeIgniter\Controller;
+use App\Controllers\BaseController;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Finance extends Controller
+class Finance extends BaseController
 {
     protected $session;
     protected $CustomerModel;

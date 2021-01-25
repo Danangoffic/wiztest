@@ -10,7 +10,6 @@ use App\Models\MarketingModel;
 use App\Models\PemeriksaanModel;
 use App\Models\StatusHasilModel;
 use App\Models\TestModel;
-use CodeIgniter\Controller;
 use CodeIgniter\RESTful\ResourceController;
 
 // use App\Controllers;
