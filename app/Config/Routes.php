@@ -51,7 +51,7 @@ $routes->get('/api/hadir/(:num)', 'backoffice\Peserta::kehadiran_by_scanning_qr/
 // $routes->post('/api/midtrans_notification', 'Customer::midtrans_notification');
 $routes->add('/api/notification', 'Midtrans_handlers::index');
 $routes->add('/api/redirection-handler', 'Midtrans_handlers::redirection_handler');
-$routes->add('/api/test-email/(:any)/(:any)/(:any)', 'Midtrans_handlers::CobaSendEmail/$1/$2/$3');
+$routes->add('/api/test-email/(:any)', 'Midtrans_handlers::CobaSendEmail/$1');
 $routes->get('/api/check_no_registration', 'Customer::validasi_no_registrasi');
 
 $routes->get('detail_form2', 'Customer::detail_form2');
