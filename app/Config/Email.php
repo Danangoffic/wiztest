@@ -55,7 +55,7 @@ class Email extends BaseConfig
 	 *
 	 * @var string
 	 */
-	public $SMTPUser = "info@quicktest.id";
+	public $SMTPUser = "pendaftaran@quicktest.id";
 
 	/**
 	 * SMTP Password
