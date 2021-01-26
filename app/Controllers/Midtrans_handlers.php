@@ -385,27 +385,18 @@ class Midtrans_handlers extends ResourceController
         $alias = $get_customer['nama'];
         $subject = "Konfirmasi Pembayaran";
         $Layanan = new Layanan;
-        // $config["protocol"] = "smtp"
-        // $config['protocol'] = 'sendmail';
-        // $config['mailPath'] = '/usr/sbin/sendmail';
-        // $config['charset']  = 'iso-8859-1';
-        // $config['wordWrap'] = true;
-        // $config['SMTPHost'] = "ssl://quicktest.id";
-        // $config['SMTPUser'] = "info@quicktest.id";
-        // $config['SMTPPass'] = "QuickTest123";
-        // $config['SMTPPort'] = "465";
-        // $config['mailType'] = "html";
+
         $Email = \Config\Services::email();
 
         // $Email->initialize($config);
-        $Email->setFrom('info@quicktest.id', 'QuickTest.id INFO');
+        $Email->setFrom('pendaftaran@quicktest.id', 'QuickTest.id INFO Pendaftaran');
 
         $Email->setTo($email);
         $Email->setSubject($subject);
 
-        $emailMessage = view('test_send_email', array('title' => 'Informasi Pembayaran', 'nama' => $alias, 'layanan' => $Layanan, 'detail_customer' => $get_customer));
+        $emailMessage = view('test_send_email', array('title' => 'Informasi Pendaftaran dan Pembayaran', 'nama' => $alias, 'layanan' => $Layanan, 'detail_customer' => $get_customer));
         $Email->setMessage($emailMessage);
-        // $Email->attach($Layanan->getImageQRCode(base_url('api/hadir/danang-arif-rahmanda'), "danang_arif_rahmanda.png"));
+        $Email->attach($Layanan->getImageQRCode(base_url('api/hadir/danang-arif-rahmanda'), "danang_arif_rahmanda.png"));
         if ($Email->send()) {
             echo "Email successfully sent to " . $email;
             return $emailMessage;
