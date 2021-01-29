@@ -68,7 +68,7 @@ class Frontoffice extends ResourceController
             $marketing = ($this->request->getVar('marketing')) ? $this->request->getVar('marketing') : '';
             $layanan_test = ($this->request->getVar('layanan_test')) ? $this->request->getVar('layanan_test') : '';
             $queryFilter = 'SELECT * FROM customers';
-            $queryFilter .= " WHERE jenis_layanan = '1'";
+            $queryFilter .= " WHERE jenis_test IN (SELECT id FROM data_layanan WHERE id_segmen = '1' AND id_layanan = '1')";
 
             if ($date1 !== '' && $date2 !== '') {
                 $queryFilter .= " AND tgl_kunjungan BETWEEN '" . $date1 . "' AND '" . $date2 . "'";
@@ -89,7 +89,12 @@ class Frontoffice extends ResourceController
             $queryFilter .= " ORDER BY id DESC";
             $Customer = db_connect()->query($queryFilter)->getResultArray();
         } else {
-            $Customer = db_connect()->table('customers')->select()->orderBy('id', 'DESC')->get()->getResultArray();
+            $data_layanan_test = $this->layananTestModel->select("id")->where(['id_segmen' => "1", 'id_layanan' => 1])->get()->getResultArray();
+            $ids_test = array();
+            foreach ($data_layanan_test as $key => $lt) {
+                $ids_test[] = $lt['id'];
+            }
+            $Customer = db_connect()->table('customers')->select()->whereIn('jenis_test', $ids_test)->orderBy('id', 'DESC')->get()->getResultArray();
         }
         // $Customer = $this->customerModel->detailRegistrasi(false, $id_jenis_pemeriksaan)->getResultArray();
         $data = array(
@@ -219,10 +224,11 @@ class Frontoffice extends ResourceController
 
         // $id_jenis_test = $detail_layanan_test['id'];
         $antrian_swabber = $this->customerModel->where(['tgl_kunjungan' => $tanggal, 'jam_kunjungan' => $jam, 'jenis_test' => $id_test, 'kehadiran' => '23'])->orderBy('no_antrian', 'ASC')->get()->getResultArray();
-        echo db_connect()->showLastQuery();
+        // echo db_connect()->showLastQuery() . "<br>";
         $booking_antrian = $this->customerModel->where(['tgl_kunjungan' => $tanggal, 'jam_kunjungan' => $jam, 'jenis_test' => $id_test])->orderBy('no_antrian', 'ASC')->get()->getResultArray();
+        // echo db_connect()->showLastQuery() . "<br>";
         $data = array('antrian_swabber' => $antrian_swabber, 'booking_antrian' => $booking_antrian);
-        // return $this->respond($data, 200, 'success');
+        return $this->respond($data, 200, 'success');
     }
 
     //--------------------------------------------------------------------

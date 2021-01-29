@@ -4,32 +4,32 @@
 <div class="content-wrapper">
 
     <section class="content mt-3">
-        <div class="row">
-            <div class="col-12">
-                <div class="card card-danger">
-                    <div class="card-header">
-                        <h5 class="card-title"><?= $title; ?></h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label for=""></label>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <form action="/backoffice/peserta/doDelete" method="post">
+                        <?= csrf_field() ?>
+
+                        <input type="hidden" name="id_customer" value="<?= base64_encode($id); ?>">
+                        <div class="card card-danger">
+                            <div class="card-header">
+                                <h5 class="card-title"><?= $title; ?> <?= $data_customer['nama']; ?></h5>
+                            </div>
+                            <div class="card-body">
+                                <h5>Apakah anda yakin akan menghapus data peserta <strong><?= $data_customer['nama']; ?></strong> ?</h5>
+                            </div>
+                            <div class="card-footer">
+                                <div class="float-right">
+                                    <a href="/backoffice/registrasi" class="btn btn-default mr-3"><i class="fa fa-chevron-left"></i> Kembali</a>
+                                    <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Hapus</button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     </section>
 </div>
 
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/dataTables.responsive.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/dataTables.buttons.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js'); ?>"></script>
-<script>
-    $(document).ready(() => {
-        $("#data_customer").DataTable();
-    });
-</script>
 <?= $this->endSection(); ?>

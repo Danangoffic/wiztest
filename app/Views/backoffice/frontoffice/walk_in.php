@@ -152,6 +152,8 @@
                                             $status_bayar = "<span class='badge bg-danger'>" . $status_bayar . "</span>";
                                         } elseif ($status_bayar == "settlement" || $status_bayar == "success") {
                                             $status_bayar = "<span class='badge bg-success'>" . $status_bayar . "</span>";
+                                        } else {
+                                            $status_bayar = "<span class='badge bg-secondary'>" . $status_bayar . "</span>";
                                         }
                                         // $status_hadir_detail = $status_model->find($value['kehadiran']);
                                         // $status_hadir = $status_hadir_detail['nama_status'];

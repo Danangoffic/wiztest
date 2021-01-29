@@ -182,6 +182,7 @@ class Layanan extends ResourceController
 
     public function coba_barcode($id_customer)
     {
+
         $CustomerModel = new CustomerModel();
         $detailCustomer = $CustomerModel->find($id_customer);
         $url = $detailCustomer['customer_unique'];

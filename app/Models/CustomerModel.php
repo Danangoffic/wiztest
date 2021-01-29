@@ -129,7 +129,16 @@ class CustomerModel extends Model
         return $builder->get();
     }
 
-    public function customersBooking($id_data_jenis_test, $tgl_kunjungan = false, $jam_kunjungan = false, $paymentStatus = 'settlement', $kehadiran = '0')
+    /**
+     * this function is to get total customer in same test for home service
+     * @param int|string $jenis_test
+     */
+    public function total_customer_same_test_hs($id_hs, $jenis_test): int
+    {
+        return db_connect()->table($this->table)->where(['id_hs' => $id_hs, 'jenis_test' => $jenis_test])->countAllResults();
+    }
+
+    public function customersBooking($id_data_jenis_test, $tgl_kunjungan = false, $jam_kunjungan = false, $paymentStatus = 'settlement', $kehadiran = '22')
     {
         $builder = db_connect()->table('customers a')
             ->select('a.*, b.nama_pemeriksaan, c.jam, hour(c.jam) as jam_, c.kuota')

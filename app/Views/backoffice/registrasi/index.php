@@ -51,12 +51,12 @@
         </div>
     </section>
     <section class="content mt-0">
-        <div class="conteiner-fluid">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Data <?= $title; ?></h3>
+                            <h3 class="card-title"><?= $title; ?></h3>
                         </div>
                         <div class="card-body">
                             <a href="<?= base_url('backoffice/peserta/create'); ?>" class="btn btn-primary mb-3">Tambah Peserta</a>
@@ -91,6 +91,8 @@
                                                 $status_bayar = "<span class='badge bg-danger'>" . $status_bayar . "</span>";
                                             } elseif ($status_bayar == "settlement" || $status_bayar == "success") {
                                                 $status_bayar = "<span class='badge bg-success'>" . $status_bayar . "</span>";
+                                            } else {
+                                                $status_bayar = "<span class='badge bg-secondary'>" . $status_bayar . "</span>";
                                             }
                                             $nama_marketing = $dataMarketing['nama_marketing'];
                                             $nama_instansi = $dataInstansi['nama'];
