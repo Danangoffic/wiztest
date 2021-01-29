@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '10ec2e1d74b2eeecca09e546a56b05b5273534c2',
+    'reference' => 'b8eed9df793440624a939c6ad3e1e7610719ec7d',
     'name' => 'codeigniter4/framework',
   ),
   'versions' => 
@@ -27,7 +27,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '10ec2e1d74b2eeecca09e546a56b05b5273534c2',
+      'reference' => 'b8eed9df793440624a939c6ad3e1e7610719ec7d',
     ),
     'doctrine/instantiator' => 
     array (
@@ -113,12 +113,12 @@
     ),
     'markbaker/matrix' => 
     array (
-      'pretty_version' => '2.1.1',
-      'version' => '2.1.1.0',
+      'pretty_version' => '2.1.2',
+      'version' => '2.1.2.0',
       'aliases' => 
       array (
       ),
-      'reference' => '35a2d1a919a1de732402f694925168c53c17c838',
+      'reference' => '361c0f545c3172ee26c3d596a0aa03f0cef65e6a',
     ),
     'midtrans/midtrans-php' => 
     array (
@@ -128,6 +128,24 @@
       array (
       ),
       'reference' => '94cdca1eba636b75ec3bdcf338e303068f14025c',
+    ),
+    'mike42/escpos-php' => 
+    array (
+      'pretty_version' => 'v3.0',
+      'version' => '3.0.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'dcb569a123d75f9f6a4a927aae7625ca6b7fdcf3',
+    ),
+    'mike42/gfx-php' => 
+    array (
+      'pretty_version' => 'v0.6',
+      'version' => '0.6.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'ed9ded2a9298e4084a9c557ab74a89b71e43dbdb',
     ),
     'mikey179/vfsstream' => 
     array (
@@ -303,6 +321,15 @@
       array (
       ),
       'reference' => 'c25f79895d27b6ecd5abfa63de1606b786a461a3',
+    ),
+    'picqer/php-barcode-generator' => 
+    array (
+      'pretty_version' => 'v2.1.0',
+      'version' => '2.1.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '2221d834efab0dbfa9d37f9dfb4673d7f27f3757',
     ),
     'predis/predis' => 
     array (

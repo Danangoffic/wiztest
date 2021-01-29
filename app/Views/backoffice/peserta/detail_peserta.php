@@ -34,40 +34,7 @@
                                 <tbody>
                                     <tr>
                                         <td><strong>Total: </strong></td>
-                                        <?php
-                                        $amt = "";
-                                        $bank = "";
-                                        $va = "";
-                                        $paymentType = "";
-                                        $transactionStatus = "";
-                                        // echo $detail_payment->bank;
-                                        // dd($detail_payment);
-                                        if ($detail_payment) {
-                                            if ($detail_payment->status_code != '404') {
-                                                $payment_type = $detail_payment->payment_type;
-                                                if ($payment_type == "bank_transfer" || $payment_type == "credit_card") {
-                                                    if ($detail_payment->va_numbers[0]) {
-                                                        $va_numbers = $detail_payment->va_numbers[0];
-                                                        $bank = ($va_numbers->bank) ? $va_numbers->bank : null;
-                                                        $va = ($va_numbers->va_number) ? $va_numbers->va_number : null;
-                                                    }
-                                                } elseif ($payment_type == "echannel") {
-                                                    $va = "<p>Biller Code : " . $detail_payment->biller_code . "</p>";
-                                                    $va .= "<p>Bill Key : " . $detail_payment->bill_key . "</p>";
-                                                }
-                                                if ($detail_payment->gross_amount) {
-                                                    $amt = 'Rp ' . number_format(intval($detail_payment->gross_amount), 0, ',', '.');
-                                                }
 
-                                                if ($detail_payment->payment_type) {
-                                                    $paymentType = ucwords(str_replace('_', ' ', $detail_payment->payment_type));
-                                                }
-                                                if ($detail_payment->transaction_status) {
-                                                    $transactionStatus = ucwords($detail_payment->transaction_status);
-                                                }
-                                            }
-                                        }
-                                        ?>
                                         <td id="total_payment"><?= $amt; ?></td>
                                     </tr>
                                     <tr>
@@ -89,7 +56,7 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="<?= base_url('backoffice/print/pdf/' . $data_customer->id); ?>" class="btn btn-primary btn-sm">Print Pdf</a>
+                    <a href="<?= base_url('backoffice/peserta/print_pdf/' . $data_customer->id); ?>" class="btn btn-primary btn-sm">Print Pdf</a>
                     <!-- <?= $data_customer->kehadiran; ?> -->
                     <?php
                     if ($data_customer->kehadiran == 0) {

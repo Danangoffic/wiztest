@@ -91,8 +91,9 @@ class User extends ResourceController
                 'responseMessage' => 'failed',
                 'errors' => $this->validator->getErrors()
             ];
-            return $this->respond($result, 400, 'Bad Request');
-            // return redirect()->to('/backoffice/registration')->withInput();
+            $this->session->setFlashdata('error', 'Login gagal');
+            // return $this->respond($result, 400, 'Bad Request');
+            return redirect()->to('/backoffice/login')->withInput();
         }
         try {
             //code...
@@ -124,6 +125,7 @@ class User extends ResourceController
                 return redirect()->to(base_url('backoffice'));
             } else {
                 $this->session->setFlashdata('error', 'Gagal login');
+                return redirect()->to('/backoffice')->withInput();
                 // echo "error " . $th->getMessage();
             }
         } catch (\Throwable $th) {

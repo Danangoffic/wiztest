@@ -17,9 +17,16 @@ class Midtrans extends BaseController
     public $SNAP_PRODUCTION_BASE_URL = 'https://app.midtrans.com/snap/v1';
     protected $ServerKeySandbox = "SB-Mid-server-njmm7T2YGKMdzauzJRLre29W";
     protected $ClientKeySandBox = "SB-Mid-client-FNK0ZdKVig8hiqwE";
+
+    protected $midtrans_config;
+    protected $midtrans_snap;
+    protected $midtrans;
     public function __construct()
     {
         $this->sysParam = new SystemParameter();
+        $this->midtrans_config =  new \Midtrans\Config;
+        $this->midtrans_snap = new \Midtrans\Snap;
+        $this->midtrans = new \Midtrans;
     }
 
     public function index()
@@ -46,19 +53,23 @@ class Midtrans extends BaseController
             $vgroup = 'MIDTRANS_KEY';
             $paramter = 'SERVER_KEY';
             $DB = db_connect()->table('system_parameter')->select('*')->where('vgroup', $vgroup)->where('parameter', $paramter)->get()->getFirstRow();
-            $encrypted_server = $DB->value;
-            $ServerKey = base64_decode($encrypted_server);
-            \Midtrans\Config::$serverKey = "SB-Mid-server-njmm7T2YGKMdzauzJRLre29W";
-            \Midtrans\Config::$isProduction = false;
-            // Set sanitization on (default)
-            \Midtrans\Config::$isSanitized = true;
-            // Set 3DS transaction for credit card to true
-            \Midtrans\Config::$is3ds = true;
+            if ($DB == null) {
+                return false;
+            }
+            $ServerKey = base64_decode($DB->value);
+            $this->midtrans_config::$serverKey = $ServerKey;
+            $this->midtrans_config::$isProduction = false;
+            $this->midtrans_config::$isSanitized = true;
+            $this->midtrans_config::$is3ds = true;
+            // \Midtrans\Config::$serverKey = $ServerKey;
+            // \Midtrans\Config::$isProduction = false;
+            // // Set sanitization on (default)
+            // \Midtrans\Config::$isSanitized = true;
+            // // Set 3DS transaction for credit card to true
+            // \Midtrans\Config::$is3ds = true;
 
-            $snapToken = \Midtrans\Snap::getSnapToken($params);
-            $CreateTrans = \Midtrans\Snap::createTransaction($params);
-
-
+            $snapToken = $this->midtrans_snap->getSnapToken($params);
+            $CreateTrans = $this->midtrans_snap->createTransaction($params);
 
             if ($snapToken) {
                 return ['data' => $CreateTrans, 'statusMessage' => 'success'];
@@ -80,14 +91,14 @@ class Midtrans extends BaseController
             $db_param = db_connect()->table('system_parameter')->where(['vgroup' => 'MIDTRANS_KEY', 'parameter' => 'SERVER_KEY'])->get()->getFirstRow();
             $EncodeduserNameKey = $db_param->value;
             $decodedUsernameKey = base64_decode($EncodeduserNameKey);
-            $MidtransService = new \Midtrans;
+
             $configMidtrans = array(
                 'server_key' => $decodedUsernameKey,
                 'production' => false
             );
             // echo "Selesai";
-            $MidtransService->config($configMidtrans);
-            $returnArray = $MidtransService->status($OrderId);
+            $this->midtrans->config($configMidtrans);
+            $returnArray = $this->midtrans->status($OrderId);
 
             // return $StatusMidtrans;
         } catch (\Throwable $th) {

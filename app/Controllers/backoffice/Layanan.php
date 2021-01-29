@@ -182,6 +182,7 @@ class Layanan extends ResourceController
 
     public function coba_barcode($id_customer)
     {
+
         $CustomerModel = new CustomerModel();
         $detailCustomer = $CustomerModel->find($id_customer);
         $url = $detailCustomer['customer_unique'];
@@ -374,6 +375,17 @@ class Layanan extends ResourceController
     {
         $str_result = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz';
         return substr(str_shuffle($str_result), 0, $length_string);
+    }
+
+
+    public function encode_key()
+    {
+        $client_key = "SB-Mid-client-mp4wARPRYp1RjrBO";
+        $server_key = "SB-Mid-server-QkrkR-LkKVtR3SeHfFH5roM4";
+        $enc_client = base64_encode($client_key);
+        $enc_server = base64_encode($server_key);
+        echo $enc_client . "<br>";
+        print_r($enc_server);
     }
 
     //--------------------------------------------------------------------
