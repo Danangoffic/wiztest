@@ -100,12 +100,14 @@ class ComposerStaticInit618375556bd63e4c1757c1e607bc8f67
             'Psr\\Http\\Client\\' => 16,
             'Prophecy\\' => 9,
             'Predis\\' => 7,
+            'Picqer\\Barcode\\' => 15,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
         'M' => 
         array (
             'MyCLabs\\Enum\\' => 13,
+            'Mike42\\' => 7,
             'Midtrans\\' => 9,
             'Matrix\\' => 7,
         ),
@@ -188,6 +190,10 @@ class ComposerStaticInit618375556bd63e4c1757c1e607bc8f67
         array (
             0 => __DIR__ . '/..' . '/predis/predis/src',
         ),
+        'Picqer\\Barcode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/picqer/php-barcode-generator/src',
+        ),
         'PhpOffice\\PhpSpreadsheet\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
@@ -199,6 +205,11 @@ class ComposerStaticInit618375556bd63e4c1757c1e607bc8f67
         'MyCLabs\\Enum\\' => 
         array (
             0 => __DIR__ . '/..' . '/myclabs/php-enum/src',
+        ),
+        'Mike42\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mike42/escpos-php/src/Mike42',
+            1 => __DIR__ . '/..' . '/mike42/gfx-php/src/Mike42',
         ),
         'Midtrans\\' => 
         array (

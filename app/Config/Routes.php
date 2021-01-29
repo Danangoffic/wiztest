@@ -75,9 +75,10 @@ $routes->post('/backoffice/instansi/deleting', 'backoffice\Instansi::instansi/do
 $routes->add('/backoffice/registrasi', 'backoffice\Peserta::index');
 // $routes->post('/backoffice/registrasi', 'backoffice\Peserta::index');
 $routes->get('/backoffice/peserta/create', 'backoffice\Peserta::create_peserta');
-$routes->post('/backoffice/peserta/save', 'backoffice\Peserta::save_peserta');
+$routes->post('/backoffice/peserta/save', 'backoffice\Peserta::save');
 $routes->get('/backoffice/peserta/(:num)', 'backoffice\Peserta::detail_peserta/$1');
-$routes->get('/backoffice/peserta/hapus/(:num)', 'backoffice\Registrasi::hapus_peserta/$1');
+$routes->get('/backoffice/peserta/hapus/(:num)', 'backoffice\Peserta::delete/$1');
+$routes->post('/backoffice/peserta/doDelete/', 'backoffice\Peserta::doDelete');
 // $routes->get('/backoffice/peserta/edit/(:num)', 'backoffice\Peserta::edit/$1');
 // $routes->post('backoffice/peserta/update/(:num)', 'backoffice\Peserta::update_peserta/$1');
 // $routes->get('/backoffice/peserta/delete/(:num)', 'backoffice\Peserta::delete_peserta/$1');

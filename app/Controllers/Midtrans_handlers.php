@@ -393,8 +393,8 @@ class Midtrans_handlers extends ResourceController
 
         $Email->setTo($email);
         $Email->setSubject($subject);
-
-        $emailMessage = view('test_send_email', array('title' => 'Informasi Pendaftaran dan Pembayaran', 'nama' => $alias, 'layanan' => $Layanan, 'detail_customer' => $get_customer));
+        $data_konten = array('title' => 'Informasi Pendaftaran dan Pembayaran', 'nama' => $alias, 'layanan' => $Layanan, 'detail_customer' => $get_customer);
+        $emailMessage = view('send_email', $data_konten);
         $Email->setMessage($emailMessage);
         $Email->attach($Layanan->getImageQRCode(base_url('api/hadir/danang-arif-rahmanda'), "danang_arif_rahmanda.png"));
         if ($Email->send()) {

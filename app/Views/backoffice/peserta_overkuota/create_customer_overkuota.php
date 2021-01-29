@@ -14,14 +14,17 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <form action="save" method="post" class="col-md-12">
+                                <form action="/backoffice/peserta/save" method="post" class="col-md-12">
+                                    <?= csrf_field(); ?>
+                                    <input type="hidden" name="status_peserta" value="21">
                                     <div class="form-group row">
                                         <label for="tgl_kunjungan" class="col-md-4 mt-2">Waktu Kunjungan <span class="text-danger">*</span></label>
                                         <div class="col-md-4 mt-2">
                                             <input type="date" name="tgl_kunjungan" class="form-control" id="tgl_kunjungan" min="<?= date('Y-m-d'); ?>" autofocus required>
                                         </div>
                                         <div class="col-md-4 mt-2">
-                                            <select name="jam_kunjungan" id="jam_kunjungan" class="form-control">
+                                            <select name="jam_kunjungan" id="jam_kunjungan" class="form-control" data-placeholder="Pilih jam kunjungan">
+                                                <option value=""></option>
                                                 <?php
                                                 for ($i = 7; $i < 23; $i++) {
                                                     $timeNow = date('H');
@@ -43,7 +46,8 @@
                                     <div class="form-group row">
                                         <label for="nama_pemeriksa" class="col-md-4">Nama Pemeriksa <span class="text-danger">*</span></label>
                                         <div class="col-md-8">
-                                            <select name="nama_pemeriksa" id="nama_pemeriksa" class="form-control">
+                                            <select name="nama_pemeriksa" id="nama_pemeriksa" class="form-control" data-placeholder="Pilih pemeriksa">
+                                                <option value=""></option>
                                                 <?php
                                                 foreach ($pemeriksa as $key => $value) {
                                                 ?>
@@ -55,17 +59,20 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="jenis_layanan" class="col-md-4">Jenis Layanan</label>
+                                        <label for="layanan_test" class="col-md-4">Jenis Layanan</label>
                                         <div class="col-md-8">
-                                            <select name="jenis_layanan" id="jenis_layanan" class="form-control">
+                                            <select name="layanan_test" id="layanan_test" class="form-control" data-placeholder="Pilih jenis layanan">
+                                                <option value=""></option>
                                                 <?php
                                                 foreach ($data_layanan_test as $key => $value) {
-                                                    $DetailLayanan = $layananModel->find($value['id_layanan']);
-                                                    $DetailTest = $testModel->find($value['id_test']);
+                                                    $id_layanan = $value['id_layanan'];
+                                                    $id_test = $value['id_test'];
+                                                    $DetailLayanan = $layananModel->find($id_layanan);
+                                                    $DetailTest = $testModel->find($id_test);
                                                     $namaLayanan = $DetailLayanan['nama_layanan'];
                                                     $nama_test = $DetailTest['nama_test'];
                                                 ?>
-                                                    <option value="<?= $value['id']; ?>"><?= $nama_test; ?> (<?= $namaLayanan; ?>)</option>
+                                                    <option value="<?= $id_test . " " . $id_layanan; ?>"><?= $nama_test; ?> (<?= $namaLayanan; ?>)</option>
                                                 <?php
                                                 }
                                                 ?>
@@ -87,7 +94,8 @@
                                     <div class="form-group row">
                                         <label for="jenis_kelamin" class="col-md-4">Jenis Kelamin</label>
                                         <div class="col-md-8">
-                                            <select name="jenis_kelamin" id="jenis_kelamin" class="form-control" required>
+                                            <select name="jenis_kelamin" id="jenis_kelamin" class="form-control" required data-placeholder="Pilih jenis kelamin">
+                                                <option value=""></option>
                                                 <option value="pria">Pria</option>
                                                 <option value="wanita">Wanita</option>
                                             </select>
@@ -120,7 +128,8 @@
                                     <div class="form-group row">
                                         <label for="faskes" class="col-md-4">Faskes Asal</label>
                                         <div class="col-md-8">
-                                            <select name="faskes" id="faskes" class="form-control">
+                                            <select name="faskes" id="faskes" class="form-control" data-placeholder="Pilih faskes asal">
+                                                <option value=""></option>
                                                 <?php
                                                 foreach ($faskes as $key => $value) {
                                                 ?>
@@ -134,7 +143,8 @@
                                     <div class="form-group row">
                                         <label for="instansi" class="col-md-4">Instansi</label>
                                         <div class="col-md-8">
-                                            <select name="instansi" id="instansi" class="form-control">
+                                            <select name="instansi" id="instansi" class="form-control" data-placeholder="Pilih instansi">
+                                                <option value=""></option>
                                                 <?php
                                                 foreach ($instansi as $key => $value) {
                                                 ?>
@@ -148,7 +158,8 @@
                                     <div class="form-group row">
                                         <label for="id_marketing" class="col-md-4">PIC Marketing</label>
                                         <div class="col-md-8">
-                                            <select name="id_marketing" id="id_marketing" class="form-control">
+                                            <select name="id_marketing" id="id_marketing" class="form-control" data-placeholder="Pilih PIC Marketing">
+                                                <option value=""></option>
                                                 <?php
                                                 foreach ($marketing as $key => $value) {
                                                 ?>
@@ -162,10 +173,11 @@
                                     <div class="form-group row">
                                         <label for="status_pembayaran" class="col-md-4">Cara Pembayaran</label>
                                         <div class="col-md-8">
-                                            <select name="status_pembayaran" id="status_pembayaran" class="form-control">
-                                                <option value="2">Invoice</option>
-                                                <option value="0">Belum Lunas</option>
-                                                <option value="1">Lunas</option>
+                                            <select name="status_pembayaran" id="status_pembayaran" class="form-control" data-placeholder="Pilih cara pembayaran">
+                                                <option value=""></option>
+                                                <option value="invoice">Invoice</option>
+                                                <option value="belum lunas">Belum Lunas</option>
+                                                <option value="lunas">Lunas</option>
                                             </select>
                                         </div>
                                     </div>
@@ -190,15 +202,11 @@
     </section>
 </div>
 
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/dataTables.responsive.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/dataTables.buttons.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js'); ?>"></script>
 <script>
     $(document).ready(() => {
-
+        $("select").select2({
+            theme: "bootstrap4"
+        })
     });
 </script>
 <?= $this->endSection(); ?>

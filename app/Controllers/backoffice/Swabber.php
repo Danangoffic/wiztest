@@ -9,6 +9,9 @@ use App\Models\KehadiranModel;
 use App\Models\LayananTestModel;
 use App\Models\StatusHasilModel;
 use App\Models\UserModel;
+use Mike42\Escpos\Printer;
+
+// use 
 
 class Swabber extends BaseController
 {
@@ -20,6 +23,7 @@ class Swabber extends BaseController
     protected $layanan_test_model;
     protected $bilik_model;
     protected $layanan_controller;
+    protected $escpos;
     function __construct()
     {
         $this->session = \Config\Services::session();
@@ -30,6 +34,8 @@ class Swabber extends BaseController
         $this->layanan_test_model = new LayananTestModel();
         $this->bilik_model = new BilikSwabberModel();
         $this->layanan_controller = new Layanan;
+        // $connector = new FilePrintConnector("php://stdout");
+        // $printer = new Printer($connector);
     }
 
     public function index()
@@ -72,8 +78,8 @@ class Swabber extends BaseController
 
     public function print_it(int $id_customer)
     {
-        
-        $data_L = $this->layanan_controller->printbarcode()
+        // $Connector = new FilePrintConnector("php://stdout");
+        // $data_L = $this->layanan_controller->printbarcode();
     }
 
     public function kelola()

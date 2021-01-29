@@ -114,4 +114,9 @@ class Marketing extends BaseController
             return redirect()->to(base_url());
         }
     }
+
+    public function afiliasi()
+    {
+        # code...
+    }
 }

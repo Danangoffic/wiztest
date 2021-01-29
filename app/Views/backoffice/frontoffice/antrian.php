@@ -69,7 +69,7 @@
                                             foreach ($kuota_swab as $key => $value) {
                                                 // $DetailInstansi = new Ins
                                                 $jml_booking = $customer_model->customersBooking($value['jenis_test_layanan'], $filterDate, $value['jam'])->get()->getResultArray();
-                                                $jml_antrian = $customer_model->customersBooking($value['jenis_test_layanan'], $filterDate, $value['jam'], 'settlement', '1')->get()->getResultArray();
+                                                $jml_antrian = $customer_model->customersBooking($value['jenis_test_layanan'], $filterDate, $value['jam'], 'settlement', '23')->get()->getResultArray();
                                                 // echo db_connect()->showLastQuery();
                                                 // exit();
                                             ?>
