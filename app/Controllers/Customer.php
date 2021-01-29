@@ -101,8 +101,7 @@ class Customer extends ResourceController
 
     public function registrasi()
     {
-        $marketingModel = new MarketingModel();
-        $validation =  \Config\Services::validation();
+
         $nama = $this->request->getPost('nama');
         $nik = $this->request->getPost('nik');
         $phone = $this->request->getPost('phone');
@@ -216,7 +215,7 @@ class Customer extends ResourceController
             $insertPembayaran = $this->PembayaranModel->insert($dataInsertPembayaran);
             $id_pembayaran = $this->PembayaranModel->getInsertID();
             if ($MidtransToken) {
-                $data = ['data' => $MidtransToken, 'invoice_number' => $InvoiceCustomer, 'transaction' => $params, 'detail_payment' => $PembayaranModel->find($id_pembayaran)];
+                $data = ['data' => $MidtransToken, 'invoice_number' => $InvoiceCustomer, 'transaction' => $params, 'detail_payment' => $this->PembayaranModel->find($id_pembayaran)];
                 return $this->respond($data, 200, 'success');
             } else {
                 $data = ['data' => '', 'invoice_number' => null];
