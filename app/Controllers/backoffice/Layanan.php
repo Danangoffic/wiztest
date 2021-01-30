@@ -380,12 +380,8 @@ class Layanan extends ResourceController
 
     public function encode_key()
     {
-        $client_key = "SB-Mid-client-mp4wARPRYp1RjrBO";
-        $server_key = "SB-Mid-server-QkrkR-LkKVtR3SeHfFH5roM4";
-        $enc_client = base64_encode($client_key);
-        $enc_server = base64_encode($server_key);
-        echo $enc_client . "<br>";
-        print_r($enc_server);
+        $url = "https://reg.quicktest.id";
+        echo base64_encode($url);
     }
 
     //--------------------------------------------------------------------
