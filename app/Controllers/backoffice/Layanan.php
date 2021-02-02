@@ -24,7 +24,7 @@ class Layanan extends ResourceController
     protected $layanan_model;
     public function __construct()
     {
-        $this->codeBarCode = "code128";;
+        $this->codeBarCode = "code128";
         $this->session = \Config\Services::session();
         $this->dompdf = new Dompdf();
         $this->customer = new CustomerModel();
@@ -91,8 +91,8 @@ class Layanan extends ResourceController
         $Email->setTo($emailCustomer);
         $Email->setSubject("Informasi Pembayaran Dari Pendaftaran Test Melalui Quictest.id");
         $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
-
-        $emailMessage = view('send_email', array('detail_pembayaran' => $PaymentDetail, 'detail_customer' => $CustomerDetail, 'notif' => $midtrans_response, 'title' => 'Informasi Pembayaran'));
+        $midtrans = new Midtrans;
+        $emailMessage = view('send_email', array('detail_pembayaran' => $PaymentDetail, 'detail_customer' => $CustomerDetail, 'notif' => $this->midtrans->getStatusByOrderId($CustomerDetail['customer_unique']), 'title' => 'Informasi Pembayaran'));
         $Email->setMessage($emailMessage);
         $Email->attach($this->getImageQRCode(base_url('api/hadir/' . $id_customer), $nama_customer));
         if ($$Email->send()) {

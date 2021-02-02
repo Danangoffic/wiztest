@@ -25,6 +25,7 @@ class Whatsapp_service extends ResourceController
     protected $layanan_model;
     protected $test_model;
     protected $layanan_bo;
+    protected $api_key;
     public function __construct()
     {
         $this->customer_model = new CustomerModel();
@@ -34,6 +35,7 @@ class Whatsapp_service extends ResourceController
         $this->test_model = new TestModel();
         $this->layanan_model = new LayananModel();
         $this->layanan_bo = new Layanan;
+        $this->api_key = "a8d3096e3e52bc1cb7bdf376fe6a8eb3";
     }
 
     public function send_whatsapp_img_invoice($id_customer)
@@ -61,16 +63,17 @@ class Whatsapp_service extends ResourceController
         $api_key_wasap = "a8d3096e3e52bc1cb7bdf376fe6a8eb3";
 
         // MAKE SURE PHONE NUMBER USING REGION CODE
-        $APIkey = $api_key_wasap;
+        // $APIkey = $api_key_wasap;
         $phone = $phone;
         $message = 'Terima kasih kepada Bpk/Ibu ' . $cek_customer['nama'] .
-            " yang telah melakukan pembayaran untuk mengikuti test *{$jenis_test}* pada tanggal *{$tgl_kunjungan}*. 
-            Berikut kami lampirkan Invoice beserta QR yang diperlukan saat anda hadir pada klinik kami.";
-        $url_img = $this->layanan_bo->getUrlBarCode("https://reg.quicktest.id/api/hadir/" . $id_customer);
+            " yang telah melakukan pembayaran untuk mengikuti test *{$jenis_test}* pada tanggal *{$tgl_kunjungan}*. \n
+            Berikut kami lampirkan Invoice beserta QR Code yang diperlukan saat anda hadir pada klinik kami.";
+        $str = "https://reg.quicktest.id/api/hadir/" . $id_customer;
+        $url_img = $this->layanan_bo->getUrlQRCode($str);
 
         $url = 'http://gowagateway-silly-platypus.mybluemix.net/sendimagemsg';
         $data = array(
-            'APIKey'     => $APIkey,
+            'APIKey'     => $this->api_key,
             'phoneNumber'  => $phone,
             'message' => $message,
             'urlDownloadImage' => $url_img,
@@ -108,7 +111,7 @@ class Whatsapp_service extends ResourceController
 
         $url = 'http://gowagateway-silly-platypus.mybluemix.net/sendtxtmsg';
         $data = array(
-            'APIKey'     => $APIkey,
+            'APIKey'     => $this->api_key,
             'phoneNumber'  => $phone,
             'message' => $message,
         );
