@@ -17,52 +17,70 @@ use CodeIgniter\Config\AutoloadConfig;
 class Autoload extends AutoloadConfig
 {
 
-	/**
-	 * -------------------------------------------------------------------
-	 * Namespaces
-	 * -------------------------------------------------------------------
-	 * This maps the locations of any namespaces in your application to
-	 * their location on the file system. These are used by the autoloader
-	 * to locate files the first time they have been instantiated.
-	 *
-	 * The '/app' and '/system' directories are already mapped for you.
-	 * you may change the name of the 'App' namespace if you wish,
-	 * but this should be done prior to creating any namespaced classes,
-	 * else you will need to modify all of those classes for this to work.
-	 *
-	 * Prototype:
-	 *
-	 *   $psr4 = [
-	 *       'CodeIgniter' => SYSTEMPATH,
-	 *       'App'	       => APPPATH
-	 *   ];
-	 *
-	 * @var array
-	 */
-	public $psr4 = [
-		APP_NAMESPACE => APPPATH, // For custom app namespace
-		'Config'      => APPPATH . 'Config',
-		'Dompdf'      => APPPATH . 'ThirdParty/dompdf/src',
-		'escpospos'	  => ROOTPATH . "vendor/autoload.php"
-	];
+	public $psr4 = [];
 
-	/**
-	 * -------------------------------------------------------------------
-	 * Class Map
-	 * -------------------------------------------------------------------
-	 * The class map provides a map of class names and their exact
-	 * location on the drive. Classes loaded in this manner will have
-	 * slightly faster performance because they will not have to be
-	 * searched for within one or more directories as they would if they
-	 * were being autoloaded through a namespace.
-	 *
-	 * Prototype:
-	 *
-	 *   $classmap = [
-	 *       'MyClass'   => '/path/to/class/file.php'
-	 *   ];
-	 *
-	 * @var array
-	 */
 	public $classmap = [];
+
+	public function __construct()
+	{
+		parent::__construct();
+
+		/**
+		 * -------------------------------------------------------------------
+		 * Namespaces
+		 * -------------------------------------------------------------------
+		 * This maps the locations of any namespaces in your application
+		 * to their location on the file system. These are used by the
+		 * Autoloader to locate files the first time they have been instantiated.
+		 *
+		 * The '/app' and '/system' directories are already mapped for
+		 * you. You may change the name of the 'App' namespace if you wish,
+		 * but this should be done prior to creating any namespaced classes,
+		 * else you will need to modify all of those classes for this to work.
+		 *
+		 * DO NOT change the name of the CodeIgniter namespace or your application
+		 * WILL break. *
+		 * Prototype:
+		 *
+		 *   $Config['psr4'] = [
+		 *       'CodeIgniter' => SYSPATH
+		 *   `];
+		 */
+		$psr4 = [
+			'App'         => APPPATH,                // To ensure filters, etc still found,
+			APP_NAMESPACE => APPPATH,                // For custom namespace
+			'Config'      => APPPATH . 'Config',
+			'Dompdf'      => APPPATH . 'ThirdParty/dompdf/src',
+			// 'escpospos'	  => ROOTPATH . "vendor/autoload.php"
+		];
+
+		/**
+		 * -------------------------------------------------------------------
+		 * Class Map
+		 * -------------------------------------------------------------------
+		 * The class map provides a map of class names and their exact
+		 * location on the drive. Classes loaded in this manner will have
+		 * slightly faster performance because they will not have to be
+		 * searched for within one or more directories as they would if they
+		 * were being autoloaded through a namespace.
+		 *
+		 * Prototype:
+		 *
+		 *   $Config['classmap'] = [
+		 *       'MyClass'   => '/path/to/class/file.php'
+		 *   ];
+		 */
+		$classmap = [
+			'PHPExcel' => APPPATH . 'ThirdParty/PHPExcel/PHPExcel.php'
+		];
+
+		//--------------------------------------------------------------------
+		// Do Not Edit Below This Line
+		//--------------------------------------------------------------------
+
+		$this->psr4     = array_merge($this->psr4, $psr4);
+		$this->classmap = array_merge($this->classmap, $classmap);
+
+		unset($psr4, $classmap);
+	}
 }

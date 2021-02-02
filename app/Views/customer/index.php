@@ -255,7 +255,7 @@
 </div>
 
 
-<script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?= $midtrans_client_key; ?>"></script>
+<script type="text/javascript" src="https://app.midtrans.com/snap/snap.js" data-client-key="<?= $midtrans_client_key; ?>"></script>
 <script>
     var id_jenis_test, nama_jenis_test, jam_kunjungan, token_client;
     var midtransToken, invoice_number, transaction;
@@ -584,11 +584,14 @@
                         }
                     });
                 } else if (transaction_status == 'pending') {
-                    showToast('info', 'Silahkan melakukan pembayaran').then(reloadAfterDismiss)
+                    showToast('info', 'Silahkan melakukan pembayaran');
+                    window.location.reload();
                 } else if (transaction_status == "deny" || transaction_status == "cancel") {
-                    showError('Maaf, pembayaran ditolak').then(reloadAfterDismiss);
+                    showError('Maaf, pembayaran ditolak');
+                    window.location.reload();
                 } else if (transaction_status == "expire") {
-                    showError('Maaf, pembayaran sudah melewati batas waktunya').then(reloadAfterDismiss);
+                    showError('Maaf, pembayaran sudah melewati batas waktunya');
+                    window.location.reload();
                 }
             }
         })

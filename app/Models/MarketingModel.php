@@ -13,7 +13,10 @@ class MarketingModel extends Model
     // protected $useSoftDeletes = true;
 
     protected $allowedFields = [
+        'id_kota',
         'nama_marketing',
+        'is_afiliated_hs',
+        'is_afiliated_rujukan',
         'created_by',
         'updated_by'
     ];

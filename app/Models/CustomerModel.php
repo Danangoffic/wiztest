@@ -35,6 +35,7 @@ class CustomerModel extends Model
         'tahap',
         'kehadiran',
         'no_antrian',
+        'nomor_bilik',
         'jam_kunjungan',
         'tgl_kunjungan',
         'status_pembayaran',
@@ -42,7 +43,9 @@ class CustomerModel extends Model
         'catatan',
         'url_pdf',
         'is_hs',
-        'id_hs'
+        'id_hs',
+        'is_corporate',
+        'id_cust_corporate'
     ];
 
     public function db_this()

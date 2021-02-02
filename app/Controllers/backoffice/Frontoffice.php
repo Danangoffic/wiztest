@@ -89,7 +89,7 @@ class Frontoffice extends ResourceController
             $queryFilter .= " ORDER BY id DESC";
             $Customer = db_connect()->query($queryFilter)->getResultArray();
         } else {
-            $data_layanan_test = $this->layananTestModel->select("id")->where(['id_segmen' => "1", 'id_layanan' => 1])->get()->getResultArray();
+            $data_layanan_test = $this->layananTestModel->select("id")->where(['id_layanan' => "1"])->get()->getResultArray();
             $ids_test = array();
             foreach ($data_layanan_test as $key => $lt) {
                 $ids_test[] = $lt['id'];

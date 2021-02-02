@@ -17,7 +17,7 @@
 
                             <div id="collapseOne" class="collapsing" aria-labelledby="headingOne" data-parent="#accordion">
                                 <div class="card-body">
-                                    <form action="<?= base_url('backoffice/registrasi'); ?>" method="POST">
+                                    <form action="<?= base_url('backoffice/laboratorium/hasil'); ?>" method="POST">
                                         <input type="hidden" name="filtering" value="on">
                                         <div class="form-group row">
                                             <div class="col-md-8 col-offset-3">
@@ -58,7 +58,10 @@
             <div class="col-12">
                 <div class="card card-primary">
                     <h5 class="card-header"><?= $title; ?></h5>
-                    <div class="card-body p-0 m-2">
+                    <div class="card-body">
+                        <a href="import_data" class="btn btn-success btn-sm mb-3">Import Excel PCR</a>
+                        <a href="insert_antigen" class="btn btn-success btn-sm mb-3">Insert Data Antigen</a>
+                        <a href="insert_rapid" class="btn btn-success btn-sm mb-3">Insert Data Rapid Test</a>
                         <div class="table-responsive">
                             <table class="table table-bordered table-sm table-condensed" id="data_laboratorium">
                                 <thead class="text-center text-justify">
@@ -87,7 +90,7 @@
                                         <th>Anti SARS-<br>COV-2<br>IgM</th>
                                     </tr>
                                 </thead>
-                                <tbody id="data_hasil">
+                                <tbody id="data_hasil2">
                                 </tbody>
                             </table>
                         </div>
@@ -134,22 +137,23 @@
                         <td>${v.nama_customer}</td>
                         <td>${v.waktu_sampling}</td>
                         <td>${v.waktu_periksa}</td>
-                        <td>${v.waktu_selesai_periksa}</td>
+                        <td>${v.waktu_selesa_periksa}</td>
                         <td>${v.nama_sample}</td>
                         <td>${v.status_cov}</td>
                         <td>${v.status_gene}</td>
                         <td>${v.status_orf}</td>
+                        <td>${v.ic}</td>
                         <td>${v.status_igg}</td>
                         <td>${v.status_igm}</td>
-                        <td>${v.catatam}</td>
+                        <td>${v.catatan}</td>
                         <td>
-                            <a class="btn btn-success btn-sm" target="_blank" href="<?= base_url('backoffice/laboratorium/input/'); ?>${v.id_hasil}">Input</a>
-                            <a class="btn btn-primary btn-sm" target="_blank" href="<?= base_url('backoffice/laboratorium/print/'); ?>${v.id_hasil}">Cetak Hasil</a>
+                            <a class="btn btn-success btn-sm" target="_blank" href="/backoffice/laboratorium/input/${v.id_hasil}">Input</a>
+                            <a class="btn btn-primary btn-sm" target="_blank" href="/backoffice/laboratorium/print/${v.id_hasil}">Cetak Hasil</a>
                         </td>
                     </tr>
                     `
                 });
-                $("#data_laboratorium").html(html_hasil);
+                $("#data_hasil2").html(html_hasil);
             }
         })
 

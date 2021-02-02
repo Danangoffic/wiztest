@@ -31,7 +31,12 @@ class UserModel extends Model
     public function loginUser1($email = false, $password = false)
     {
         if ($email && $password) {
-            return $this->where(['email' => $email, 'password' => $password])->first();
+            return $this->where(['email' => $email, 'password' => md5($password)])->first();
+            // db_connect()
+            //     ->table($this->table)
+            //     ->select()
+            //     ->where('email', $email)
+            //     ->where('password', $password);
         } else {
             return false;
         }
@@ -63,18 +68,18 @@ class UserModel extends Model
     public function crud_users_detail(string $type = "read", $idUser = null, $data = null)
     {
         # code...
-        $db = \Config\Database::connect();
+        $db = db_connect();
         if ($type == "read" && $idUser) {
             $builder = $db->table('users');
-            return $builder->select("*")->join('users_detail detail', 'detail.id_user = users.id')->where(['users.id' => $idUser])->get();
+            return $builder->select("*")->join('users_detail detail', 'detail.id_user = users.id')->where('users.id', $idUser, true)->get();
         } elseif ($type == "create" && $data) {
             # code...
             return $db->table('users_detail')->insert($data);
         } elseif ($type == "update" && $data && $idUser) {
-            return $db->table('users_detail')->where(['id_user' => $idUser])->update($data);
+            return $db->table('users_detail')->where('id_user', $idUser, true)->update($data);
         } elseif ($type == "delete" && $idUser) {
             # code...
-            return $db->table('users_detail')->delete(['id_user' => $idUser]);
+            return $db->table('users_detail')->delete('id_user', $idUser);
         } else {
             return false;
         }

@@ -3,6 +3,7 @@
 namespace App\Controllers\backoffice;
 
 use App\Models\CustomerModel;
+use App\Models\KehadiranModel;
 use App\Models\LayananModel;
 use App\Models\LayananTestModel;
 use App\Models\PemeriksaanModel;
@@ -20,12 +21,14 @@ class Layanan extends ResourceController
     public $dompdf;
     public $pdf;
     protected $customer;
+    protected $layanan_model;
     public function __construct()
     {
-        $this->codeBarCode = "code128";;
-        $this->session = session();
+        $this->codeBarCode = "code128";
+        $this->session = \Config\Services::session();
         $this->dompdf = new Dompdf();
         $this->customer = new CustomerModel();
+        $this->layanan_model = new LayananModel();
     }
     public function index()
     {
@@ -33,8 +36,71 @@ class Layanan extends ResourceController
         if (!$this->session->has('logged_in')) {
             return redirect()->to('/backoffice/login');
         }
-        // dd($this->session->get('nama'));
-        return view('backoffice/layanan/index');
+        $is_filterd = $this->request->getPost("is_filterd");
+        if ($is_filterd == "yes") {
+            $date1 = $this->request->getPost("date1");
+            $date2 = $this->request->getPost("date2");
+        } else {
+            $date1 = date("Y-m-d");
+            $date2 = date("Y-m-d");
+        }
+        $jenis_layanan = $this->layanan_model->findAll();
+        // dd($layanan);
+        $data = [
+            'title' => "Data Layanan",
+            'page' => "layanan",
+            'session' => $this->session,
+            'jenis_layanan' => $jenis_layanan,
+            'date_now' => date("Y-m-d"),
+            'layanan_model' => $this->layanan_model,
+            'kehadiran_model' => new KehadiranModel(),
+            'date1' => $date1,
+            'date2' => $date2
+        ];
+        // dd($data);
+        return view('backoffice/layanan/index', $data);
+    }
+
+    public function kirim_hasil()
+    {
+        $id_customer = $this->request->getVar("id_customer");
+
+        $get = $this->customer->find($id_customer);
+
+        $Whatsapp_service = new Whatsapp_service;
+
+        $Whatsapp_service->send_whatsapp_img_invoice($id_customer);
+
+        $Email = \Config\Services::email();
+
+        // $Email->initialize($config);
+
+        $CustomerDetail = $this->CustomerModel->find($id_customer)->first();
+        $emailCustomer = $CustomerDetail['email'];
+        $id_customer = $CustomerDetail['id'];
+        $nama_customer = $CustomerDetail['nama'];
+
+        $Email->setFrom('info@quicktest.id', 'QuickTest.id INFO');
+        // $Email->setTo($emailCustomer);
+        // $Email->setFrom('johndoe@gmail.com', 'Confirm Registration');
+
+        // $Email->setSubject($subject);
+        // $Email->setMessage($message);
+
+
+        $Email->setTo($emailCustomer);
+        $Email->setSubject("Informasi Pembayaran Dari Pendaftaran Test Melalui Quictest.id");
+        $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
+        $midtrans = new Midtrans;
+        $emailMessage = view('send_email', array('detail_pembayaran' => $PaymentDetail, 'detail_customer' => $CustomerDetail, 'notif' => $this->midtrans->getStatusByOrderId($CustomerDetail['customer_unique']), 'title' => 'Informasi Pembayaran'));
+        $Email->setMessage($emailMessage);
+        $Email->attach($this->getImageQRCode(base_url('api/hadir/' . $id_customer), $nama_customer));
+        if ($$Email->send()) {
+            echo "Email successfully sent";
+        } else {
+            $data = $email->printDebugger(['headers']);
+            print_r($data);
+        }
     }
 
     public function detail_layanan($id_layanan)
@@ -178,6 +244,25 @@ class Layanan extends ResourceController
         // readfile("fileinit.pdf");
 
         // return view('backoffice/Layanan/print_barcode', ['img_url' => $img_url]);
+    }
+
+    /**
+     * @method GET
+     * @link https://lab.quicktest.id/api/direct-print-barcode/{encoded_id_customer}
+     * @todo image barcode to print barcode directly
+     */
+    public function direct_print_barcode(string $encoded_id_customer = null)
+    {
+        $decoded = base64_decode($encoded_id_customer);
+        $detailCustomer = $this->customer->find(base64_decode($encoded_id_customer));
+        $customer_unique = $detailCustomer['customer_unique'];
+        $img_url = $this->get_bar_code($customer_unique);
+        $type = pathinfo($img_url, PATHINFO_EXTENSION);
+        $data = (file_get_contents($img_url)) ? file_get_contents($img_url) : "";
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        // It will be called downloaded.pdf
+        $html = '<center>' . $detailCustomer['nama'] . '<br><img importance="" width=\'150\' height=\'75\' src="' . $base64 . '" id=""></center>';
+        return view('backoffice/layanan/print_barcode', ['base64' => $base64, 'url' => $customer_unique, 'detailCustomer' => $detailCustomer, 'original_img' => $img_url, 'html_img' => $html]);
     }
 
     public function coba_barcode($id_customer)
@@ -380,12 +465,8 @@ class Layanan extends ResourceController
 
     public function encode_key()
     {
-        $client_key = "SB-Mid-client-mp4wARPRYp1RjrBO";
-        $server_key = "SB-Mid-server-QkrkR-LkKVtR3SeHfFH5roM4";
-        $enc_client = base64_encode($client_key);
-        $enc_server = base64_encode($server_key);
-        echo $enc_client . "<br>";
-        print_r($enc_server);
+        $server_key = "Mid-server-ziBWgMIMvdY6Xd7PsTgBdnEz";
+        echo base64_encode($server_key);
     }
 
     //--------------------------------------------------------------------

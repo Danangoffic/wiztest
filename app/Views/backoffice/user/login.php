@@ -17,6 +17,8 @@
                 <p class="login-box-msg">Sign in</p>
 
                 <form action="<?= base_url('backoffice/login'); ?>" method="post">
+
+                    <input type="hidden" name="csrf_token" value="<?= csrf_hash(); ?>">
                     <div class="input-group mb-3">
                         <input type="email" class="form-control" placeholder="Email" autocomplete="off" autofocus name="email">
                         <div class="input-group-append">
