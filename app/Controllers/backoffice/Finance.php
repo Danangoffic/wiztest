@@ -156,10 +156,10 @@ class Finance extends BaseController
         }
     }
 
-    public function FunctionName(Type $var = null)
-    {
-        # code...
-    }
+    // public function FunctionName(Type $var = null)
+    // {
+    //     # code...
+    // }
 
     protected function print_pdf($data)
     {
