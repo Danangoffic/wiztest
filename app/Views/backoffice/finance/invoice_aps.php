@@ -172,8 +172,8 @@
                                                     <a href="<?= $url_download_file; ?>" target="_blank" rel="noopener noreferrer" class="btn btn-default btn-sm">Download Files</a>
                                                 </td>
                                                 <td class="text-center align-middle">
-                                                    <a href="<?= base_url('backoffice/finance/edit/' . $c['id']); ?>" class="btn btn-primary btn-sm">Edit</a>
-                                                    <a href="<?= base_url('backoffice/finance/delete/' . $c['id']); ?>" class="btn btn-danger btn-sm">Hapus</a>
+                                                    <a href="<?= base_url('backoffice/peserta/edit/' . $c['id']); ?>" class="btn btn-primary btn-sm">Edit</a>
+                                                    <a href="<?= base_url('backoffice/peserta/delete/' . $c['id']); ?>" class="btn btn-danger btn-sm">Hapus</a>
                                                 </td>
                                             </tr>
                                         <?php

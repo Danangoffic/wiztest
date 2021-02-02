@@ -57,6 +57,7 @@ $routes->get('/api/check_no_registration', 'Customer::validasi_no_registrasi');
 $routes->get("/api/direct-print-barcode/(:any)", "backoffice\Layanan::direct_print_barcode/$1");
 $routes->get("/api/detail-paket-pemeriksaan", "backoffice\Settings::detail_paket_pemeriksaan");
 $routes->post("/api/home-service", "backoffice\Home_service::save");
+$routes->post("/api/kirim_hasil", "backoffice\layanan::kirim_hasil");
 
 $routes->get('detail_form2', 'Customer::detail_form2');
 
@@ -176,14 +177,16 @@ $routes->get('/backoffice/user/(:segment)/(:num)', 'backoffice\User::$1/$2');
 $routes->post('/backoffice/user/(:segment)/(:num)', 'backoffice\User::$1/$2');
 
 $routes->add('/backoffice/finance/(:segment)', 'backoffice\Finance::$1');
-$routes->add('/backoffice/finance/print_invoice/(:segment)/(:any)', 'backoffice\Finanace::print_invoice/$1/$2');
-$routes->get('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finanace::$1/$2');
+$routes->add('/backoffice/finance/print_invoice/(:segment)/(:any)', 'backoffice\Finance::print_invoice/$1/$2');
+$routes->get('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finance::$1/$2');
 
 $routes->get('/marketing', 'backoffice\Marketing::index');
 $routes->get('/marketing/(:num)', 'backoffice\Marketing::detail/$1');
 $routes->add('/marketing/(:segment)', 'backoffice\Marketing::$1');
 $routes->add('/marketing/(:segment)/(:num)', 'backoffice\Marketing::$1/$2');
+$routes->get("/backoffice/laporan/hasil", "backoffice\Laboratorium::hasil");
 
+$routes->get("/led/(:num)", "Antrian::$1");
 /**
  * --------------------------------------------------------------------
  * Additional Routing

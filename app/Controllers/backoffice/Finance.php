@@ -99,6 +99,18 @@ class Finance extends BaseController
         return $this->returning_invoice($filter_submit, $data);
     }
 
+    public function instansi()
+    {
+        $DataInstansi = $this->instansi_model->findAll();
+        $data = array(
+            'title' => "Data Instansi",
+            'page' => "instansi",
+            'session' => session(),
+            'data' => $DataInstansi
+        );
+        return view("backoffice/finance/instansi", $data);
+    }
+
     protected function invoice_filter()
     {
         $this->date1 = ($this->request->getPost('date1')) ? $this->request->getPost('date1') : '';
@@ -142,6 +154,11 @@ class Finance extends BaseController
                 # code...
                 break;
         }
+    }
+
+    public function FunctionName(Type $var = null)
+    {
+        # code...
     }
 
     protected function print_pdf($data)
