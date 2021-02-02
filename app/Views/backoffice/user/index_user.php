@@ -54,16 +54,21 @@
                             <tbody>
                                 <?php
                                 $no = 1;
+                                // dd($users);
                                 foreach ($users as $key => $value) {
-                                    $detail_user = $user_detail->find($value['id']);
+                                    $id = $value['id'];
+                                    $detail_user = $user_detail->where(['id_user' => $id])->first();
                                     // echo db_connect()->showLastQuery();exit();
                                     $data_level = $user_level->find($value['user_level']);
+
                                     $level_user = $data_level['level'];
                                     $nama_user = $detail_user['nama'];
                                     $phone_user = $detail_user['phone'];
                                     $id_lokasi_user = $detail_user['id_lokasi'];
+
                                     // $detail_lokasi = $lokasi_input->find($id_lokasi_user);
-                                    $data_lokasi_user = $kota_user->find($id_lokasi_user);
+                                    $data_lokasi_user = $kota_user->where('id', $id_lokasi_user)->first();
+
                                     $nama_lokasi = $data_lokasi_user['nama_kota'];
                                     $city_user = $data_lokasi_user['city'];
                                     $province_user = $data_lokasi_user['province'];
@@ -78,7 +83,7 @@
                                         <td><?= $level_user; ?></td>
                                         <td class="text-center">
                                             <a href="<?= base_url('backoffice/user/edit_user/' . $value['id']); ?>" class="btn btn-success btn-sm">Edit</a>
-                                            <!-- <a href="<?= base_url('backoffice/user/edit_user/' . $value['id']); ?>" class="btn btn-danger btn-sm">Hapus</a> -->
+                                            <a href="<?= base_url('backoffice/user/edit_user/' . $value['id']); ?>" class="btn btn-danger btn-sm">Hapus</a>
                                         </td>
                                     </tr>
                                 <?php

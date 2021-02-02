@@ -97,19 +97,41 @@ class User extends ResourceController
         }
         try {
             //code...
+            $csrf_token = $this->request->getPost("csrf_token");
+            if ($csrf_token == null) {
+                $this->session->setFlashdata("error", "Sorry...you are not eligible to login");
+                return redirect()->to("/backoffice/login");
+            }
+            $db = db_connect();
+
             $email = $this->request->getPost('email');
-            $password = md5($this->request->getPost('password'));
+            $password = $this->request->getPost('password');
+            // dd($password);
             $getUser = $this->userModel->loginUser1($email, $password);
-
+            // dd(db_connect()->getLastQuery());
+            // $total_login = count($getUser);
+            // if ($total_login > 1) {
+            //     $this->session->setFlashdata('error', 'Gagal login');
+            //     return redirect()->to('/backoffice')->withInput();
+            // }
+            // $getUser = $getUser->get()->getRowArray();
+            $db_email = $getUser['email'];
+            $db_password = $getUser['password'];
+            if ($db_email != $email || $db_password != md5($password)) {
+                $this->session->setFlashdata('error', 'Gagal login, username dan password tidak sesuai');
+                return redirect()->to('/backoffice/login')->withInput();
+            }
+            // dd($getUser);
             if ($getUser) {
-
                 // $session = session();
                 $id = $getUser['id'];
                 $detail_user = $this->userModel->detailById($id)->getFirstRow();
-                // $dbCon = db_connect();
-                // echo $dbCon->showLastQuery();
-                // dd($detail_user);
-                $user_level = $getUser['user_level'];
+                if (!$detail_user) {
+                    $this->session->setFlashdata('error', 'Gagal login');
+                    return redirect()->to('/backoffice/login')->withInput();
+                }
+
+                $user_level = intval($getUser['user_level']);
                 $newdata = array(
                     'email'     => $email,
                     'id_user' => $id,
@@ -119,27 +141,48 @@ class User extends ResourceController
                     'user_level' => $user_level
                 );
                 $this->session->set($newdata);
-                // echo $this->session->get('user_level');
-                // exit();
-                // dd($this->session->get('user_level'));
-                return redirect()->to(base_url('backoffice'));
+                $this->session->setFlashdata('success', 'Sukses login');
+                return $this->user_redirect($user_level);
             } else {
                 $this->session->setFlashdata('error', 'Gagal login');
                 return redirect()->to('/backoffice')->withInput();
-                // echo "error " . $th->getMessage();
             }
         } catch (\Throwable $th) {
             //throw $th;
             $this->session->setFlashdata('error', 'Gagal login');
-            echo "error " . $th->getMessage() . " {$th->getFile()} {$th->getLine()} {$th->getCode()}";
-            exit();
+
             return redirect()->to('/backoffice')->withInput();
+        }
+    }
+
+    protected function user_redirect(int $user_level = null)
+    {
+        if ($user_level == null) {
+            $this->session->setFlashdata("error", "Gagal login");
+            return redirect()->to("/backoffice/login");
+        }
+
+        if ($user_level == 1 || $user_level == 99) {
+            return redirect()->to(base_url('backoffice'));
+        } else if ($user_level == 100) {
+            return redirect()->to(base_url('backoffice/swabber'));
+        } else if ($user_level == 101) {
+            return redirect()->to(base_url('backoffice/finance/instansi'));
+        } else if ($user_level == 102 || $user_level == 8) {
+            return redirect()->to(base_url('backoffice/laboratorium/validasi'));
+        } else if ($user_level == 2) {
+            return redirect()->to(base_url('backoffice/frontoffice/walkin'));
+        } else if ($user_level == 4 || $user_level == 6) {
+            return redirect()->to(base_url('backoffice/reception'));
+        } else if ($user_level == 7) {
+            return redirect()->to(base_url('backoffice/dokter'));
         }
     }
 
     public function logout()
     {
-        session_destroy();
+        $this->session->destroy();
+        $this->session->start();
         $this->session->setFlashdata('success', 'Berhasil keluar');
         return redirect()->to('backoffice/login');
     }

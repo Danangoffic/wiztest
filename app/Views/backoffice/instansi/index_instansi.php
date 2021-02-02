@@ -53,6 +53,7 @@
                                             <td>
                                                 <a href="<?= base_url('backoffice/instansi/' . $value['id']); ?>" class="btn btn-primary btn-sm">Detail</a>
                                                 <a href="<?= base_url('backoffice/instansi/edit/' . $value['id']); ?>" class="btn btn-success btn-sm">Edit</a>
+                                                <a href="/backoffice/instansi/delete_instansi/<?= $value['id']; ?>" class="btn btn-danger btn-sm">Hapus</a>
                                             </td>
                                         </tr>
                                     <?php

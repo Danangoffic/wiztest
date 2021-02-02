@@ -102,7 +102,7 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
 
-        $data_walkin = $this->layananTestModel->where(['id_segmen' => "1", 'id_pemeriksaan' => "1"])->get()->getResultArray();
+        $data_walkin = $this->layananTestModel->where(['id_pemeriksaan' => "1"])->get()->getResultArray();
 
         $ids_test = array();
         foreach ($data_walkin as $key => $lt) {
@@ -138,7 +138,7 @@ class Peserta extends BaseController
             'layananModel' => $this->layananModel,
             'testModel' => $this->testModel,
             'layananTestModel' => $this->layananTestModel,
-            'session' => session()
+            'session' => \Config\Services::session()
         );
         return view('backoffice/registrasi/index', $data);
     }
@@ -400,7 +400,7 @@ class Peserta extends BaseController
             'title' => "Registrasi",
             'page' => "registrasi",
             'data_customer' => $Customer,
-            'session' => session(),
+            'session' => $this->session,
             'id' => $id,
             'amt' => $amt,
             'va' => $va,
@@ -751,21 +751,34 @@ class Peserta extends BaseController
 
     public function kehadiran_by_scanning_qr($id_peserta)
     {
-        if (!$this->session->has("logged_in")) {
-            $this->session->setFlashData("error", "Anda harus login");
-            return redirect()->to("/backoffice/login");
-        }
-        $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100 || $user_level == 4) {
-        } else {
-            $this->session->setFlashData("error", "Anda tidak memiliki akses");
-            return redirect()->to("/backoffice/login");
-        }
+        // if (!$this->session->has("logged_in")) {
+        //     $this->session->setFlashData("error", "Anda harus login");
+        //     return redirect()->to("/backoffice/login");
+        // }
+        // $user_level = intval($this->session->get("user_level"));
+        // if ($user_level == 1 || $user_level == 100 || $user_level == 4) {
+        // } else {
+        //     $this->session->setFlashData("error", "Anda tidak memiliki akses");
+        //     return redirect()->to("/backoffice/login");
+        // }
 
 
         $update_peserta_by_qr = $this->updated_by_qr($id_peserta);
         $responseCode = $update_peserta_by_qr['responseCode'];
+        $responseMessage = $update_peserta_by_qr['message'];
+        switch ($responseCode) {
+            case '00':
+                $this->session->setFlashdata("success", $responseMessage);
+                break;
+            case '10':
+                $this->session->setFlashdata("success", $responseMessage);
+                break;
+            default:
+                $this->session->setFlashdata("error", $responseMessage);
+                break;
+        }
         if ($responseCode == "00" || $responseCode == "10") {
+
             $customerDetail = $this->customerModel->find($id_peserta);
             $nama_customer = $customerDetail['nama'];
             $order_id = $customerDetail['customer_unique'];
@@ -776,6 +789,7 @@ class Peserta extends BaseController
         } else {
             $message = $update_peserta_by_qr;
         }
+        return view("customer/kehadiran", $update_peserta_by_qr);
     }
 
     protected function updated_by_qr($id_peserta)
@@ -794,7 +808,7 @@ class Peserta extends BaseController
                 if ($updateCustomer && $insertKehadiran) {
                     $array_return = array(
                         'statusMessage' => "success",
-                        'message' => "hadir",
+                        'message' => "Berhasil absen untuk hadir",
                         'responseCode' => "00"
                     );
                     return $array_return;

@@ -47,12 +47,16 @@ $routes->post('/api/get_server_key', 'Customer::get_server_key');
 $routes->post('/api/update_status', 'Customer::update_data_customer_registration');
 $routes->post('/api/getQRByOrderId', 'Customer::get_qr_by_order_id');
 $routes->get('/api/hadir/(:num)', 'backoffice\Peserta::kehadiran_by_scanning_qr/$1');
+$routes->get("/api/get_antrian_swabber", "backoffice\Swabber::get_antrian_swabber");
 // $routes->get('/api/marketings', '')
 // $routes->post('/api/midtrans_notification', 'Customer::midtrans_notification');
 $routes->add('/api/notification', 'Midtrans_handlers::index');
 $routes->add('/api/redirection-handler', 'Midtrans_handlers::redirection_handler');
 $routes->add('/api/test-email/(:any)', 'Midtrans_handlers::CobaSendEmail/$1');
 $routes->get('/api/check_no_registration', 'Customer::validasi_no_registrasi');
+$routes->get("/api/direct-print-barcode/(:any)", "backoffice\Layanan::direct_print_barcode/$1");
+$routes->get("/api/detail-paket-pemeriksaan", "backoffice\Settings::detail_paket_pemeriksaan");
+$routes->post("/api/home-service", "backoffice\Home_service::save");
 
 $routes->get('detail_form2', 'Customer::detail_form2');
 

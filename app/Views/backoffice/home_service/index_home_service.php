@@ -58,7 +58,7 @@
                             <h5 class="card-title"><?= $title; ?></h5>
                         </div>
                         <div class="card-body">
-                            <a href="<?= base_url('backoffice/peserta/create'); ?>" class="btn btn-primary mb-3">Tambah Peserta</a>
+                            <a href="home_service/create" class="btn btn-primary mb-3">Tambah Peserta</a>
                             <table class="table table-bordered table-sm table-condensed" id="data_cust">
                                 <thead>
                                     <tr>

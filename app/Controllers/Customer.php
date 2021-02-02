@@ -2,10 +2,12 @@
 
 namespace App\Controllers;
 
+use App\Controllers\backoffice\Home_service;
 use App\Controllers\backoffice\Layanan;
 use App\Controllers\backoffice\Midtrans as BackofficeMidtrans;
 use App\Controllers\backoffice\SystemParameter;
 use App\Models\AlatModel;
+use App\Models\CustomerHomeServiceModel;
 use App\Models\CustomerModel;
 use App\Models\DokterModel;
 use App\Models\HasilLaboratoriumModel;
@@ -45,6 +47,7 @@ class Customer extends ResourceController
     protected $sample_model;
     protected $petugas_model;
     protected $layanan_controller;
+    protected $CustomerHomeServiceModel;
 
     public function __construct()
     {
@@ -64,6 +67,7 @@ class Customer extends ResourceController
         $this->sample_model = new SampleModel();
         $this->petugas_model = new PemeriksaModel();
         $this->layanan_controller = new Layanan;
+        $this->CustomerHomeServiceModel = new CustomerHomeServiceModel();
     }
 
     public function index()
@@ -136,6 +140,15 @@ class Customer extends ResourceController
             $dataTest = $this->testModel->find($jenis_test);
 
             $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
+            if ($jenis_test == 2 || $jenis_test == "2") {
+                $nomor_bilik = 1;
+            } else if ($jenis_test == 3 || $jenis_test == "3") {
+                $nomor_bilik = 2;
+            } else {
+                $hitung_bilik = 6 % $no_urutan;
+                $nomor_bilik = $hitung_bilik + 2;
+            }
+
             // echo "Urutan : " . $no_urutan;
 
             // var_dump($data);
@@ -159,9 +172,11 @@ class Customer extends ResourceController
                 'tahap' => 1,
                 'kehadiran' => '22',
                 'no_antrian' => $no_urutan,
+                'nomor_bilik' => $nomor_bilik,
                 'jam_kunjungan' => $jam_kunjungan,
                 'tgl_kunjungan' => $tgl_kunjungan,
-                'status_pembayaran' => 'pending'
+                'status_pembayaran' => 'pending',
+                'status_peserta' => "20"
             ];
             $insert = $this->customerModel->insert($DataInsertCustomer);
             $insert_id = null;
@@ -743,6 +758,53 @@ class Customer extends ResourceController
                 $this->session->setFlashdata('error', "Daftar peserta yang di daftarkan minimal adalah 5 orang");
                 return redirect()->to("/home-service");
             }
+            $p = $peserta[0];
+            $detail_jenis_test = $this->layananTestModel->find($p['jenis_test']);
+            $detail_layanan = $this->layananModel->find($detail_jenis_test['id_layanan']);
+            $detail_test = $this->testModel->find($detail_jenis_test['id_test']);
+            $jenis_pemeriksaan = $detail_jenis_test['id_pemeriksaan'];
+            $jenis_layanan = $detail_jenis_test['id_layanan'];
+            $jenis_test = $p['jenis_test'];
+            $tgl_kunjungan = $p['tgl_kunjungan'];
+            $jam_kunjungan = $p['jam_kunjungan'];
+            $jenis_kelamin = $p['jenis_kelamin'];
+            $tempat_lahir = $p['tempat_lahir'];
+            $tgl_lahir = $p['tgl_lahir'];
+            $alamat = $p['alamat'];
+            $instansi = $p['instansi'];
+            $marketing = $p['marketing'];
+
+            $customer_UNIQUE = $this->getOrderId($jenis_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
+            $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
+
+            $array_insert = array(
+                'jenis_test' => $p['jenis_test'],
+                'jenis_pemeriksaan' => $jenis_pemeriksaan,
+                'jenis_layanan' => $jenis_layanan,
+                'faskes_asal' => $p['faskes_asal'],
+                'customer_unique' => $customer_UNIQUE,
+                'jenis_kelamin' => $jenis_kelamin,
+                'tempat_lahir' => $tempat_lahir,
+                'tanggal_lahir' => $tgl_lahir,
+                'alamat' => $alamat,
+                'no_urutan' => $no_urutan,
+                'id_marketing' => $marketing,
+                'instansi' => $instansi,
+                'status_test' => 'menunggu',
+                'tahap' => 1,
+                'kehadiran' => '22',
+                'no_antrian' => '0',
+                'jam_kunjungan' => $jam_kunjungan,
+                'tgl_kunjungan' => $tgl_kunjungan,
+                'status_pembayaran' => 'invoice',
+                'status_peserta' => "20",
+            );
+            $this->CustomerHomeServiceModel->insert($array_insert);
+            $id_hs = $this->CustomerHomeServiceModel->getInsertID();
+
+            $InvoiceCustomer = $this->generate_invoice_hs($id_hs);
+            $this->CustomerHomeServiceModel->update($id_hs, ['invoice_number' => $InvoiceCustomer]);
+
             $array_insert = array();
             $ids = array();
             $harga_test = 0;
@@ -785,10 +847,17 @@ class Customer extends ResourceController
                     'no_antrian' => '0',
                     'jam_kunjungan' => $jam_kunjungan,
                     'tgl_kunjungan' => $tgl_kunjungan,
-                    'status_pembayaran' => 'invoice'
+                    'status_pembayaran' => 'invoice',
+                    'status_peserta' => "20",
+                    'is_hs' => "yes",
+                    'id_hs' => $id_hs
                 );
                 $this->customerModel->insert($array_insert);
-                $ids[] = $this->customerModel->getInsertID();
+                $ids = $this->customerModel->getInsertID();
+
+                $InvoiceCustomer = $this->getInvoiceNumber($ids);
+                $this->customerModel->update($ids, ['invoice_number' => $InvoiceCustomer]);
+
                 $harga_test += $detail_jenis_test['biaya'];
                 $product_name[] = $detail_test['nama_test'] . " " . $detail_layanan['nama_layanan'];
             }
@@ -805,10 +874,31 @@ class Customer extends ResourceController
                 'product_name' => $product_name,
 
             );
+
+            $array_result = array('statusMessage' => 'success', 'id_hs' => $id_hs, 'total_customers' => count($peserta));
+            return $this->respond($array_result, 200, 'success');
             // return $this->midtrans_transaction_get_token("2", )
         } catch (\Throwable $th) {
             return $this->failServerError('failed', 500, 'failed');
         }
+    }
+
+    protected function generate_invoice_hs($id_customer)
+    {
+        $data = $this->customer_home_service_model->find($id_customer);
+
+        $word1 = 'INV-';
+        $date = date('ymd');
+        if (!is_array($id_customer)) {
+            $urutan = $data['no_antrian'];
+        } else {
+            $urutan =  1;
+        }
+
+        $generateUrutan = str_pad($urutan, 3, '0', STR_PAD_LEFT);
+
+        $invoice = $word1 . $date . $generateUrutan;
+        return $invoice;
     }
 
 

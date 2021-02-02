@@ -17,6 +17,8 @@ use App\Models\TestModel;
 use CodeIgniter\RESTful\ResourceController;
 // use Dompdf\Cpdf;
 use Dompdf\Dompdf;
+use PHPExcel;
+use PHPExcel_IOFactory;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
@@ -26,8 +28,8 @@ class Laboratorium extends ResourceController
     public $codeBarCode;
     public $dompdf;
     public $pdf;
-    protected $customer;
     public $laboratoriumModel;
+    protected $customer;
     protected $customerC;
     protected $sampleModel;
     protected $dokterModel;
@@ -38,11 +40,11 @@ class Laboratorium extends ResourceController
     protected $testModel;
     protected $layananModel;
     protected $pemeriksaanModel;
-
+    protected $composer;
     public function __construct()
     {
         $this->codeBarCode = "code128";;
-        $this->session = session();
+        $this->session = \Config\Services::session();
         $this->dompdf = new Dompdf();
         $this->customer = new CustomerModel();
         $this->laboratoriumModel = new HasilLaboratoriumModel();
@@ -82,6 +84,181 @@ class Laboratorium extends ResourceController
         ];
         // dd($this->session->get('nama'));
         return view('backoffice/laboratorium/index_laboratorium', $data);
+    }
+
+    public function import_data()
+    {
+        if (!$this->session->has('logged_in')) {
+            return redirect()->to('/backoffice/login');
+        }
+        $user_level = $this->session->get("user_level");
+        $level = array(1, 6, 7, 8, 99);
+        // in_array($level);
+        if (!in_array($user_level, $level)) {
+            $this->session->setFlashdata("error", "Anda tidak mempunyai akses");;
+            return redirect()->to("/backoffice/login");
+        }
+        $data = array(
+            'title' => "Import data",
+            'page' => "lab",
+            'session' => $this->session
+        );
+        return view("backoffice/laboratorium/import_excel", $data);
+    }
+
+    public function insert_antigen()
+    {
+        if (!$this->session->has('logged_in')) {
+            return redirect()->to('/backoffice/login');
+        }
+        $user_level = $this->session->get("user_level");
+        $level = array(1, 6, 7, 8, 99);
+        // in_array($level);
+        if (!in_array($user_level, $level)) {
+            $this->session->setFlashdata("error", "Anda tidak mempunyai akses");;
+            return redirect()->to("/backoffice/login");
+        }
+        $list_status_cov = $this->statusHasilModel->where('jenis_status', 'status_cov')->get()->getResultArray();
+        $list_status_gene = $this->statusHasilModel->where('jenis_status', 'status_gene')->get()->getResultArray();
+        $list_status_orf = $this->statusHasilModel->where('jenis_status', 'status_orf')->get()->getResultArray();
+        $data = array(
+            'title' => "Import data",
+            'page' => "lab",
+            'session' => $this->session
+        );
+        return view("backoffice/laboratorium/import_excel", $data);
+    }
+
+    public function save()
+    {
+        if (!$this->session->has('logged_in')) {
+            return redirect()->to('/backoffice/login');
+        }
+        $user_level = $this->session->get("user_level");
+        $level = array(1, 6, 7, 8, 99);
+        // in_array($level);
+        if (!in_array($user_level, $level)) {
+            $this->session->setFlashdata("error", "Anda tidak mempunyai akses");;
+            return redirect()->to("/backoffice/login");
+        }
+        $type = $this->request->getPost("type");
+        if ($type == "import_excel") {
+            $fileexcel = $this->request->getFile("excel");
+            if ($fileexcel) {
+                $origin_file_name = $fileexcel->getName();
+                // $origin_mime_type = $fileexcel->getExtension;
+                // $date_now = date("dmYHis");
+                // $name = ($this->request->getPost("file_name") == null || $this->request->getPost("file_name") == "") ? $origin_file_name . "-" . $date_now . "." . $origin_mime_type : $this->request->getPost("file_name");
+                // $new_name = $fileexcel->getRandomName();
+                // if ($fileexcel->isValid() && !$fileexcel->hasMoved()) {
+                //     $path = WRITEPATH . "/excels";
+                //     if (!$fileexcel->move($path, $new_name)) {
+                //         $this->session->setFlashdata("error", "Gagal import excel, silahkan import ulang");
+                //         return redirect()->to("/backoffice/laboratorium/import_data");
+                //     }
+                // }
+                $excelReader  = new PHPExcel();
+                //mengambil lokasi temp file
+                $fileLocation = $fileexcel->getTempName();
+                //baca file
+                $objPHPExcel = PHPExcel_IOFactory::load($fileLocation);
+                //ambil sheet active
+                $sheet    = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+                //looping untuk mengambil data
+                $table = "<table width='100%' border='1'>";
+                $table .= "<thead><tr>";
+                $table .= "<td>Well</td>";
+                $table .= "<td>SampleID</td>";
+                $table .= "<td>Sample</td>";
+                $table .= "<td>SampleType</td>";
+                $table .= "<td>gene</td>";
+                $table .= "<td>Dye</td>";
+                $table .= "<td>ct</td>";
+                $table .= "<td>concentration</td>";
+                $table .= "<td>c_unit</td>";
+                $table .= "<td>standard_c</td>";
+                $table .= "<td>ref_dye</td>";
+                $table .= "<td>unique_ID</td>";
+                $table .= "<td>replicate</td>";
+                $table .= "<td>QC</td>";
+                $table .= "</tr></thead>";
+                $reader_index = 1;
+                $indx = 0;
+                foreach ($sheet as $idx => $data) {
+                    //skip index 1 karena title excel
+                    if ($idx == 1) {
+                        continue;
+                    }
+
+                    $array_insert[$indx] = array();
+                    $Well = $data['A'];
+                    $SampleID = $data['B'];
+                    $Sample = $data['C'];
+                    $SampleType = $data['D'];
+                    $Dye = $data['E'];
+                    $gene = $data['F'];
+                    $ct = $data['G'];
+                    $concentration = $data['H'];
+                    $c_unit = $data['I'];
+                    $standard_c = $data['J'];
+                    $ref_dye = $data['K'];
+                    $unique_ID = $data['L'];
+                    $replicate = $data['M'];
+                    $QC = $data['N'];
+                    $customer = $this->customer->where(['customer_unique' => db_connect()->escape($SampleID)])->get()->getRowArray();
+                    if ($customer != null) {
+                        $id_customer = $customer['id'];
+                        switch ($reader_index) {
+                            case 1:
+                                array_push($array_insert[$indx], [
+                                    'id_customer' => $id_customer,
+                                    'value_orf' => $ct,
+                                    'status_orf' => ($ct != "--" || $ct != "") ? 6 : 5
+                                ]);
+                                break;
+                            case 2:
+                                array_push($array_insert[$indx], [
+                                    'value_n_gene' => $ct,
+                                    'status_gene' => ($ct != "--" || $ct != "") ? 4 : 3
+                                ]);
+                                break;
+                            case 3:
+                                array_push($array_insert[$indx], [
+                                    'value_ic' => $ct
+                                ]);
+
+                                $indx++;
+                                break;
+                            default:
+                                # code...
+                                break;
+                        }
+
+                        $reader_index++;
+                        if ($reader_index == 4) $reader_index = 1;
+                    }
+
+
+                    $table .= "<tr>";
+                    $table .= "<td>" . $Well . "</td>";
+                    $table .= "<td>" . $SampleID . "</td>";
+                    $table .= "<td>" . $Sample . "</td>";
+                    $table .= "<td>" . $SampleType . "</td>";
+                    $table .= "<td>" . $gene . "</td>";
+                    $table .= "<td>" . $Dye . "</td>";
+                    $table .= "<td>" . $ct . "</td>";
+                    $table .= "<td>" . $concentration . "</td>";
+                    $table .= "<td>" . $c_unit . "</td>";
+                    $table .= "<td>" . $standard_c . "</td>";
+                    $table .= "<td>" . $ref_dye . "</td>";
+                    $table .= "<td>" . $unique_ID . "</td>";
+                    $table .= "<td>" . $replicate . "</td>";
+                    $table .= "<td>" . $QC . "</td>";
+                    $table .= "</tr>";
+                }
+                echo $table;
+            }
+        }
     }
 
     public function get_data_laboratorium()

@@ -9,6 +9,7 @@ use App\Models\LayananTestModel;
 use App\Models\MarketingModel;
 use App\Models\TestModel;
 use App\Controllers\BaseController;
+use App\Models\CustomerCorporateModel;
 use Dompdf\Cpdf;
 // use App\Controllers;
 // use CodeIgniter\Controller;
@@ -19,12 +20,14 @@ class Instansi extends BaseController
     protected $kotaModel;
     protected $marketingModel;
     public $instansiModel;
+    public $customers_corporate_model;
     public function __construct()
     {
         $this->session = session();
         $this->kotaModel = new KotaModel();
         $this->marketingModel = new MarketingModel();
         $this->instansiModel = new InstansiModel();
+        $this->customers_corporate_model = new CustomerCorporateModel();
     }
     public function index()
     {
@@ -79,14 +82,14 @@ class Instansi extends BaseController
             $save = $this->instansiModel->insert($data_insert);
             if ($save) {
                 $this->session->setFlashdata('success', 'Berhasil tambahkan instansi');
-                return redirect(base_url('backoffice/registrasi/instansi'));
+                return redirect()->to("/backoffice/registrasi/instansi");
             } else {
                 $this->session->setFlashdata('error', 'Gagal tambahkan instansi');
-                return redirect(base_url('backoffice/instansi/create'));
+                return redirect()->to("/backoffice/instansi/create");
             }
         } catch (\Throwable $th) {
             $this->session->setFlashdata('error', 'Server error untuk tambahkan instansi');
-            return redirect(base_url('backoffice/instansi/create'));
+            return redirect()->to('/backoffice/instansi/create');
         }
     }
 
@@ -159,15 +162,30 @@ class Instansi extends BaseController
     public function delete_instansi($id_instansi)
     {
         $data = array(
+            'data_instansi' => $this->instansiModel->find($id_instansi),
             'title' => "Hapus Instansi",
             'page' => "instansi",
             'session' => session(),
+            'id' => $id_instansi
         );
         return view('backoffice/instansi/delete_instansi', $data);
     }
 
     public function doDelete_instansi()
     {
-        # code...
+        $id_instansi = $this->request->getPost("id_instansi");
+        $cek_instansi = $this->instansiModel->find($id_instansi);
+        if ($cek_instansi != null || count($cek_instansi) == 1) {
+            if ($this->instansiModel->delete($id_instansi)) {
+                $this->session->setFlashdata('success', 'Berhasil hapus instansi');
+                return redirect()->to("/backoffice/registrasi/instansi");
+            } else {
+                $this->session->setFlashdata('error', 'Gagal hapus instansi');
+                return redirect()->to('/backoffice/instansi/delete_instansi/' . $id_instansi);
+            }
+        } else {
+            $this->session->setFlashdata('error', 'Gagal hapus instansi');
+            return redirect()->to('/backoffice/instansi/delete_instansi/' . $id_instansi);
+        }
     }
 }

@@ -9,7 +9,7 @@
                     <?php
                     if (session()->getFlashdata('success')) {
                     ?>
-                        <div class="alert alert-success">
+                        <div class="alert alert-success alert-dismissible">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                             <h5><i class="icon fas fa-check"></i> Berhasil</h5>
                             <p><?= session()->getFlashdata('success'); ?></p>
@@ -18,7 +18,7 @@
                     }
                     if (session()->getFlashdata('error')) {
                     ?>
-                        <div class="alert alert-warning">
+                        <div class="alert alert-warning alert-dismissible">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                             <h5><i class="icon fas fa-exclamation-triangle"></i> Gagal!</h5>
                             <p><?= session()->getFlashdata('error'); ?></p>
