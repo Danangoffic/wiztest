@@ -188,7 +188,7 @@ $routes->get("/backoffice/laporan/hasil", "backoffice\Laboratorium::hasil");
 
 $routes->get("/led/(:num)", "Antrian::$1");
 
-$routes->get("/api/wa", "backoffice\Whatsapp_service::coba_wa")
+$routes->get("/api/wa", "backoffice\Whatsapp_service::coba_wa");
 /**
  * --------------------------------------------------------------------
  * Additional Routing
