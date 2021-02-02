@@ -58,7 +58,7 @@ class Midtrans extends BaseController
             }
             $ServerKey = base64_decode($DB->value);
             $this->midtrans_config::$serverKey = $ServerKey;
-            $this->midtrans_config::$isProduction = false;
+            $this->midtrans_config::$isProduction = true;
             $this->midtrans_config::$isSanitized = true;
             $this->midtrans_config::$is3ds = true;
             // \Midtrans\Config::$serverKey = $ServerKey;
@@ -94,7 +94,7 @@ class Midtrans extends BaseController
 
             $configMidtrans = array(
                 'server_key' => $decodedUsernameKey,
-                'production' => false
+                'production' => true
             );
             // echo "Selesai";
             $this->midtrans->config($configMidtrans);

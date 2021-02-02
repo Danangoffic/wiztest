@@ -162,6 +162,10 @@
     function selectMenu(id_jenis_test) {
         $(".btn-test").removeClass("btn-primary active");
         $("#test" + id_jenis_test).addClass("btn-primary active");
+        get_selected_test(id_jenis_test);
+    }
+
+    function get_selected_test(id_jenis_test) {
         $.ajax({
             url: "<?= base_url('select-test'); ?>",
             type: "GET",
@@ -170,26 +174,28 @@
                 type: '2',
                 segmen: '1'
             },
-            success: function(data, status) {
-                let result_data = data.data;
-                console.table(result_data);
-                if (data.data.length > 0) {
-
-                    let html_radio = "";
-                    $.each(result_data, (k, v) => {
-                        html_radio += `<label><input type="radio" name="id_layanan_test" onchange="return getJadwal('${v.id}', '${v.nama_test}', '${v.nama_layanan}', '${v.biaya}')" value="${v.id}"> ${v.nama_test} ${v.nama_layanan} <b class="text-primary">${v.biaya}</b></label>`;
-                    });
-                    $("#data_tipe").html(html_radio)
-                }
-                // $("[name=id_layanan_test]").change(getJadwal);
-            },
+            success: on_success_get_selected_test,
             error: function(xhr, ajaxOptions, thrownError) {
                 console.error(ajaxOptions);
                 console.error(xhr.status);
                 console.error("Error iki ");
                 console.error(thrownError);
             }
-        })
+        });
+    }
+
+    function on_success_get_selected_test(data, status, xhr) {
+        let result_data = data.data;
+        console.table(result_data);
+        if (data.data.length > 0) {
+
+            let html_radio = "";
+            $.each(result_data, (k, v) => {
+                html_radio += `<label><input type="radio" name="id_layanan_test" onchange="return getJadwal('${v.id}', '${v.nama_test}', '${v.nama_layanan}', '${v.biaya}')" value="${v.id}"> ${v.nama_test} ${v.nama_layanan} <b class="text-primary">${v.biaya}</b></label>`;
+            });
+            $("#data_tipe").html(html_radio)
+        }
+        // $("[name=id_layanan_test]").change(getJadwal);
     }
 
     function getJadwal(id_test, test, layanan, harga) {
@@ -206,6 +212,10 @@
             jenis_test,
             tgl_kunjungan
         };
+        jadwal(data);
+    }
+
+    function jadwal() {
         $.get("<?= base_url('cek_jadwal'); ?>", data).then(e => {
             if (e.length > 0) {
                 var div_button_jam = '';

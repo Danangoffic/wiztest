@@ -180,6 +180,25 @@ class Layanan extends ResourceController
         // return view('backoffice/Layanan/print_barcode', ['img_url' => $img_url]);
     }
 
+    /**
+     * @method GET
+     * @link https://lab.quicktest.id/api/direct-print-barcode/{encoded_id_customer}
+     * @todo image barcode to print barcode directly
+     */
+    public function direct_print_barcode(string $encoded_id_customer = null)
+    {
+        $decoded = base64_decode($encoded_id_customer);
+        $detailCustomer = $this->customer->find(base64_decode($encoded_id_customer));
+        $customer_unique = $detailCustomer['customer_unique'];
+        $img_url = $this->get_bar_code($customer_unique);
+        $type = pathinfo($img_url, PATHINFO_EXTENSION);
+        $data = (file_get_contents($img_url)) ? file_get_contents($img_url) : "";
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        // It will be called downloaded.pdf
+        $html = '<center>' . $detailCustomer['nama'] . '<br><img importance="" width=\'150\' height=\'75\' src="' . $base64 . '" id=""></center>';
+        return view('backoffice/layanan/print_barcode', ['base64' => $base64, 'url' => $customer_unique, 'detailCustomer' => $detailCustomer, 'original_img' => $img_url, 'html_img' => $html]);
+    }
+
     public function coba_barcode($id_customer)
     {
 
@@ -380,12 +399,8 @@ class Layanan extends ResourceController
 
     public function encode_key()
     {
-        $client_key = "SB-Mid-client-mp4wARPRYp1RjrBO";
-        $server_key = "SB-Mid-server-QkrkR-LkKVtR3SeHfFH5roM4";
-        $enc_client = base64_encode($client_key);
-        $enc_server = base64_encode($server_key);
-        echo $enc_client . "<br>";
-        print_r($enc_server);
+        $server_key = "Mid-server-ziBWgMIMvdY6Xd7PsTgBdnEz";
+        echo base64_encode($server_key);
     }
 
     //--------------------------------------------------------------------

@@ -128,6 +128,22 @@ class Settings extends ResourceController
         }
     }
 
+    public function detail_paket_pemeriksaan()
+    {
+        $id_paket_pemeriksaan = $this->request->getVar("id_paket_pemeriksaan");
+
+        try {
+            $check = $this->data_layanan_test_model->find($id_paket_pemeriksaan);
+            if ($check && $check != null) {
+                return $this->respond($check, 200, 'success');
+            } else {
+                return $this->failNotFound('failed');
+            }
+        } catch (\Throwable $th) {
+            return $this->failServerError("failed");
+        }
+    }
+
     // public function update_kuota($id)
     // {
     //     # code...

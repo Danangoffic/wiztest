@@ -8,14 +8,14 @@
         <!-- filtering box -->
         <div id="accordion">
             <?php
-            if (session()->getFlashdata('success')) {
+            if ($session->getFlashdata('success')) {
             ?>
                 <div class="alert alert-success fade show" role="alert">
                     <?= session()->getFlashdata('success'); ?>
                 </div>
             <?php
             }
-            if (session()->getFlashdata('error')) {
+            if ($session->getFlashdata('error')) {
             ?>
                 <div class="alert alert-warning fade show" role="alert">
                     <?= session()->getFlashdata('error'); ?>
@@ -99,6 +99,7 @@
                                         $jam_kunjungan = substr($data_customer->jam_kunjungan, 0, 5);
                                         $getStatus = $status_hadir->find($data_customer->kehadiran);
                                         $status_kehadiran = $getStatus['nama_status'];
+                                        $kehadiran = $data_customer->kehadiran;
                                         ?>
                                         <td><?= $data_customer->customer_unique; ?></td>
                                         <td><?= $data_customer->tgl_kunjungan . ', ' . $jam_kunjungan; ?></td>
@@ -112,17 +113,29 @@
                                         <td><?= $transactionStatus; ?></td>
                                         <td><?= $status_kehadiran; ?></td>
                                         <td width="10%">
-                                            <a href="<?= base_url('backoffice/layanan/printbarcode/' . base64_encode($data_customer->id)); ?>" class="btn btn-primary btn-sm mt-2" id="print_barcode">Barcode</a>
-                                            <a href="<?= base_url('backoffice/peserta/edit/' . $data_customer->id); ?>" class="btn btn-primary btn-sm mt-2" id="edit">Edit</a>
-                                            <a href="<?= base_url('backoffice/peserta/hapus/' . $data_customer->id); ?>" class="btn btn-danger btn-sm mt-2" id="hapus">Hapus</a>
+                                            <?php
+                                            if ($kehadiran == 23) :
+                                            ?>
+                                                <a href="<?= base_url('backoffice/layanan/printbarcode/' . base64_encode($data_customer->id)); ?>" class="btn btn-primary btn-sm m-2" id="print_barcode">Barcode</a>
+                                            <?php
+                                            endif;
+                                            ?>
+                                            <a href="<?= base_url('backoffice/peserta/edit/' . $data_customer->id); ?>" class="btn btn-primary btn-sm m-2" id="edit">Edit</a>
+                                            <a href="<?= base_url('backoffice/peserta/hapus/' . $data_customer->id); ?>" class="btn btn-danger btn-sm m-2" id="hapus">Hapus</a>
                                             <?php
                                             if ($data_customer->kehadiran == 22) {
                                             ?>
-                                                <a href="<?= base_url('backoffice/peserta/hadirkan_peserta/' . $data_customer->id); ?>" class="btn btn-primary btn-sm">Hadir</a>
+
+
+                                                <a href="<?= base_url('backoffice/peserta/reschedule/' . $data_customer->id); ?>" class="btn btn-info btn-sm disabled m-2" id="reschedule">Reschedule</a>
+                                                <?php
+                                                if (lcfirst($transactionStatus) == "settlement" || lcfirst($transactionStatus) == "invoice" || lcfirst($transactionStatus) == "lunas") {
+                                                ?>
+                                                    <a href="<?= base_url('backoffice/peserta/hadirkan_peserta/' . $data_customer->id); ?>" class="btn btn-primary btn-sm">Hadir</a>
                                             <?php
+                                                }
                                             }
                                             ?>
-                                            <a href="<?= base_url('backoffice/peserta/reschedule/' . $data_customer->id); ?>" class="btn btn-info btn-sm disabled mt-2" id="reschedule">Reschedule</a>
                                         </td>
                                     </tr>
                                 </tbody>

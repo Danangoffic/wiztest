@@ -17,7 +17,7 @@
 
                             <div id="collapseOne" class="collapsing" aria-labelledby="headingOne" data-parent="#accordion">
                                 <div class="card-body">
-                                    <form action="<?= base_url('backoffice/registrasi'); ?>" method="POST">
+                                    <form action="<?= base_url('backoffice/laboratorium/hasil'); ?>" method="POST">
                                         <input type="hidden" name="filtering" value="on">
                                         <div class="form-group row">
                                             <div class="col-md-8 col-offset-3">
@@ -58,7 +58,10 @@
             <div class="col-12">
                 <div class="card card-primary">
                     <h5 class="card-header"><?= $title; ?></h5>
-                    <div class="card-body p-0 m-2">
+                    <div class="card-body">
+                        <a href="import_data" class="btn btn-success btn-sm mb-3">Import Excel PCR</a>
+                        <a href="insert_antigen" class="btn btn-success btn-sm mb-3">Insert Data Antigen</a>
+                        <a href="insert_rapid" class="btn btn-success btn-sm mb-3">Insert Data Rapid Test</a>
                         <div class="table-responsive">
                             <table class="table table-bordered table-sm table-condensed" id="data_laboratorium">
                                 <thead class="text-center text-justify">
