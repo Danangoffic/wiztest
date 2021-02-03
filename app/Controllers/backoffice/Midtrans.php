@@ -21,12 +21,14 @@ class Midtrans extends BaseController
     protected $midtrans_config;
     protected $midtrans_snap;
     protected $midtrans;
+    public $production_mode;
     public function __construct()
     {
         $this->sysParam = new SystemParameter();
         $this->midtrans_config =  new \Midtrans\Config;
         $this->midtrans_snap = new \Midtrans\Snap;
         $this->midtrans = new \Midtrans;
+        $this->production_mode = true;
     }
 
     public function index()
@@ -58,7 +60,7 @@ class Midtrans extends BaseController
             }
             $ServerKey = base64_decode($DB->value);
             $this->midtrans_config::$serverKey = $ServerKey;
-            $this->midtrans_config::$isProduction = true;
+            $this->midtrans_config::$isProduction = $this->production_mode;
             $this->midtrans_config::$isSanitized = true;
             $this->midtrans_config::$is3ds = true;
             // \Midtrans\Config::$serverKey = $ServerKey;
@@ -94,7 +96,7 @@ class Midtrans extends BaseController
 
             $configMidtrans = array(
                 'server_key' => $decodedUsernameKey,
-                'production' => true
+                'production' => $this->production_mode
             );
             // echo "Selesai";
             $this->midtrans->config($configMidtrans);

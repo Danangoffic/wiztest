@@ -61,6 +61,8 @@ $routes->post("/api/kirim_hasil", "backoffice\layanan::kirim_hasil");
 
 $routes->get('detail_form2', 'Customer::detail_form2');
 
+$routes->get("/api/get-print-pdf-peserta/(:num)", "backoffice\Layanan::print_pdf/$1");
+
 
 // $routes->get('/backoffice/peserta/edit/(:num)', 'backoffice\Registrasi::edit_peserta/$1');
 
