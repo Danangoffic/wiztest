@@ -115,8 +115,11 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card card-primary">
-                <div class="card-body" style="padding: 0;">
+            <div class="card">
+                <h5 class="card-header bg-primary text-white">
+                    Tabel Peserta
+                </h5>
+                <div class="card-body" style="padding: 1rem 0;">
                     <table class="table table-bordered table-condensed table-hover" id="table_peserta">
                         <thead>
                             <tr>
@@ -130,13 +133,18 @@
                         <tbody id="data_peserta"></tbody>
                     </table>
                 </div>
+                <div class="card-footer">
+                    <div class="float-right" id="collective">
+                        <button class="btn btn-primary" type="button" onclick="submit_peserta_hs()">Simpan</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 
-<script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?= $midtrans_client_key; ?>"></script>
+<!-- <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?= $midtrans_client_key; ?>"></script> -->
 <script>
     var jenis_test, nama_test, nama_layanan, biaya, array_peserta = [],
         array_table_peserta = [],
@@ -145,6 +153,7 @@
     $(document).ready(function() {
         $("#loading_jam").hide();
         $("#loading").hide();
+        $("#collective").hide();
         // document.getElementById("add_peserta").addEventListener("click")
     });
 
@@ -215,7 +224,7 @@
         jadwal(data);
     }
 
-    function jadwal() {
+    function jadwal(data) {
         $.get("<?= base_url('cek_jadwal'); ?>", data).then(e => {
             if (e.length > 0) {
                 var div_button_jam = '';
@@ -293,10 +302,15 @@
             <td>${v.nik}</td>
             <td>${v.nama_layanan} ${v.nama_test}</td>
             <td>${v.biaya}</td>
-            <td><button class="btn btn-sm btn-danger btn-icon" type="button" role="button" onclick="return remove_peserta(${k})"><i class="icon fas fa-trash"></i></button></td>
+            <td><button class="btn btn-sm btn-danger btn-icon" type="button" role="button" onclick="return remove_peserta(${k})">Hapus</button></td>
             </tr>`;
         });
         $("#data_peserta").html(html_table);
+        if (array_peserta.length >= 5) {
+            $("#collective").show();
+        } else {
+            $("#collective").hide();
+        }
     }
 
     function remove_peserta(key) {
@@ -360,6 +374,26 @@
             // type: 'success',
             // text: "Berhasil M"
         });
+    }
+
+    function submit_peserta_hs() {
+        let url_hs = '<?= base_url('api/save-hs'); ?>';
+        let data = {
+            token: '<?= csrf_hash(); ?>',
+            peserta: array_peserta
+        };
+        $.ajax({
+            url: url_hs,
+            type: 'post',
+            data: data,
+            success: function(data, status, xhr) {
+                showToast('success', 'Berhasil simpan data peserta untuk home service, silahkan cek pada email untuk qr code yang nantinya dibutuhkan saat kehadiran');
+                setInterval(window.location.reload, 5000);
+            },
+            error: function(err) {
+                showError("terjadi kesalahan dalam menyimpan data anda, silahkan menunggu beberapa saat. Terima kasih");
+            }
+        })
     }
 
     function formatNumber(x) {
