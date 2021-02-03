@@ -38,7 +38,10 @@ class HasilLaboratoriumModel extends Model
         'waktu_selesai_periksa',
         'created_by',
         'updated_by',
-        'catatan'
+        'catatan',
+        'has_file',
+        'id_file',
+        'valid'
     ];
 
     protected $useTimestamps = true;

@@ -864,16 +864,7 @@ class Customer extends ResourceController
             // $this->customerModel->insertBatch($array_insert);
             // $last_inserted = $this->customerModel->getInsertID();
 
-            $InvoiceCustomer = $this->getInvoiceNumber($ids);
-            $this->customerModel->update($ids, ['invoice_number' => $InvoiceCustomer]);
-            $DetailLayananTest = $this->layananModel->detail_layanan($jenis_pemeriksaan);
-            $productName = $DetailLayananTest['nama_test'] . ' ' . $DetailLayananTest['nama_layanan'];
-            $detail_transaction = array(
-                'customer_unique' => $InvoiceCustomer,
-                'biaya' => $harga_test,
-                'product_name' => $product_name,
 
-            );
 
             $array_result = array('statusMessage' => 'success', 'id_hs' => $id_hs, 'total_customers' => count($peserta));
             return $this->respond($array_result, 200, 'success');

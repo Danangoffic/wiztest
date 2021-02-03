@@ -8,9 +8,9 @@
                 <div class="col-md-12">
                     <!-- filtering box -->
                     <div id="accordion">
-                        <div class="card">
+                        <div class="card collapsed-card">
                             <div class="card-header" id="headingOne">
-                                <button class="btn btn-default" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <button class="btn btn-default" data-card-widget="collapse">
                                     Filtering
                                 </button>
                             </div>
@@ -115,47 +115,47 @@
             info: false,
             deferRender: true
         });
-        $.ajax({
-            url: "<?= base_url('backoffice/laboratorium/get_data_laboratorium'); ?>",
-            type: "GET",
-            success: function(data, status, xhr) {
-                let result = data.data;
-                let html_hasil;
-                let no = 1;
-                $.each(result, (i, v) => {
-                    let bg_status_customer_send = '';
-                    if (v.status_kirim == "Sudah Dikirim") {
-                        bg_status_customer_send = 'bg-success';
-                    }
-                    html_hasil += `
-                    <tr class="${bg_status_customer_send}">
-                        <td>${no++}</td>
-                        <td>${v.tgl_kunjungan}</td>
-                        <td>${v.registrasi}</td>
-                        <td>${v.paket_pemeriksaan}</td>
-                        <td>${v.nik}</td>
-                        <td>${v.nama_customer}</td>
-                        <td>${v.waktu_sampling}</td>
-                        <td>${v.waktu_periksa}</td>
-                        <td>${v.waktu_selesa_periksa}</td>
-                        <td>${v.nama_sample}</td>
-                        <td>${v.status_cov}</td>
-                        <td>${v.status_gene}</td>
-                        <td>${v.status_orf}</td>
-                        <td>${v.ic}</td>
-                        <td>${v.status_igg}</td>
-                        <td>${v.status_igm}</td>
-                        <td>${v.catatan}</td>
-                        <td>
-                            <a class="btn btn-success btn-sm" target="_blank" href="/backoffice/laboratorium/input/${v.id_hasil}">Input</a>
-                            <a class="btn btn-primary btn-sm" target="_blank" href="/backoffice/laboratorium/print/${v.id_hasil}">Cetak Hasil</a>
-                        </td>
-                    </tr>
-                    `
-                });
-                $("#data_hasil2").html(html_hasil);
-            }
-        })
+        // $.ajax({
+        //     url: "<?= base_url('backoffice/laboratorium/get_data_laboratorium'); ?>",
+        //     type: "GET",
+        //     success: function(data, status, xhr) {
+        //         let result = data.data;
+        //         let html_hasil;
+        //         let no = 1;
+        //         $.each(result, (i, v) => {
+        //             let bg_status_customer_send = '';
+        //             if (v.status_kirim == "Sudah Dikirim") {
+        //                 bg_status_customer_send = 'bg-success';
+        //             }
+        //             html_hasil += `
+        //             <tr class="${bg_status_customer_send}">
+        //                 <td>${no++}</td>
+        //                 <td>${v.tgl_kunjungan}</td>
+        //                 <td>${v.registrasi}</td>
+        //                 <td>${v.paket_pemeriksaan}</td>
+        //                 <td>${v.nik}</td>
+        //                 <td>${v.nama_customer}</td>
+        //                 <td>${v.waktu_sampling}</td>
+        //                 <td>${v.waktu_periksa}</td>
+        //                 <td>${v.waktu_selesa_periksa}</td>
+        //                 <td>${v.nama_sample}</td>
+        //                 <td>${v.status_cov}</td>
+        //                 <td>${v.status_gene}</td>
+        //                 <td>${v.status_orf}</td>
+        //                 <td>${v.ic}</td>
+        //                 <td>${v.status_igg}</td>
+        //                 <td>${v.status_igm}</td>
+        //                 <td>${v.catatan}</td>
+        //                 <td>
+        //                     <a class="btn btn-success btn-sm" target="_blank" href="/backoffice/laboratorium/input/${v.id_hasil}">Input</a>
+        //                     <a class="btn btn-primary btn-sm" target="_blank" href="/backoffice/laboratorium/print/${v.id_hasil}">Cetak Hasil</a>
+        //                 </td>
+        //             </tr>
+        //             `
+        //         });
+        //         $("#data_hasil2").html(html_hasil);
+        //     }
+        // })
 
     });
 </script>

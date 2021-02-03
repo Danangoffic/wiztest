@@ -1,9 +1,12 @@
 <?= $this->extend('backoffice/template/layout'); ?>
 <?= $this->section('content'); ?>
+<?php
+// dd($jenis_layanan);
+?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 
-    <section class="content">
+    <section class="content-header">
 
         <!-- filtering box -->
         <div id="accordion">
@@ -19,6 +22,7 @@
                 <div id="collapseOne" class="collapsing" aria-labelledby="headingOne" data-parent="#accordion">
                     <div class="card-body bg-light">
                         <form action="" method="POST">
+                            <input type="hidden" name="is_filtered" value="yes">
                             <div class="form-group row">
                                 <div class="col-8 col-offset-3">
                                     <div class="row">
@@ -41,6 +45,9 @@
                 </div>
             </div>
         </div>
+
+    </section>
+    <section class="content">
         <div class="row">
             <div class="col-12">
                 <div class="alert alert-info" role="alert">

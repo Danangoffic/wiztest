@@ -28,6 +28,9 @@
                 </div>
             </div>
             <div class="row" id="menus">
+                <div class="col-md-6">
+                    <?= $message; ?>
+                </div>
             </div>
         </div>
     </div>
