@@ -44,7 +44,7 @@
                 $responseMessage = "";
                 $transType = $notif->transaction_status;
                 if ($transType == "settlement" || $transType == "capture") {
-                    $responseMessage = "<P>Terima kasih telah melakukan pembayaran pada kami, berikut kami berikan gambar QR Code untuk anda 
+                    $responseMessage = "<p>Terima kasih telah melakukan pembayaran pada kami, berikut kami berikan gambar QR Code untuk anda 
                     hadir pada tempat kami saat melakukan konfirmasi kedatangan pada tanggal " . $detail_customer['tgl_kunjungan'] .
                         " pukul " . $detail_customer['jam_kedatangan'] . ".</p>";
                     echo $responseMessage;

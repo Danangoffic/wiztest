@@ -4,6 +4,8 @@ namespace App\Controllers;
 // use App\Controllers\BaseController;
 
 use App\Controllers\backoffice\Layanan;
+use App\Controllers\backoffice\Midtrans;
+use App\Controllers\backoffice\Whatsapp_service;
 use App\Models\CustomerModel;
 use App\Models\PemanggilanModel;
 use App\Models\PembayaranModel;
@@ -20,6 +22,7 @@ class Midtrans_handlers extends ResourceController
     protected $CustomerModel;
     protected $PembayaranModel;
     protected $notif;
+    protected $production_mode;
     public function __construct()
     {
         // parent::__construct();
@@ -29,6 +32,8 @@ class Midtrans_handlers extends ResourceController
         $this->midtrans = new \Midtrans;
         $this->CustomerModel = new CustomerModel();
         $this->PembayaranModel = new PembayaranModel();
+        $Midtrans_bo = new Midtrans;
+        $this->production_mode = $Midtrans_bo->production_mode;
         // $this->veritrans->config($params);
         // $this->load->helper('url');
     }
@@ -51,7 +56,7 @@ class Midtrans_handlers extends ResourceController
                 $serverKey = $data_key->value;
                 $params = array(
                     'server_key' => base64_decode($serverKey),
-                    'production' => false
+                    'production' => $this->production_mode
                 );
                 $this->midtrans->config($params);
                 $NotifMidtrans = $this->midtrans->status($result->order_id);
@@ -123,7 +128,10 @@ class Midtrans_handlers extends ResourceController
                                 'fraud' => $fraud,
                                 'midtrans_response' => $NotifMidtrans
                             );
-                            $this->sendEmailCustomer($order_id, $midtrans_response);
+                            if ($transaction == "settlement" || $transaction == "capture") {
+                                $this->sendEmailCustomer($order_id, $NotifMidtrans);
+                                $this->send_whatsapp($id_customer);
+                            }
                         } else {
                             $responseStatus = $NotifMidtrans->status_message;
                             $responseMessage = "Failed update customer";
@@ -298,24 +306,12 @@ class Midtrans_handlers extends ResourceController
      * Send email to customer user 
      * 
      */
-    protected function sendEmailCustomer(string $order_id, $midtrans_response)
+    protected function sendEmailCustomer(string $order_id, $notif_modtrans)
     {
         # code...
 
         $Layanan = new Layanan;
-        // $config["protocol"] = "smtp";
 
-        // //isi sesuai nama domain/mail server
-        // $config["SMTPHost"]  = "mail.danangoffic.xyz";
-
-        // //alamat email SMTP
-        // $config["SMTPUser"]  = "info@danangoffic.xyz";
-
-        // //password email SMTP
-        // $config["SMTPPass"]  = "infoDanang123";
-
-        // $config["SMTPPort"]  = 465;
-        // $config["SMTPCrypto"] = "ssl";
         $Email = \Config\Services::email();
 
         // $Email->initialize($config);
@@ -325,26 +321,36 @@ class Midtrans_handlers extends ResourceController
         $id_customer = $CustomerDetail['id'];
         $nama_customer = $CustomerDetail['nama'];
 
-        $Email->setFrom('info@danang.xyz', 'QuickTest.id INFO');
-        // $Email->setTo($emailCustomer);
-        // $Email->setFrom('johndoe@gmail.com', 'Confirm Registration');
-
-        // $Email->setSubject($subject);
-        // $Email->setMessage($message);
-
+        $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
+        $data_email = array(
+            'detail_pembayaran' => $PaymentDetail,
+            'detail_customer' => $CustomerDetail,
+            'notif' => $notif_modtrans,
+            'title' => 'Informasi Pembayaran'
+        );
+        $attachment = $Layanan->getImageQRCode(base_url('api/hadir/' . $id_customer), $nama_customer);
+        $attachment_name = $nama_customer . ".pdf";
+        $emailMessage = view('send_email', $data_email);
 
         $Email->setTo($emailCustomer);
-        $Email->setSubject("Informasi Pembayaran Dari Pendaftaran Test Melalui Quictest.id");
-        $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
-
-        $emailMessage = view('send_email', array('detail_pembayaran' => $PaymentDetail, 'detail_customer' => $CustomerDetail, 'notif' => $midtrans_response, 'title' => 'Informasi Pembayaran'));
+        $Email->setFrom('info@quicktest.id', 'QuickTest.id INFO');
+        $Email->setSubject("Informasi Pendaftaran Quictest.id");
         $Email->setMessage($emailMessage);
-        $Email->attach($Layanan->getImageQRCode(base_url('api/hadir/' . $id_customer), $nama_customer));
-        if ($$Email->send()) {
-            echo "Email successfully sent";
+        $Email->attach($attachment, 'attachment', $attachment_name, "application/pdf");
+        if ($Email->send()) {
+            return true;
         } else {
-            $data = $email->printDebugger(['headers']);
+            $data = $Email->printDebugger(['headers']);
             print_r($data);
+        }
+    }
+
+    protected function send_whatsapp($id_customer = null)
+    {
+        if ($id_customer != null) {
+            $whatsapp_service = new Whatsapp_service;
+            $whatsapp_service->send_whatsapp_QR($id_customer);
+            $whatsapp_service->send_whatsapp_invoice($id_customer);
         }
     }
 

@@ -26,6 +26,9 @@ class Whatsapp_service extends ResourceController
     protected $test_model;
     protected $layanan_bo;
     protected $api_key;
+    protected $url_send_txt;
+    protected $url_send_txt_img;
+    protected $curl;
     public function __construct()
     {
         $this->customer_model = new CustomerModel();
@@ -36,42 +39,50 @@ class Whatsapp_service extends ResourceController
         $this->layanan_model = new LayananModel();
         $this->layanan_bo = new Layanan;
         $this->api_key = "a8d3096e3e52bc1cb7bdf376fe6a8eb3";
+        $this->url_send_txt = 'http://gowagateway-silly-platypus.mybluemix.net/sendtxtmsg';
+        $this->url_send_txt_img = 'http://gowagateway-silly-platypus.mybluemix.net/sendimagemsg';
     }
 
-    public function send_whatsapp_img_invoice($id_customer)
+    public function send_whatsapp_QR($id_customer)
     {
         // header('Content-Type: application/json; charset=utf-8');
 
         $cek_customer = $this->customer_model->find($id_customer);
-        if ($cek_customer && $cek_customer != null && count($cek_customer) == 1) {
-            $phone = $cek_customer['phone'];
-            if ($phone == "" || $phone == null) {
-                return $this->fail("mobile phone is not recognised", 400, 'Failed');
-            }
-            $jenis_test = $cek_customer['jenis_test'];
-            $layanan_test = $this->layanan_test_model->find($jenis_test);
-            $id_layanan = $layanan_test['id_layanan'];
-            $id_test = $layanan_test['id_test'];
-            $layanan = $this->layanan_model->find($id_layanan);
-            $test = $this->test_model->find($id_test);
-            $tgl_kunjungan = $cek_customer['tgl_kunjungan'];
-            $nama_layanan = $layanan['nama_layanan'];
-            $nama_test = $test['nama_test'];
-        } else {
+        if ($cek_customer == null) {
             return $this->failForbidden();
         }
-        $api_key_wasap = "a8d3096e3e52bc1cb7bdf376fe6a8eb3";
+        $phone = $cek_customer['phone'];
+        if ($phone == "" || $phone == null) {
+            return $this->fail("mobile phone is not recognised", 400, 'Failed');
+        }
+        $get_0 = substr($phone, 0, 1);
+        if ($get_0 == "0") {
+            $new_0_to_region = str_replace("0", "+62", $get_0);
+            $new_phone = (int)$phone;
+            $new_phone = $new_0_to_region . $new_phone;
+        } else {
+            $new_phone = $phone;
+        }
+        $jenis_test = $cek_customer['jenis_test'];
+        $layanan_test = $this->layanan_test_model->find($jenis_test);
+        $id_layanan = $layanan_test['id_layanan'];
+        $id_test = $layanan_test['id_test'];
+        $layanan = $this->layanan_model->find($id_layanan);
+        $test = $this->test_model->find($id_test);
+        $tgl_kunjungan = $cek_customer['tgl_kunjungan'];
+        $nama_layanan = $layanan['nama_layanan'];
+        $nama_test = $test['nama_test'];
 
         // MAKE SURE PHONE NUMBER USING REGION CODE
         // $APIkey = $api_key_wasap;
-        $phone = $phone;
+        $phone = $new_phone;
         $message = 'Terima kasih kepada Bpk/Ibu ' . $cek_customer['nama'] .
-            " yang telah melakukan pembayaran untuk mengikuti test *{$jenis_test}* pada tanggal *{$tgl_kunjungan}*. \n
-            Berikut kami lampirkan Invoice beserta QR Code yang diperlukan saat anda hadir pada klinik kami.";
+            " yang telah melakukan pembayaran pada kami untuk mengikuti test *{$jenis_test}* pada tanggal *{$tgl_kunjungan}*. \n
+            Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.";
         $str = "https://reg.quicktest.id/api/hadir/" . $id_customer;
         $url_img = $this->layanan_bo->getUrlQRCode($str);
 
-        $url = 'http://gowagateway-silly-platypus.mybluemix.net/sendimagemsg';
+        $url = $this->url_send_txt_img;
         $data = array(
             'APIKey'     => $this->api_key,
             'phoneNumber'  => $phone,
@@ -79,23 +90,82 @@ class Whatsapp_service extends ResourceController
             'urlDownloadImage' => $url_img,
         );
 
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_HEADER, 0);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
-        curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-
-        // EXECUTE:
-        $result = curl_exec($curl);
+        $result = $this->send_curl($url, $data);
         if (!$result) {
             return $this->fail('failed', 400, 'failed');
             // die("Connection Failure");
         }
-        curl_close($curl);
+        curl_close($this->curl);
+        return $this->respond($result, 200, 'success');
+    }
+
+    protected function send_curl($url, $data)
+    {
+        $this->curl = curl_init();
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        curl_setopt($this->curl, CURLOPT_HEADER, 0);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($this->curl, CURLOPT_TIMEOUT, 30);
+        curl_setopt($this->curl, CURLOPT_POST, 1);
+        curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
+
+        // EXECUTE:
+        return curl_exec($this->curl);
+    }
+
+    public function send_whatsapp_invoice($id_customer = null)
+    {
+        if ($id_customer == null) {
+            return $this->failForbidden();;
+        }
+        $cek_customer = $this->customer_model->find($id_customer);
+        if ($cek_customer == null) {
+            return $this->failNotFound();
+        }
+        $phone = $cek_customer['phone'];
+        if ($phone == "" || $phone == null) {
+            return $this->fail("mobile phone is not recognised", 400, 'Failed');
+        }
+        $get_0 = substr($phone, 0, 1);
+        if ($get_0 == "0") {
+            $new_0_to_region = str_replace("0", "+62", $get_0);
+            $new_phone = (int)$phone;
+            $new_phone = $new_0_to_region . $new_phone;
+        } else {
+            $new_phone = $phone;
+        }
+        $jenis_test = $cek_customer['jenis_test'];
+        $layanan_test = $this->layanan_test_model->find($jenis_test);
+        $id_layanan = $layanan_test['id_layanan'];
+        $id_test = $layanan_test['id_test'];
+        $layanan = $this->layanan_model->find($id_layanan);
+        $test = $this->test_model->find($id_test);
+        $tgl_kunjungan = $cek_customer['tgl_kunjungan'];
+        $nama_layanan = $layanan['nama_layanan'];
+        $nama_test = $test['nama_test'];
+
+        // MAKE SURE PHONE NUMBER USING REGION CODE
+        // $APIkey = $api_key_wasap;
+        $phone = $new_phone;
+        $message = 'Terima kasih kepada Bpk/Ibu ' . $cek_customer['nama'] .
+            " yang telah melakukan pembayaran pada kami untuk mengikuti test *{$jenis_test}* pada tanggal *{$tgl_kunjungan}*. \n
+            Berikut kami lampirkan Invoice. " . base_url('/api/get-print-pdf-peserta/' . $id_customer);
+
+        $url = $this->url_send_txt;
+        $data = array(
+            'APIKey'     => $this->api_key,
+            'phoneNumber'  => $phone,
+            'message' => $message
+        );
+
+        $result = $this->send_curl($url, $data);
+        if (!$result) {
+            return $this->fail('failed', 400, 'failed');
+            // die("Connection Failure");
+        }
+        curl_close($this->curl);
         return $this->respond($result, 200, 'success');
     }
 
