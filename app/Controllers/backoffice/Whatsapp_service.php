@@ -56,8 +56,8 @@ class Whatsapp_service extends ResourceController
             return $this->fail("mobile phone is not recognised", 400, 'Failed');
         }
         $get_0 = substr($phone, 0, 1);
-        if ($get_0 == "0") {
-            $new_0_to_region = str_replace("0", "+62", $get_0);
+        if ($get_0 == "0" || $get_0 == 0) {
+            $new_0_to_region = str_replace("0", "62", $get_0);
             $new_phone = (int)$phone;
             $new_phone = $new_0_to_region . $new_phone;
         } else {
@@ -81,13 +81,13 @@ class Whatsapp_service extends ResourceController
             Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.";
         $str = "https://reg.quicktest.id/api/hadir/" . $id_customer;
         $url_img = $this->layanan_bo->getUrlQRCode($str);
-
+        $image = "<img download src=data:image/png;base64," . base64_encode($url_img) . ">";
         $url = $this->url_send_txt_img;
         $data = array(
             'APIKey'     => $this->api_key,
             'phoneNumber'  => $phone,
             'message' => $message,
-            'urlDownloadImage' => $url_img,
+            'urlDownloadImage' => $image,
         );
 
         $result = $this->send_curl($url, $data);
