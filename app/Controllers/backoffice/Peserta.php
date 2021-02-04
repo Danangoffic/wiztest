@@ -795,10 +795,10 @@ class Peserta extends BaseController
     protected function updated_by_qr($id_peserta)
     {
         $customerDetail = $this->customerModel->find($id_peserta);
-        if ($customerDetail !== null) {
+        if ($customerDetail != null) {
             $statusKehadiran = intval($customerDetail['kehadiran']);
-            $statusPembayaran = $customerDetail['status_pembayaran'];
-            if ($statusKehadiran == 20 && ($statusPembayaran == 'settlement' || $statusPembayaran == 'Invoice' || $statusPembayaran == "Lunas")) {
+            $statusPembayaran = lcfirst($customerDetail['status_pembayaran']);
+            if ($statusKehadiran == 20 && ($statusPembayaran == 'settlement' || $statusPembayaran == 'invoice' || $statusPembayaran == "lunas")) {
                 $dataCustomer = array(
                     'kehadiran' => 21
                 );
