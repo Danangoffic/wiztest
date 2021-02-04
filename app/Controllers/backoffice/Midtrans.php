@@ -107,7 +107,7 @@ class Midtrans extends ResourceController
         } catch (\Throwable $th) {
             $returnArray = ['status_message' => 'failed. ' . $th->getMessage()];
         }
-        return $this->respond($returnArray, 200, $returnArray['status_message']);
+        return $this->respond($returnArray, 200);
     }
 
     public function getStatusByOrderId(string $OrderId)
