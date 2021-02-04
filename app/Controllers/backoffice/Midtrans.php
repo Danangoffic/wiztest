@@ -86,6 +86,29 @@ class Midtrans extends BaseController
         }
     }
 
+    public function get_status_midtrans($order_id = null)
+    {
+        $returnArray = array();
+        try {
+            $db_param = db_connect()->table('system_parameter')->where(['vgroup' => 'MIDTRANS_KEY', 'parameter' => 'SERVER_KEY'])->get()->getFirstRow();
+            $EncodeduserNameKey = $db_param->value;
+            $decodedUsernameKey = base64_decode($EncodeduserNameKey);
+
+            $configMidtrans = array(
+                'server_key' => $decodedUsernameKey,
+                'production' => $this->production_mode
+            );
+            // echo "Selesai";
+            $this->midtrans->config($configMidtrans);
+            $returnArray = $this->midtrans->status($order_id);
+
+            // return $StatusMidtrans;
+        } catch (\Throwable $th) {
+            $returnArray = ['statusMessage' => 'failed. ' . $th->getMessage()];
+        }
+        return $returnArray;
+    }
+
     public function getStatusByOrderId(string $OrderId)
     {
         $returnArray = array();

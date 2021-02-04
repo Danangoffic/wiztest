@@ -51,6 +51,7 @@ $routes->get("/api/get_antrian_swabber", "backoffice\Swabber::get_antrian_swabbe
 // $routes->get('/api/marketings', '')
 // $routes->post('/api/midtrans_notification', 'Customer::midtrans_notification');
 $routes->add('/api/notification', 'Midtrans_handlers::index');
+$routes->get("api/check-payment-id/(:any)", "backoffice\Midtrans::getStatusByOrderId/$1");
 $routes->add('/api/redirection-handler', 'Midtrans_handlers::redirection_handler');
 $routes->add('/api/test-email/(:any)', 'Midtrans_handlers::CobaSendEmail/$1');
 $routes->get('/api/check_no_registration', 'Customer::validasi_no_registrasi');
