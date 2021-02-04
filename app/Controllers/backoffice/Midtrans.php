@@ -4,13 +4,14 @@ namespace App\Controllers\backoffice;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\CURLRequest;
+use CodeIgniter\RESTful\ResourceController;
 use Midtrans as GlobalMidtrans;
 
 // use 
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
-class Midtrans extends BaseController
+class Midtrans extends ResourceController
 {
     protected $sysParam;
     public $SNAP_SANDBOX_BASE_URL = 'https://app.sandbox.midtrans.com/snap/v1';
@@ -104,9 +105,9 @@ class Midtrans extends BaseController
 
             // return $StatusMidtrans;
         } catch (\Throwable $th) {
-            $returnArray = ['statusMessage' => 'failed. ' . $th->getMessage()];
+            $returnArray = ['status_message' => 'failed. ' . $th->getMessage()];
         }
-        return $returnArray;
+        return $this->respond($returnArray, 200, $returnArray['status_message']);
     }
 
     public function getStatusByOrderId(string $OrderId)
