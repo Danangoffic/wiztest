@@ -62,6 +62,8 @@ $routes->post("/api/kirim_hasil", "backoffice\layanan::kirim_hasil");
 $routes->get("/api/antrian", "backoffice\Antrian::get_data_antrian");
 $routes->get("/api/on_call", "backoffice\Antrian::get_data_on_call");
 
+$routes->get("/api/print_invoice/(:segment)/(:any)", "backoffice\Finance::print_invoice/$1/$2");
+
 $routes->get('detail_form2', 'Customer::detail_form2');
 
 $routes->get("/api/get-print-pdf-peserta/(:num)", "backoffice\Layanan::print_pdf/$1");

@@ -140,9 +140,9 @@ class Finance extends BaseController
 
     public function print_invoice(string $type_invoice = "ttd", string $invoice_number)
     {
-        if (!$this->session->get('logged_in') || !$this->session->get('id_user')) {
-            return redirect()->to('/backoffice/login');
-        }
+        // if (!$this->session->get('logged_in') || !$this->session->get('id_user')) {
+        //     return redirect()->to('/backoffice/login');
+        // }
         switch ($type_invoice) {
             case 'ttd':
                 return $this->pdf_customer_ttd($invoice_number);
@@ -206,6 +206,9 @@ class Finance extends BaseController
             return null;
         }
         $customer = $this->CustomerModel->where(['invoice_number' => $invoice_number])->get()->getRowArray();
+        if ($customer == null) {
+            return null;
+        }
         $id_customer = $customer['id'];
         $data_pembayaran = $this->pembayaran_model->where(['id_customer' => $id_customer])->get()->getRowArray();
         $data_layanan_test = db_connect()->table('data_layanan_test')->where('id', $customer['jenis_test'])->limit(1)->get()->getRowArray();
