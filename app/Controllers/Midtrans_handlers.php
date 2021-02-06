@@ -356,7 +356,7 @@ class Midtrans_handlers extends ResourceController
         $Email->setMessage($emailMessage);
         $Email->attach($file_img, 'attachment', $attachment_name, "image/png");
         $Email->attach(
-            base_url('backoffice/finance/print_invoice/no_ttd/' . $invoice_number),
+            base_url('api/print_invoice/no-ttd/' . $invoice_number),
             'attachment',
             "Invoice " . $CustomerDetail['nama'] . " - {$invoice_number}",
             "application/pdf"
