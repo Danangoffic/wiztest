@@ -46,13 +46,14 @@
                 if ($transType == "settlement" || $transType == "capture") {
                     $responseMessage = "<p>Terima kasih telah melakukan pembayaran pada kami, berikut kami berikan gambar QR Code untuk anda 
                     hadir pada tempat kami saat melakukan konfirmasi kedatangan pada tanggal " . $detail_customer['tgl_kunjungan'] .
-                        " pukul " . $detail_customer['jam_kedatangan'] . ".</p>";
+                        " pukul " . $detail_customer['jam_kunjungan'] . ".</p>";
                     echo $responseMessage;
                 }
                 ?>
                 <div id="qrcode"></div>
                 <p>Thanks,<br>QuickTest Info</p>
                 <img src="<?= $qr_image; ?>" alt="">
+                <a href="<?= $pdf_file; ?>" target="_blank" rel="noopener noreferrer">Invoice</a>
             </div>
             <!-- /.mailbox-read-message -->
         </div>
