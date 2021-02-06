@@ -17,6 +17,9 @@ class Midtrans extends ResourceController
     public $SNAP_SANDBOX_BASE_URL = 'https://app.sandbox.midtrans.com/snap/v1';
     public $SNAP_PRODUCTION_BASE_URL = 'https://app.midtrans.com/snap/v1';
 
+    protected $snap_url_prod = "https://app.midtrans.com/snap/snap.js";
+    protected $snap_url_dev = "https://app.sandbox.midtrans.com/snap/snap.js";
+
     protected $server_key_prod = "Mid-server-ziBWgMIMvdY6Xd7PsTgBdnEz";
     protected $client_key_prod = "Mid-client-coq-IuJTF1nZLqTE";
 
@@ -27,14 +30,18 @@ class Midtrans extends ResourceController
     protected $midtrans_snap;
     protected $midtrans;
     public $production_mode;
-    protected $server_key;
-    protected $client_key;
+    public $server_key;
+    public $client_key;
+    public $snap_url_js;
     public function __construct()
     {
         //set production mode (true to production mode, false to development mode)
-        $this->production_mode = false;
+        $this->production_mode = true;
+
+        //set serverkey, clientkey, snapurljs on customers payment where production mode is set
         $this->server_key = ($this->production_mode) ? $this->server_key_prod : $this->server_key_dev;
         $this->client_key = ($this->production_mode) ? $this->client_key_prod : $this->client_key_dev;
+        $this->snap_url_js = ($this->production_mode) ? $this->snap_url_prod : $this->snap_url_dev;
     }
 
     public function index()

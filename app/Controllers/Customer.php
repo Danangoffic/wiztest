@@ -27,7 +27,7 @@ use App\Models\TestModel;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\SystemParameterModel;
-use Midtrans;
+use App\Controllers\Midtrans;
 
 class Customer extends ResourceController
 {
@@ -49,6 +49,7 @@ class Customer extends ResourceController
     protected $layanan_controller;
     protected $CustomerHomeServiceModel;
     protected $layanan_test_model;
+    protected $midtrans_bo;
 
     public function __construct()
     {
@@ -70,22 +71,19 @@ class Customer extends ResourceController
         $this->layanan_controller = new Layanan;
         $this->CustomerHomeServiceModel = new CustomerHomeServiceModel();
         $this->layanan_test_model = new LayananTestModel();
+        $this->midtrans_bo = new BackofficeMidtrans;
     }
 
     public function index()
     {
 
         $data_marketing = $this->marketing_model->findAll();
-        $vgroup = 'MIDTRANS_KEY';
-        $paramter = 'CLIENT_KEY';
-        $DB = db_connect()->table('system_parameter')->select('*')->where('vgroup', $vgroup)->where('parameter', $paramter)->get()->getFirstRow();
-        // $getData = $this->sysParamModel->getByVgroupAndParamter('MIDTRANS_KEY', 'CLIENT_KEY');
-        $encrypted_client = $DB->value;
-        $ClientKey = base64_decode($encrypted_client);
+
         $data = [
             'title' => "Home",
             'marketings' => $data_marketing,
-            'midtrans_client_key' => $ClientKey
+            'midtrans_client_key' => $this->midtrans_bo->client_key,
+            'snap_url_js' => $this->midtrans_bo->snap_url_js
         ];
         return view('customer/index', $data);
     }
