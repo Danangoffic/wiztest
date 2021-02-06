@@ -331,17 +331,17 @@ class Midtrans_handlers extends ResourceController
         $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
         $attachment = $Layanan->getUrlQRCode(base_url('api/hadir/' . $id_customer));
 
-        $img = file_get_contents($attachment);
-        $file_img = basename($img);
+        // $img = file_get_contents($attachment);
+        // $file_img = basename($img);
         // write_file("assets/qr_code/" . $file_img, $img);
         // $img_QR_att =
-        $attachment_name = $file_img;
+        // $attachment_name = $file_img;
         $pdf_file = base_url('backoffice/finance/print_invoice/no_ttd/' . $invoice_number);
         $data_email = array(
             'detail_pembayaran' => $PaymentDetail,
             'detail_customer' => $CustomerDetail,
             'notif' => $notif_modtrans,
-            'title' => 'Informasi Pembayaran',
+            'title' => 'Informasi Pembayaran dan Pendaftaran',
             'qr_image' => $attachment,
             'pdf_file' => $pdf_file
         );
@@ -351,14 +351,14 @@ class Midtrans_handlers extends ResourceController
         $emailMessage = view('send_email', $data_email);
 
         $Email->setTo($emailCustomer);
-        $Email->setFrom('pendaftaran@quicktest.id', 'QuickTest.id INFO');
-        $Email->setSubject("Informasi Pendaftaran Quictest.id");
+        $Email->setFrom('pendaftaran@quicktest.id', 'Pendaftaran QuickTest.id');
+        $Email->setSubject("Informasi Pembayaran dan Pendaftaran Quictest.id");
         $Email->setMessage($emailMessage);
-        $Email->attach($file_img, 'attachment', $attachment_name, "image/png");
+        $Email->attach($attachment, 'attachment', "qr_code_quictest.png", "image/png");
         $Email->attach(
             base_url('api/print_invoice/no-ttd/' . $invoice_number),
             'attachment',
-            "Invoice " . $CustomerDetail['nama'] . " - {$invoice_number}",
+            "Invoice " . $CustomerDetail['nama'] . " - {$invoice_number}.pdf",
             "application/pdf"
         );
         if ($Email->send()) {
