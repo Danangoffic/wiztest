@@ -143,12 +143,13 @@ class Finance extends BaseController
         // if (!$this->session->get('logged_in') || !$this->session->get('id_user')) {
         //     return redirect()->to('/backoffice/login');
         // }
+        $attachment = ($this->request->getGet("attachment")) ? $this->request->getGet("attachment") : 1;
         switch ($type_invoice) {
             case 'ttd':
-                return $this->pdf_customer_ttd($invoice_number);
+                return $this->pdf_customer_ttd($invoice_number, $attachment);
                 break;
             case 'no-ttd':
-                return $this->pdf_customer($invoice_number);
+                return $this->pdf_customer($invoice_number, $attachment);
                 break;
             default:
                 # code...
@@ -172,7 +173,7 @@ class Finance extends BaseController
         $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 0]);
     }
 
-    public function pdf_customer($invoice_number)
+    public function pdf_customer($invoice_number, $attachment = 1)
     {
         $customer = $this->CustomerModel->where(['invoice_number' => $invoice_number])->get()->getRowArray();
         $id_customer = $customer['id'];
@@ -197,10 +198,10 @@ class Finance extends BaseController
         $dompdf->render();
         // $dompdf->set
         // $dompdf->
-        $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 1]);
+        $dompdf->stream($data['title'] . ".pdf", ['Attachment' => $attachment]);
     }
 
-    public function pdf_customer_ttd($invoice_number = null)
+    public function pdf_customer_ttd($invoice_number = null, $attachment = 1)
     {
         if ($invoice_number == null) {
             return null;
@@ -231,7 +232,7 @@ class Finance extends BaseController
         $dompdf->render();
         // $dompdf->set
         // $dompdf->
-        $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 1]);
+        $dompdf->stream($data['title'] . ".pdf", ['Attachment' => $attachment]);
     }
 
     /**
