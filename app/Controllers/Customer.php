@@ -48,6 +48,7 @@ class Customer extends ResourceController
     protected $petugas_model;
     protected $layanan_controller;
     protected $CustomerHomeServiceModel;
+    protected $layanan_test_model;
 
     public function __construct()
     {
@@ -68,6 +69,7 @@ class Customer extends ResourceController
         $this->petugas_model = new PemeriksaModel();
         $this->layanan_controller = new Layanan;
         $this->CustomerHomeServiceModel = new CustomerHomeServiceModel();
+        $this->layanan_test_model = new LayananTestModel();
     }
 
     public function index()
@@ -118,8 +120,9 @@ class Customer extends ResourceController
         $alamat = $this->request->getPost('alamat');
         $marketing = $this->request->getPost('marketing');
         $jenis_test = $this->request->getPost('jenis_test');
-        $jenis_pemeriksaan = $this->request->getPost('jenis_pemeriksaan');
-        $jenis_layanan = $this->request->getPost('jenis_layanan');
+        $detail_layanan_test = $this->layanan_test_model->find($jenis_test);
+        $jenis_pemeriksaan = $detail_layanan_test['id_pemeriksaan'];
+        $jenis_layanan = $detail_layanan_test['id_layanan'];
         $faskes_asal = $this->request->getPost('faskes_asal');
         $instansi = $this->request->getPost('instansi');
         $kehadiran = 0;
@@ -137,7 +140,7 @@ class Customer extends ResourceController
             $Layanan = new Layanan();
             $dataMarketing = $this->marketing_model->find($marketing);
             $dataLayanan = $this->layananModel->find($jenis_layanan);
-            $dataTest = $this->testModel->find($jenis_test);
+
 
             $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
             if ($jenis_test == 2 || $jenis_test == "2") {
@@ -192,7 +195,7 @@ class Customer extends ResourceController
             $params = array(
                 'transaction_details' => array(
                     'order_id' => $DataInsertCustomer['customer_unique'],
-                    'gross_amount' => $DetailLayananTest['biaya'],
+                    'gross_amount' => $detail_layanan_test['biaya'],
                     'product_name' => $productName,
                     'quantity' => 1
                 ),
@@ -219,7 +222,7 @@ class Customer extends ResourceController
                 'jenis_test' => $jenis_test,
                 'jenis_pemeriksaan' => $jenis_pemeriksaan,
                 'jenis_layanan' => $dataLayanan['nama_layanan'],
-                'antrain' => $DataInsertCustomer['no_antrian']
+                'no_antrian' => $DataInsertCustomer['no_antrian']
             );
             array_push($params, $vars);
 
@@ -381,6 +384,7 @@ class Customer extends ResourceController
                         'url_pdf' => $pdf_url
                     );
                     $arrayPembayaranUpdate = array(
+                        'tipe_pembayaran' => "midtrans",
                         'amount' => $gross_amount,
                         'jenis_pembayaran' => $payment_type,
                         'status_pembayaran' => $transaction_status

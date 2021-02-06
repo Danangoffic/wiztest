@@ -202,7 +202,7 @@
                             html_booking += `<tr><td>${new_urutan}</td>
                                     <td>${v.nama}</td>
                                     <td>${v.customer_unique}</td>
-                                    <td>${prefix_urutan} <a href="<?= base_url('backoffice/printbarcode/'); ?>${v.id}" class="btn btn-primary">Barcode</a></td></tr>`;
+                                    <td>${prefix_urutan} <button type="button" onclick="print_barcode_customer('${v.id}')" class="btn btn-primary">Barcode</button></td></tr>`;
                         });
                         $("#antrian_bilik_" + data.nomor_bilik).html(html_antrian);
                         $("#booking_bilik_" + data.nomor_bilik).html(html_booking);
@@ -213,6 +213,17 @@
             }
         endif;
         ?>
+    }
+
+    function print_barcode_customer(id_customer) {
+        for (let index = 0; index < 3; index++) {
+            $.post('<?= base_url('backoffice/swabber/print_it'); ?>', {
+                id_customer
+            }, function(data) {
+
+            });
+        }
+        setTimeout(window.location.reload(), 2000);
     }
 </script>
 <?= $this->endSection(); ?>

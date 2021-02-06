@@ -92,11 +92,13 @@ class Whatsapp_service extends ResourceController
 
         $result = $this->send_curl($url, $data);
         if (!$result) {
-            return $this->fail('failed', 400, 'failed');
+            // return $this->fail('failed', 400, 'failed');
+            return false;
             // die("Connection Failure");
         }
         curl_close($this->curl);
-        return $this->respond($result, 200, 'success');
+        return true
+        // return $this->respond($result, 200, 'success');
     }
 
     protected function send_curl($url, $data)
@@ -162,11 +164,13 @@ class Whatsapp_service extends ResourceController
 
         $result = $this->send_curl($url, $data);
         if (!$result) {
-            return $this->fail('failed', 400, 'failed');
+            // return $this->fail('failed', 400, 'failed');
+            return false;
             // die("Connection Failure");
         }
         curl_close($this->curl);
-        return $this->respond($result, 200, 'success');
+        // return $this->respond($result, 200, 'success');
+        return true;
     }
 
     public function coba_wa()

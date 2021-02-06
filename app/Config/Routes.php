@@ -59,6 +59,8 @@ $routes->get("/api/direct-print-barcode/(:any)", "backoffice\Layanan::direct_pri
 $routes->get("/api/detail-paket-pemeriksaan", "backoffice\Settings::detail_paket_pemeriksaan");
 $routes->post("/api/home-service", "backoffice\Home_service::save");
 $routes->post("/api/kirim_hasil", "backoffice\layanan::kirim_hasil");
+$routes->get("/api/antrian", "backoffice\Antrian::get_data_antrian");
+$routes->get("/api/on_call", "backoffice\Antrian::get_data_on_call");
 
 $routes->get('detail_form2', 'Customer::detail_form2');
 
