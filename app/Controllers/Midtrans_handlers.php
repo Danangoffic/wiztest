@@ -331,11 +331,11 @@ class Midtrans_handlers extends ResourceController
         $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
         $attachment = $Layanan->getUrlQRCode(base_url('api/hadir/' . $id_customer));
 
-        $img = file_get_contents($attachment);
-        $file_img = basename($img);
+        // $img = file_get_contents($attachment);
+        // $file_img = basename($img);
         // write_file("assets/qr_code/" . $file_img, $img);
         // $img_QR_att =
-        $attachment_name = $file_img;
+        // $attachment_name = $file_img;
         $pdf_file = base_url('backoffice/finance/print_invoice/no_ttd/' . $invoice_number);
         $data_email = array(
             'detail_pembayaran' => $PaymentDetail,
