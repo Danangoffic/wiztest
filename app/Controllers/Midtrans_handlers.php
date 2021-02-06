@@ -341,7 +341,7 @@ class Midtrans_handlers extends ResourceController
             'detail_pembayaran' => $PaymentDetail,
             'detail_customer' => $CustomerDetail,
             'notif' => $notif_modtrans,
-            'title' => 'Informasi Pembayaran',
+            'title' => 'Informasi Pembayaran dan Pendaftaran',
             'qr_image' => $attachment,
             'pdf_file' => $pdf_file
         );
@@ -351,14 +351,14 @@ class Midtrans_handlers extends ResourceController
         $emailMessage = view('send_email', $data_email);
 
         $Email->setTo($emailCustomer);
-        $Email->setFrom('pendaftaran@quicktest.id', 'QuickTest.id INFO');
-        $Email->setSubject("Informasi Pendaftaran Quictest.id");
+        $Email->setFrom('pendaftaran@quicktest.id', 'Pendaftaran QuickTest.id');
+        $Email->setSubject("Informasi Pembayaran dan Pendaftaran Quictest.id");
         $Email->setMessage($emailMessage);
-        $Email->attach($file_img, 'attachment', $attachment_name, "image/png");
+        $Email->attach($attachment, 'attachment', "qr_code_quictest.png", "image/png");
         $Email->attach(
             base_url('api/print_invoice/no-ttd/' . $invoice_number),
             'attachment',
-            "Invoice " . $CustomerDetail['nama'] . " - {$invoice_number}",
+            "Invoice " . $CustomerDetail['nama'] . " - {$invoice_number}.pdf",
             "application/pdf"
         );
         if ($Email->send()) {
