@@ -125,8 +125,12 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
+                <?php
+                $menu_open = ($page == 'reporting_hasil' || $page == 'reporting_marketing' || $page == 'reporting_dinkes') ? 'menu-is-open menu-open' : '';
+                $menu_aktif = ($page == 'reporting_hasil' || $page == 'reporting_marketing' || $page == 'reporting_dinkes') ? 'active' : '';
+                ?>
+                <li class="nav-item <?= $menu_open; ?>">
+                    <a href="#" class="nav-link <?= $menu_aktif; ?>">
                         <i class="nav-icon fas fa-tree"></i>
                         <p>
                             Laporan
@@ -135,13 +139,13 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="<?= base_url('backoffice/laporan/hasil'); ?>" class="nav-link">
+                            <a href="/backoffice/reporting/hasil" class="nav-link <?= ($page == "reporting_hasil") ? "active" : ""; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Data Hasil</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= base_url('marketing'); ?>" class="nav-link">
+                            <a href="/backoffice/reporting/marketing" class="nav-link <?= ($page == "reporting_marketing") ? "active" : ""; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Data Marketing</p>
                             </a>
@@ -153,7 +157,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= base_url('backoffice/laporan/dinkes'); ?>" class="nav-link">
+                            <a href="/backoffice/reporting/dinkes" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Laporan Dinkes</p>
                             </a>

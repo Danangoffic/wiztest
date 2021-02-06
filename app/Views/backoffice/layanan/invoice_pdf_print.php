@@ -12,9 +12,30 @@
     <link rel="stylesheet" href="<?= base_url('assets'); ?>/plugins/fontawesome-free/css/all.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="<?= base_url('assets'); ?>/dist/css/adminlte.min.css">
+    <style>
+        .table {
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
+    <header></header>
+    <section>
+        <table class="table">
+            <tr>
+                <th style="text-align: center; vertical-align: middle;">Invoice / Official Receipt</th>
+            </tr>
+
+        </table>
+        <table class="table">
+            <tr>
+                <td>Bill To:</td>
+                <td><?= $target_bill; ?></td>
+                <td></td>
+            </tr>
+        </table>
+    </section>
     <div class="wrapper">
         <!-- Main content -->
         <section class="invoice">

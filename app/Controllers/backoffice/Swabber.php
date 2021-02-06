@@ -140,10 +140,54 @@ class Swabber extends ResourceController
         return $this->respond($data, 200, 'success');
     }
 
-    public function print_it(int $id_customer)
+    public function print_it()
     {
-        // $Connector = new FilePrintConnector("php://stdout");
-        // $data_L = $this->layanan_controller->printbarcode();
+        $id_customer = $this->request->getPost("id_customer");
+        $data_customer = $this->customer_model->find($id_customer);
+
+        $order_id = $data_customer['customer_unique'];
+
+        $jamkunjungan = $this->input->post('nmjamkunjungan');
+        $nama =  $data_customer['nama'];
+        $jeniskelamin = $data_customer['jenis_kelamin'];
+        $tanggallahir = $data_customer['tanggal_lahir'];
+
+        $antrian_ke = $data_customer['no_antrian'];
+        $idjenis = $this->input->post('nmidjenis');
+        if ($idjenis == "3") {
+            $jenis = "SS";
+        }
+        if ($idjenis == "4") {
+            $jenis = "SB";
+        }
+        $printer = printer_open("BARCODE");
+        printer_start_doc($printer, "Doc");
+        printer_start_page($printer);
+
+        /* font management */
+        $barcode = printer_create_font("Free 3 of 9 Extended", 125, 23, PRINTER_FW_NORMAL, false, false, false, 0);
+        $arial = printer_create_font("Arial", 30, 10, 50, false, false, false, 0);
+
+        /* write the text to the print job */
+
+        printer_select_font($printer, $arial);
+        printer_draw_text($printer, $nama, 25, 10);
+        printer_draw_text($printer, $jeniskelamin . "/" . $tanggallahir, 25, 50);
+        // printer_draw_text($printer, "UMUM", 25, 90);
+        /*printer_draw_text($printer, $jenis."-".str_pad($jamkunjungan, 2, "0", STR_PAD_LEFT)."-".str_pad($antrian_ke, 3, "0", STR_PAD_LEFT), 25, 130);*/
+        printer_select_font($printer, $barcode, 20);
+        printer_draw_text($printer, '*' . $order_id . ';' . substr($nama, 0, 9) . '*', 25, 160);
+        /*printer_select_font($printer, $arial);
+			printer_draw_text($printer, $idreg.';'.substr($nama,0,9), 100,270);*/
+
+        /* font management */
+        printer_delete_font($barcode);
+        printer_delete_font($arial);
+
+        /* close the connection */
+        printer_end_page($printer);
+        printer_end_doc($printer);
+        printer_close($printer);
     }
 
     public function kelola()

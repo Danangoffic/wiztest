@@ -255,7 +255,7 @@
 </div>
 
 
-<script type="text/javascript" src="https://app.midtrans.com/snap/snap.js" data-client-key="<?= $midtrans_client_key; ?>"></script>
+<script type="text/javascript" src="<?= $snap_url_js; ?>" data-client-key="<?= $midtrans_client_key; ?>"></script>
 <script>
     var id_jenis_test, nama_jenis_test, jam_kunjungan, token_client;
     var midtransToken, invoice_number, transaction;

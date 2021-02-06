@@ -1,7 +1,10 @@
 <<?= $this->extend('backoffice/template/layout.login.php'); ?> <?= $this->section('content'); ?> <body class="hold-transition login-page">
     <div class="login-box">
         <div class="login-logo">
-            <a href="../../index2.html"><b>Backoffice</b>TEST</a>
+            <a href="../../index2.html">
+                <!-- <b>Backoffice</b>TEST -->
+                <img src="/assets/logo-warna.png" alt="">
+            </a>
         </div>
         <?php if ($session->getFlashdata('error')) : ?>
             <div class="alert alert-danger alert-dismissible">
