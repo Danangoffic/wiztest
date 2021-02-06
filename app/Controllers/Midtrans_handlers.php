@@ -333,16 +333,17 @@ class Midtrans_handlers extends ResourceController
 
         $img = file_get_contents($attachment);
         $file_img = basename($img);
-        write_file("assets/qr_code/" . $file_img, $img);
+        // write_file("assets/qr_code/" . $file_img, $img);
         // $img_QR_att =
         $attachment_name = $file_img;
-
+        $pdf_file = base_url('backoffice/finance/print_invoice/no_ttd/' . $invoice_number);
         $data_email = array(
             'detail_pembayaran' => $PaymentDetail,
             'detail_customer' => $CustomerDetail,
             'notif' => $notif_modtrans,
             'title' => 'Informasi Pembayaran',
-            'qr_image' => base_url("assets/qr_code/" . $file_img)
+            'qr_image' => $attachment,
+            'pdf_file' => $pdf_file
         );
 
         // file_get
@@ -357,7 +358,7 @@ class Midtrans_handlers extends ResourceController
         $Email->attach(
             base_url('backoffice/finance/print_invoice/no_ttd/' . $invoice_number),
             'attachment',
-            "Invoice " . $CustomerDetail['nama'] . " - {$$invoice_number}",
+            "Invoice " . $CustomerDetail['nama'] . " - {$invoice_number}",
             "application/pdf"
         );
         if ($Email->send()) {
