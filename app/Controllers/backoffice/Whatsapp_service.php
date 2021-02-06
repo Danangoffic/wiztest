@@ -97,7 +97,7 @@ class Whatsapp_service extends ResourceController
             // die("Connection Failure");
         }
         curl_close($this->curl);
-        return true
+        return true;
         // return $this->respond($result, 200, 'success');
     }
 
@@ -120,7 +120,7 @@ class Whatsapp_service extends ResourceController
     public function send_whatsapp_invoice($id_customer = null)
     {
         if ($id_customer == null) {
-            return $this->failForbidden();;
+            return $this->failForbidden();
         }
         $cek_customer = $this->customer_model->find($id_customer);
         if ($cek_customer == null) {

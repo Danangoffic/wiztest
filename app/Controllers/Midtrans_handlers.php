@@ -329,14 +329,23 @@ class Midtrans_handlers extends ResourceController
         $invoice_number = $CustomerDetail['invoice_number'];
 
         $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
+        $attachment = $Layanan->getUrlQRCode(base_url('api/hadir/' . $id_customer));
+
+        $img = file_get_contents($attachment);
+        $file_img = basename($img);
+        write_file("assets/qr_code/" . $file_img, $img);
+        // $img_QR_att =
+        $attachment_name = $file_img;
+
         $data_email = array(
             'detail_pembayaran' => $PaymentDetail,
             'detail_customer' => $CustomerDetail,
             'notif' => $notif_modtrans,
-            'title' => 'Informasi Pembayaran'
+            'title' => 'Informasi Pembayaran',
+            'qr_image' => base_url("assets/qr_code/" . $file_img)
         );
-        $attachment = $Layanan->getUrlQRCode(base_url('api/hadir/' . $id_customer));
-        $attachment_name = $nama_customer . ".png";
+
+        // file_get
 
         $emailMessage = view('send_email', $data_email);
 
@@ -344,7 +353,7 @@ class Midtrans_handlers extends ResourceController
         $Email->setFrom('pendaftaran@quicktest.id', 'QuickTest.id INFO');
         $Email->setSubject("Informasi Pendaftaran Quictest.id");
         $Email->setMessage($emailMessage);
-        $Email->attach($attachment, 'attachment', $attachment_name, "image/png");
+        $Email->attach($file_img, 'attachment', $attachment_name, "image/png");
         $Email->attach(
             base_url('backoffice/finance/print_invoice/no_ttd/' . $invoice_number),
             'attachment',
