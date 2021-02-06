@@ -528,7 +528,7 @@
         $.post(url_post_registration, dataSend).then((data, status) => {
             if (status == "success") {
                 console.log('STATUS', status);
-                let midtrans_return = data.data.data;
+                let midtrans_return = data.midtrans.data;
                 midtransToken = midtrans_return.token;
                 invoice_number = data.invoice_number;
                 transaction = data.transaction;
