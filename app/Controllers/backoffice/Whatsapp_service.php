@@ -79,7 +79,7 @@ class Whatsapp_service extends ResourceController
         $message = 'Terima kasih kepada Bpk/Ibu ' . $cek_customer['nama'] .
             " yang telah melakukan pembayaran pada kami untuk mengikuti test *{$jenis_test}* pada tanggal *{$tgl_kunjungan}*. \n
             Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.";
-        $str = "https://reg.quicktest.id/api/hadir/" . $id_customer;
+        $str = base_url("/api/hadir/" . $id_customer);
         $url_img = $this->layanan_bo->getUrlQRCode($str);
         // $image = "<img download src=data:image/png;base64," . base64_encode($url_img) . ">";
         $url = $this->url_send_txt_img;
@@ -109,7 +109,7 @@ class Whatsapp_service extends ResourceController
         curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($this->curl, CURLOPT_TIMEOUT, 30);
+        curl_setopt($this->curl, CURLOPT_TIMEOUT, 600);
         curl_setopt($this->curl, CURLOPT_POST, 1);
         curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
 
@@ -126,6 +126,7 @@ class Whatsapp_service extends ResourceController
         if ($cek_customer == null) {
             return $this->failNotFound();
         }
+        $no_invoice = $cek_customer['invoice_number'];
         $phone = $cek_customer['phone'];
         if ($phone == "" || $phone == null) {
             return $this->fail("mobile phone is not recognised", 400, 'Failed');
@@ -153,7 +154,7 @@ class Whatsapp_service extends ResourceController
         $phone = $new_phone;
         $message = 'Terima kasih kepada Bpk/Ibu ' . $cek_customer['nama'] .
             " yang telah melakukan pembayaran pada kami untuk mengikuti test *{$jenis_test}* pada tanggal *{$tgl_kunjungan}*. \n
-            Berikut kami lampirkan Invoice. " . base_url('/api/get-print-pdf-peserta/' . $id_customer);
+            Berikut kami lampirkan Invoice. " . base_url('/api/print_invoice/no-ttd/' . $no_invoice);
 
         $url = $this->url_send_txt;
         $data = array(
