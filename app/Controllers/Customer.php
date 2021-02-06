@@ -231,7 +231,7 @@ class Customer extends ResourceController
             $insertPembayaran = $this->PembayaranModel->insert($dataInsertPembayaran);
             $id_pembayaran = $this->PembayaranModel->getInsertID();
             if ($MidtransToken) {
-                $data = ['data' => $MidtransToken, 'invoice_number' => $InvoiceCustomer, 'transaction' => $params, 'detail_payment' => $this->PembayaranModel->find($id_pembayaran)];
+                $data = ['midtrans' => $MidtransToken, 'invoice_number' => $InvoiceCustomer, 'transaction' => $params, 'detail_payment' => $this->PembayaranModel->find($id_pembayaran)];
                 return $this->respond($data, 200, 'success');
             } else {
                 $data = ['data' => '', 'invoice_number' => null];
@@ -264,7 +264,8 @@ class Customer extends ResourceController
                 # code...
                 break;
         }
-        $awal = $awal . date('ymd') . substr($jam_kunjungan, 0, 2);
+        $rand_number = rand(1000, 9999);
+        $awal = $awal . $rand_number . date('d') . substr($jam_kunjungan, 0, 2);
         $urutan = $this->getUrutan($type_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
 
         $ID = str_pad($urutan, 3, '0', STR_PAD_LEFT);

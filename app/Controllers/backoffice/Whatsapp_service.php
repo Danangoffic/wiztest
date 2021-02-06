@@ -81,13 +81,13 @@ class Whatsapp_service extends ResourceController
             Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.";
         $str = "https://reg.quicktest.id/api/hadir/" . $id_customer;
         $url_img = $this->layanan_bo->getUrlQRCode($str);
-        $image = "<img download src=data:image/png;base64," . base64_encode($url_img) . ">";
+        // $image = "<img download src=data:image/png;base64," . base64_encode($url_img) . ">";
         $url = $this->url_send_txt_img;
         $data = array(
             'APIKey'     => $this->api_key,
             'phoneNumber'  => $phone,
             'message' => $message,
-            'urlDownloadImage' => $image,
+            'urlDownloadImage' => $url_img,
         );
 
         $result = $this->send_curl($url, $data);
@@ -97,7 +97,7 @@ class Whatsapp_service extends ResourceController
             // die("Connection Failure");
         }
         curl_close($this->curl);
-        return true
+        return true;
         // return $this->respond($result, 200, 'success');
     }
 
@@ -120,7 +120,7 @@ class Whatsapp_service extends ResourceController
     public function send_whatsapp_invoice($id_customer = null)
     {
         if ($id_customer == null) {
-            return $this->failForbidden();;
+            return $this->failForbidden();
         }
         $cek_customer = $this->customer_model->find($id_customer);
         if ($cek_customer == null) {
