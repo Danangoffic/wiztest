@@ -16,20 +16,25 @@ class Midtrans extends ResourceController
     protected $sysParam;
     public $SNAP_SANDBOX_BASE_URL = 'https://app.sandbox.midtrans.com/snap/v1';
     public $SNAP_PRODUCTION_BASE_URL = 'https://app.midtrans.com/snap/v1';
-    protected $ServerKeySandbox = "SB-Mid-server-njmm7T2YGKMdzauzJRLre29W";
-    protected $ClientKeySandBox = "SB-Mid-client-FNK0ZdKVig8hiqwE";
+
+    protected $server_key_prod = "Mid-server-ziBWgMIMvdY6Xd7PsTgBdnEz";
+    protected $client_key_prod = "Mid-client-coq-IuJTF1nZLqTE";
+
+    protected $server_key_dev = "SB-Mid-server-QkrkR-LkKVtR3SeHfFH5roM4";
+    protected $client_key_dev = "SB-Mid-client-mp4wARPRYp1RjrBO";
 
     protected $midtrans_config;
     protected $midtrans_snap;
     protected $midtrans;
     public $production_mode;
+    protected $server_key;
+    protected $client_key;
     public function __construct()
     {
-        $this->sysParam = new SystemParameter();
-        $this->midtrans_config =  new \Midtrans\Config;
-        $this->midtrans_snap = new \Midtrans\Snap;
-        $this->midtrans = new \Midtrans;
-        $this->production_mode = true;
+        //set production mode (true to production mode, false to development mode)
+        $this->production_mode = false;
+        $this->server_key = ($this->production_mode) ? $this->server_key_prod : $this->server_key_dev;
+        $this->client_key = ($this->production_mode) ? $this->client_key_prod : $this->client_key_dev;
     }
 
     public function index()
@@ -48,39 +53,22 @@ class Midtrans extends ResourceController
 
     public function getToken($params)
     {
-        // echo "Masuk Midtrans controller";
-        $Midtrans = new GlobalMidtrans();
-
 
         try {
-            $vgroup = 'MIDTRANS_KEY';
-            $paramter = 'SERVER_KEY';
-            $DB = db_connect()->table('system_parameter')->select('*')->where('vgroup', $vgroup)->where('parameter', $paramter)->get()->getFirstRow();
-            if ($DB == null) {
-                return false;
-            }
-            $ServerKey = base64_decode($DB->value);
-            $this->midtrans_config::$serverKey = $ServerKey;
-            $this->midtrans_config::$isProduction = $this->production_mode;
-            $this->midtrans_config::$isSanitized = true;
-            $this->midtrans_config::$is3ds = true;
-            // \Midtrans\Config::$serverKey = $ServerKey;
-            // \Midtrans\Config::$isProduction = false;
-            // // Set sanitization on (default)
-            // \Midtrans\Config::$isSanitized = true;
-            // // Set 3DS transaction for credit card to true
-            // \Midtrans\Config::$is3ds = true;
 
-            $snapToken = $this->midtrans_snap->getSnapToken($params);
-            $CreateTrans = $this->midtrans_snap->createTransaction($params);
+            \Midtrans\Config::$serverKey = $this->server_key;
+            \Midtrans\Config::$isProduction = $this->production_mode;
+            \Midtrans\Config::$isSanitized = true;
+            \Midtrans\Config::$is3ds = true;
+
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            $CreateTrans = \Midtrans\Snap::createTransaction($params);
 
             if ($snapToken) {
                 return ['data' => $CreateTrans, 'statusMessage' => 'success'];
             } else {
                 return ['statusMessage' => 'Failed'];
             }
-            // $Snap = $Midtrans->getSnapToken($params);
-
         } catch (\Throwable $th) {
             //throw $th;
             return ['statusMessage' => 'Error. ' . $th->getMessage()];
@@ -91,12 +79,8 @@ class Midtrans extends ResourceController
     {
         $returnArray = array();
         try {
-            $db_param = db_connect()->table('system_parameter')->where(['vgroup' => 'MIDTRANS_KEY', 'parameter' => 'SERVER_KEY'])->get()->getFirstRow();
-            $EncodeduserNameKey = $db_param->value;
-            $decodedUsernameKey = base64_decode($EncodeduserNameKey);
-
             $configMidtrans = array(
-                'server_key' => $decodedUsernameKey,
+                'server_key' => $this->server_key,
                 'production' => $this->production_mode
             );
             // echo "Selesai";
@@ -107,19 +91,16 @@ class Midtrans extends ResourceController
         } catch (\Throwable $th) {
             $returnArray = ['status_message' => 'failed. ' . $th->getMessage()];
         }
-        return $this->respond($returnArray, 200);
+        return $returnArray;
     }
 
     public function getStatusByOrderId(string $OrderId)
     {
         $returnArray = array();
         try {
-            $db_param = db_connect()->table('system_parameter')->where(['vgroup' => 'MIDTRANS_KEY', 'parameter' => 'SERVER_KEY'])->get()->getFirstRow();
-            $EncodeduserNameKey = $db_param->value;
-            $decodedUsernameKey = base64_decode($EncodeduserNameKey);
 
             $configMidtrans = array(
-                'server_key' => $decodedUsernameKey,
+                'server_key' => $this->server_key,
                 'production' => $this->production_mode
             );
             // echo "Selesai";
@@ -131,6 +112,11 @@ class Midtrans extends ResourceController
             $returnArray = array('statusMessage' => 'failed. ' . $th->getMessage());
         }
         return $returnArray;
+    }
+
+    public function handle_notification($order_id = null)
+    {
+        return $this->get_status_midtrans($order_id);
     }
 
     // const SANDBOX_BASE_URL = 'https://api.sandbox.veritrans.co.id/v2';

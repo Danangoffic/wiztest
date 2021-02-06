@@ -65,6 +65,18 @@
         }
     </style>
 
+
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed"">
+    <div class=" wrapper">
+    <?= $this->include('backoffice/template/navbar'); ?>
+    <?= $this->include('backoffice/template/sidebar'); ?>
+    <?= $this->renderSection('content'); ?>
+    <?= $this->include('backoffice/template/footer'); ?>
+    </div>
+
+
     <!-- jQuery -->
     <script src="/assets/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
@@ -82,34 +94,23 @@
     <script src="/assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-</head>
+    <script>
+        $(document).ready(function() {
+            $("#filter-card").collapse();
 
-<body class="hold-transition sidebar-mini sidebar-closed layout-fixed">
-    <div class="wrapper">
-        <?= $this->include('backoffice/template/navbar'); ?>
-        <?= $this->include('backoffice/template/sidebar'); ?>
-        <?= $this->renderSection('content'); ?>
-        <?= $this->include('backoffice/template/footer'); ?>
-    </div>
+
+        });
+
+
+
+        function filterDashboard() {
+            var date1 = $("#date1").val();
+            var date2 = $("#date2").val()
+        }
+    </script>
 </body>
 
 
-
-
-<script>
-    $(document).ready(function() {
-        $("#filter-card").collapse();
-
-
-    });
-
-
-
-    function filterDashboard() {
-        var date1 = $("#date1").val();
-        var date2 = $("#date2").val()
-    }
-</script>
 </body>
 
 </html>

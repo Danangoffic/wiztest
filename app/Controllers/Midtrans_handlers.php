@@ -4,7 +4,7 @@ namespace App\Controllers;
 // use App\Controllers\BaseController;
 
 use App\Controllers\backoffice\Layanan;
-use App\Controllers\backoffice\Midtrans;
+use App\Controllers\backoffice\Midtrans as MidtransBO;
 use App\Controllers\backoffice\Whatsapp_service;
 use App\Models\CustomerModel;
 use App\Models\PemanggilanModel;
@@ -23,6 +23,7 @@ class Midtrans_handlers extends ResourceController
     protected $PembayaranModel;
     protected $notif;
     protected $production_mode;
+    protected $Midtrans_bo;
     public function __construct()
     {
         // parent::__construct();
@@ -32,8 +33,8 @@ class Midtrans_handlers extends ResourceController
         $this->midtrans = new \Midtrans;
         $this->CustomerModel = new CustomerModel();
         $this->PembayaranModel = new PembayaranModel();
-        $Midtrans_bo = new Midtrans;
-        $this->production_mode = $Midtrans_bo->production_mode;
+        $this->Midtrans_bo = new MidtransBO;
+        $this->production_mode = $this->Midtrans_bo->production_mode;
         // $this->veritrans->config($params);
         // $this->load->helper('url');
     }
@@ -41,117 +42,66 @@ class Midtrans_handlers extends ResourceController
     public function index()
     {
         $PemanggilanModel = new PemanggilanModel();
-        // $this->veritrans->config($params);
-        // echo 'test notification handler';
+        $notification_receiver = new \Midtrans\Notification();
         try {
-            $json_result = file_get_contents('php://input');
-            $result = json_decode($json_result);
 
-            if ($result !== null) {
-                $data_key = db_connect()->table('system_parameter')->where(['vgroup' => 'MIDTRANS_KEY', 'parameter' => 'SERVER_KEY'])->get()->getFirstRow();
+            $transaction = $notification_receiver->transaction_status;
+            $type = $notification_receiver->payment_type;
+            $order_id = $notification_receiver->order_id;
+            $fraud = $notification_receiver->fraud_status;
+            $gross_amount = $notification_receiver->gross_amount;
+            $status_code = $notification_receiver->status_code;
 
-                /**
-                 * @param string $serverKey is encoded, plase decode with base64_decode to store into midtrans server key configuration
-                 */
-                $serverKey = $data_key->value;
-                $params = array(
-                    'server_key' => base64_decode($serverKey),
-                    'production' => $this->production_mode
-                );
-                $this->midtrans->config($params);
-                $NotifMidtrans = $this->midtrans->status($result->order_id);
-                // $NotifMidtrans->getResponse();
-                $transaction = $NotifMidtrans->transaction_status;
-                $type = $NotifMidtrans->payment_type;
-                $order_id = $NotifMidtrans->order_id;
-                $fraud = $NotifMidtrans->fraud_status;
-                $gross_amount = $NotifMidtrans->gross_amount;
-                // $status_code = $NotifMidtrans->status_code;
-                // $this->midtrans->config($params);
-                // $notif = $this->midtrans->status($result->order_id);
-                // $this->notif = $notif;
-                // $notif = $this->notif;
-                // return $this->respond($notif);
-                // exit();
-                // $transaction = $notif['transaction_status'];
-                // $type = $notif['payment_type'];
-                // $order_id = $notif['order_id'];
-                // $fraud = $notif['fraud_status'];
+            $responseMessage = "";
+            $responseStatus = "success";
+            $customer_check = $this->CustomerModel->where(['customer_unique' => $order_id])->get()->getRowArray();
+            // return $customer_check;
 
-                $responseMessage = "";
-                $responseStatus = "success";
-                $customer_check = $this->CustomerModel->where(['customer_unique' => $order_id])->first();
-                // return $customer_check;
-                if ($customer_check) {
-                    $id_customer = $customer_check['id'];
-                    $id_layanan_test = $customer_check['jenis_test'];
-                    $tgl_kunjungan = $customer_check['tgl_kunjungan'];
-                    $jam_kunjungan = $customer_check['jam_kunjungan'];
-                    $payemnt_check = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
-                    // print_r($payemnt_check);
-                    if ($payemnt_check) {
-                        $id_pembayaran = $payemnt_check['id'];
-                        $arrayCustomerUpdate = array(
-                            'status_pembayaran' => $transaction
-                        );
-                        $arrayPembayaranUpdate = array(
-                            'amount' => $gross_amount,
-                            'jenis_pembayaran' => $type,
-                            'status_pembayaran' => $transaction
-                        );
-                        $arrayInsertPemanggilan = array(
-                            'id_customer' => $id_customer,
-                            'id_layanan_test' => $id_layanan_test,
-                            'stataus_pemanggilan' => '11',
-                            'tgl_kunjungan' => $tgl_kunjungan,
-                            'jam_kunjungan' => $jam_kunjungan
-                        );
+            if ($customer_check) {
+                $id_customer = $customer_check['id'];
 
-                        $updateCustomer = $this->CustomerModel->update($id_customer, $arrayCustomerUpdate);
-                        $updatePayment = $this->PembayaranModel->update($id_pembayaran, $arrayPembayaranUpdate);
-                        $createPemanggilanCustomer = $PemanggilanModel->insert($arrayInsertPemanggilan);
+                // send email and whatsapp first then update //
+                if ($transaction == "settlement" || $transaction == "capture") {
+                    if (!$this->sendEmailCustomer($order_id, $notification_receiver)) {
+                        return $this->respond(['status_message' => "Failed to send email"], 400, "failed");
+                    }
+                    if (!$this->send_whatsapp($id_customer)) {
+                        return $this->respond(['status_message' => "Failed to send whatsapp"], 400, "failed");
+                    }
+                }
 
-                        if ($updateCustomer && $updatePayment && $createPemanggilanCustomer) {
+                $id_layanan_test = $customer_check['jenis_test'];
+                $payemnt_check = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
 
+                $tgl_kunjungan = $customer_check['tgl_kunjungan'];
+                $jam_kunjungan = $customer_check['jam_kunjungan'];
+                // print_r($payemnt_check);
+                if ($payemnt_check) {
+                    $id_pembayaran = $payemnt_check['id'];
+                    $arrayCustomerUpdate = array(
+                        'status_pembayaran' => $transaction
+                    );
+                    $arrayPembayaranUpdate = array(
+                        'amount' => $gross_amount,
+                        'jenis_pembayaran' => $type,
+                        'status_pembayaran' => $transaction
+                    );
+                    $arrayInsertPemanggilan = array(
+                        'id_customer' => $id_customer,
+                        'id_layanan_test' => $id_layanan_test,
+                        'status_pemanggilan' => '11',
+                        'tgl_kunjungan' => $tgl_kunjungan,
+                        'jam_kunjungan' => $jam_kunjungan
+                    );
 
-                            $responseStatus = $NotifMidtrans->status_message;
-                            $responseMessage = $NotifMidtrans->status_message;
-                            $arrayReturn = array(
-                                'statusMessage' => $responseStatus,
-                                'responseMessage' => $responseMessage,
-                                'paymentType' => $type,
-                                'orderId' => $order_id,
-                                'transactionStatus' => $transaction,
-                                'detailCustomer' => $customer_check,
-                                'detailPaymentCustomer' => $payemnt_check,
-                                'statusCode' => 200,
-                                'fraud' => $fraud,
-                                'midtrans_response' => $NotifMidtrans
-                            );
-                            if ($transaction == "settlement" || $transaction == "capture") {
-                                $this->sendEmailCustomer($order_id, $NotifMidtrans);
-                                $this->send_whatsapp($id_customer);
-                            }
-                        } else {
-                            $responseStatus = $NotifMidtrans->status_message;
-                            $responseMessage = "Failed update customer";
-                            $arrayReturn = array(
-                                'statusMessage' => $responseStatus,
-                                'responseMessage' => $responseMessage,
-                                'paymentType' => $type,
-                                'orderId' => $order_id,
-                                'transactionStatus' => $transaction,
-                                'detailCustomer' => $customer_check,
-                                'detailPaymentCustomer' => $payemnt_check,
-                                'statusCode' => 200,
-                                'fraud' => $fraud,
-                                'midtrans_response' => $NotifMidtrans
-                            );
-                        }
-                    } else {
+                    $updateCustomer = $this->CustomerModel->update($id_customer, $arrayCustomerUpdate);
+                    $updatePayment = $this->PembayaranModel->update($id_pembayaran, $arrayPembayaranUpdate);
+                    $createPemanggilanCustomer = $PemanggilanModel->insert($arrayInsertPemanggilan);
 
-                        $responseStatus = "failed";
-                        $responseMessage = "Payment check is failed";
+                    if ($updateCustomer && $updatePayment && $createPemanggilanCustomer) {
+
+                        $responseStatus = $notification_receiver->status_message;
+                        $responseMessage = $notification_receiver->status_message;
                         $arrayReturn = array(
                             'statusMessage' => $responseStatus,
                             'responseMessage' => $responseMessage,
@@ -160,14 +110,30 @@ class Midtrans_handlers extends ResourceController
                             'transactionStatus' => $transaction,
                             'detailCustomer' => $customer_check,
                             'detailPaymentCustomer' => $payemnt_check,
-                            'statusCode' => 200,
+                            'statusCode' => $status_code,
                             'fraud' => $fraud,
-                            'midtrans_response' => $NotifMidtrans
+                            'midtrans_response' => $notification_receiver
+                        );
+                    } else {
+                        $responseStatus = $notification_receiver->status_message;
+                        $responseMessage = "Failed update customer";
+                        $arrayReturn = array(
+                            'statusMessage' => $responseStatus,
+                            'responseMessage' => $responseMessage,
+                            'paymentType' => $type,
+                            'orderId' => $order_id,
+                            'transactionStatus' => $transaction,
+                            'detailCustomer' => $customer_check,
+                            'detailPaymentCustomer' => $payemnt_check,
+                            'statusCode' => $status_code,
+                            'fraud' => $fraud,
+                            'midtrans_response' => $notification_receiver
                         );
                     }
                 } else {
+
                     $responseStatus = "failed";
-                    $responseMessage = "Customer check is failed";
+                    $responseMessage = "Payment check is failed";
                     $arrayReturn = array(
                         'statusMessage' => $responseStatus,
                         'responseMessage' => $responseMessage,
@@ -175,20 +141,30 @@ class Midtrans_handlers extends ResourceController
                         'orderId' => $order_id,
                         'transactionStatus' => $transaction,
                         'detailCustomer' => $customer_check,
-                        'statusCode' => 200,
+                        'detailPaymentCustomer' => $payemnt_check,
+                        'statusCode' => $status_code,
                         'fraud' => $fraud,
-                        'midtrans_response' => $NotifMidtrans
+                        'midtrans_response' => $notification_receiver
                     );
                 }
-
-
-
-                // $responseNotif = $this->proses_notif($notif);
-                return $this->respond($arrayReturn, 200, 'success');
-                // $notif = $this->veritrans->status($result->order_id);
+            } else {
+                $responseStatus = "failed";
+                $responseMessage = "Customer check is failed";
+                $arrayReturn = array(
+                    'statusMessage' => $responseStatus,
+                    'responseMessage' => $responseMessage,
+                    'paymentType' => $type,
+                    'orderId' => $order_id,
+                    'transactionStatus' => $transaction,
+                    'detailCustomer' => $customer_check,
+                    'statusCode' => $status_code,
+                    'fraud' => $fraud,
+                    'midtrans_response' => $notification_receiver
+                );
             }
-            // echo "result is null";
-            return $this->respond(array('statusMessage' => 'failed'), 400, 'failed');
+
+
+            return $this->respond($arrayReturn, $status_code, $responseStatus);
         } catch (\Throwable $th) {
             //throw $th;
             return $this->respond(array(
@@ -320,6 +296,7 @@ class Midtrans_handlers extends ResourceController
         $emailCustomer = $CustomerDetail['email'];
         $id_customer = $CustomerDetail['id'];
         $nama_customer = $CustomerDetail['nama'];
+        $invoice_number = $CustomerDetail['invoice_number'];
 
         $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
         $data_email = array(
@@ -328,15 +305,22 @@ class Midtrans_handlers extends ResourceController
             'notif' => $notif_modtrans,
             'title' => 'Informasi Pembayaran'
         );
-        $attachment = $Layanan->getImageQRCode(base_url('api/hadir/' . $id_customer), $nama_customer);
-        $attachment_name = $nama_customer . ".pdf";
+        $attachment = $Layanan->getUrlQRCode(base_url('api/hadir/' . $id_customer));
+        $attachment_name = $nama_customer . ".png";
+
         $emailMessage = view('send_email', $data_email);
 
         $Email->setTo($emailCustomer);
-        $Email->setFrom('info@quicktest.id', 'QuickTest.id INFO');
+        $Email->setFrom('pendaftaran@quicktest.id', 'QuickTest.id INFO');
         $Email->setSubject("Informasi Pendaftaran Quictest.id");
         $Email->setMessage($emailMessage);
-        $Email->attach($attachment, 'attachment', $attachment_name, "application/pdf");
+        $Email->attach($attachment, 'attachment', $attachment_name, "image/png");
+        $Email->attach(
+            base_url('backoffice/finance/print_invoice/no_ttd/' . $invoice_number),
+            'attachment',
+            "Invoice " . $CustomerDetail['nama'] . " - {$$invoice_number}",
+            "application/pdf"
+        );
         if ($Email->send()) {
             return true;
         } else {
@@ -349,8 +333,14 @@ class Midtrans_handlers extends ResourceController
     {
         if ($id_customer != null) {
             $whatsapp_service = new Whatsapp_service;
-            $whatsapp_service->send_whatsapp_QR($id_customer);
-            $whatsapp_service->send_whatsapp_invoice($id_customer);
+            if (!$whatsapp_service->send_whatsapp_QR($id_customer)) {
+                return false;
+            }
+            if (!$whatsapp_service->send_whatsapp_invoice($id_customer)) {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
 

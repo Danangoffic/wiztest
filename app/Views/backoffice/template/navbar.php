@@ -13,12 +13,15 @@
                 <i class="far fa-user"></i> <?= session('nama'); ?> <i class="fa fa-angle-down"></i>
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <a href="<?= base_url('backoffice/logout'); ?>" class="dropdown-item">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <a href="/backoffice/logout" class="nav-link">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    <span class="float-right text-muted text-sm">Logout</span>
                 </a>
-                <a href="<?= base_url('backoffice/change-password'); ?>" class="dropdown-item">
-                    Ubah Password
+                <a href="/backoffice/change-password" class="nav-link">
+                    <!-- <i class="fas fa-sign-out-alt mr-2"></i>  -->
+                    <span class="float-right text-muted text-sm">Logout</span>
                 </a>
+
             </div>
         </li>
     </ul>

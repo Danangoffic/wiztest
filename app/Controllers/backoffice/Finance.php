@@ -104,7 +104,7 @@ class Finance extends BaseController
         $DataInstansi = $this->instansi_model->findAll();
         $data = array(
             'title' => "Data Instansi",
-            'page' => "instansi",
+            'page' => "finance_instansi",
             'session' => session(),
             'data' => $DataInstansi
         );
@@ -145,10 +145,10 @@ class Finance extends BaseController
         }
         switch ($type_invoice) {
             case 'ttd':
-                # code...
+                return $this->pdf_customer_ttd($invoice_number);
                 break;
             case 'no-ttd':
-
+                return $this->pdf_customer($invoice_number);
                 break;
             default:
                 # code...
@@ -170,6 +170,65 @@ class Finance extends BaseController
         // $dompdf->set
         // $dompdf->
         $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 0]);
+    }
+
+    public function pdf_customer($invoice_number)
+    {
+        $customer = $this->CustomerModel->where(['invoice_number' => $invoice_number])->get()->getRowArray();
+        $id_customer = $customer['id'];
+        $data_pembayaran = $this->pembayaran_model->where(['id_customer' => $id_customer])->get()->getRowArray();
+        $data_layanan_test = db_connect()->table('data_layanan_test')->where('id', $customer['jenis_test'])->limit(1)->get()->getRowArray();
+        $data_layanan = db_connect()->table('jenis_layanan')->where('id', $data_layanan_test['id_layanan'])->get()->getRowArray();
+        $data_test = db_connect()->table('jenis_test')->where('id', $data_layanan_test['id_test'])->get()->getRowArray();
+        $nama_test = $data_test['nama_test'];
+        $nama_layanan = $data_layanan['nama_layanan'];
+
+        $nama_paket = $nama_test . " ({$nama_layanan})";
+        $data = [
+            'title' => "Invoice " . $customer['nama'] . " - " . $invoice_number,
+            'page' => "invoice_customer",
+            'customer' => $customer,
+            'data_pembayaran' => $data_pembayaran,
+            'nama_paket' => $nama_paket
+        ];
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml(view('backoffice/finance/print_invoice_customer', $data));
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        // $dompdf->set
+        // $dompdf->
+        $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 1]);
+    }
+
+    public function pdf_customer_ttd($invoice_number = null)
+    {
+        if ($invoice_number == null) {
+            return null;
+        }
+        $customer = $this->CustomerModel->where(['invoice_number' => $invoice_number])->get()->getRowArray();
+        $id_customer = $customer['id'];
+        $data_pembayaran = $this->pembayaran_model->where(['id_customer' => $id_customer])->get()->getRowArray();
+        $data_layanan_test = db_connect()->table('data_layanan_test')->where('id', $customer['jenis_test'])->limit(1)->get()->getRowArray();
+        $data_layanan = db_connect()->table('jenis_layanan')->where('id', $data_layanan_test['id_layanan'])->get()->getRowArray();
+        $data_test = db_connect()->table('jenis_test')->where('id', $data_layanan_test['id_test'])->get()->getRowArray();
+        $nama_test = $data_test['nama_test'];
+        $nama_layanan = $data_layanan['nama_layanan'];
+
+        $nama_paket = $nama_test . " ({$nama_layanan})";
+        $data = [
+            'title' => "Invoice " . $customer['nama'] . " - " . $invoice_number,
+            'page' => "invoice_customer",
+            'customer' => $customer,
+            'data_pembayaran' => $data_pembayaran,
+            'nama_paket' => $nama_paket
+        ];
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml(view('backoffice/finance/print_invoice_customer_ttd', $data));
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        // $dompdf->set
+        // $dompdf->
+        $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 1]);
     }
 
     /**

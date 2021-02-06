@@ -54,7 +54,7 @@
         }
 
         .invoice-box table tr.details td {
-            padding-bottom: 20px;
+            padding-bottom: 10px;
         }
 
         .invoice-box table tr.item td {
@@ -127,7 +127,6 @@
                         <tr>
                             <td>
                                 <?= $customer['nama']; ?><br>
-                                <?= $customer['phone']; ?>
                                 <br>
                                 <?= $customer['email']; ?><br>
                             </td>
@@ -187,6 +186,18 @@
 
                 <td>
                     Total: <?= number_format($data_pembayaran['amount'], 0, ",", "."); ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Finance
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>
+                    <?php  //echo $image_ttd; 
+                    ?>
                 </td>
             </tr>
         </table>
