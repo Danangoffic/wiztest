@@ -42,6 +42,8 @@ class Midtrans_handlers extends ResourceController
     public function index()
     {
         $PemanggilanModel = new PemanggilanModel();
+        \Midtrans\Config::$isProduction = $this->Midtrans_bo->production_mode;
+        \Midtrans\Config::$serverKey = $this->Midtrans_bo->server_key;
         $notification_receiver = new \Midtrans\Notification();
         try {
 
