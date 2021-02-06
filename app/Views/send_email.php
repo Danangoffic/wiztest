@@ -52,6 +52,7 @@
                 ?>
                 <div id="qrcode"></div>
                 <p>Thanks,<br>QuickTest Info</p>
+                <img src="<?= $qr_image; ?>" alt="">
             </div>
             <!-- /.mailbox-read-message -->
         </div>
