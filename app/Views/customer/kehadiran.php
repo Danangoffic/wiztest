@@ -1,6 +1,6 @@
 <?= $this->extend('template/layout'); ?>
 <?= $this->section('content'); ?>
-<div class="container-fluid">
+<div class="container">
     <div class="row mt-5">
         <div class="col-lg-3">&nbsp;</div>
         <div class="col-lg-9">
@@ -32,7 +32,8 @@
                     Peserta dengan nama <?= $nama; ?> dan nomor registrasi <?= $order_id; ?>
                     <?= $message; ?>
                     <br><br>
-                    <h5>Silahkan menunggu pada bilik <strong><?= $bilik; ?></strong> dengan antrian <strong><?= $no_antrian; ?></strong></h5>
+                    <h5>Silahkan menunggu pada bilik <strong class="badge badge-info"><?= $bilik; ?></strong>
+                        dengan antrian <strong class="badge badge-primary"><?= $no_antrian; ?></strong></h5>
                 </div>
             </div>
         </div>

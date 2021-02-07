@@ -820,7 +820,7 @@ class Peserta extends BaseController
                 if ($updateCustomer && $insertKehadiran) {
                     $array_return = array(
                         'statusMessage' => "success",
-                        'message' => "Berhasil absen untuk hadir",
+                        'message' => "<span class='badge badge-success'>Berhasil absen untuk hadir</span>",
                         'responseCode' => "00"
                     );
                     return $array_return;
@@ -828,7 +828,7 @@ class Peserta extends BaseController
                     $this->session->setFlashdata('error', 'Gagal update data peserta');
                     $array_return = array(
                         'statusMessage' => "failed",
-                        'message' => "Peserta Tidak Ditemukan",
+                        'message' => "<span class='badge badge-danger'>Peserta Tidak Ditemukan</span>",
                         'responseCode' => "01"
                     );
                     return $array_return;
@@ -836,7 +836,7 @@ class Peserta extends BaseController
             } else if ($statusKehadiran == 23) {
                 $array_return = array(
                     'statusMessage' => "success",
-                    'message' => "Peserta sudah hadir",
+                    'message' => "<span class='badge badge-success'>Peserta sudah hadir</span>",
                     'responseCode' => "10"
                 );
                 return $array_return;
@@ -846,7 +846,7 @@ class Peserta extends BaseController
                 $this->session->setFlashdata('error', 'Peserta belum melakukan pelunasan');
                 $array_return = array(
                     'statusMessage' => "failed",
-                    'message' => "Peserta belum melakukan pelunasan",
+                    'message' => "<span class='badge badge-warning'>Peserta belum melakukan pelunasan</span>",
                     'responseCode' => "02"
                 );
                 return $array_return;
@@ -855,7 +855,7 @@ class Peserta extends BaseController
             $this->session->setFlashdata('error', 'Peserta tidak ditemukan');
             $array_return = array(
                 'statusMessage' => "failed",
-                'message' => "Peserta tidak ditemukan",
+                'message' => "<span class='badge badge-danger'>Peserta tidak ditemukan</span>",
                 'responseCode' => "03"
             );
             return $array_return;
