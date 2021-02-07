@@ -53,7 +53,8 @@
                 <div id="qrcode"></div>
                 <p>Thanks,<br>QuickTest Info</p>
                 <img src="<?= $qr_image; ?>" alt="">
-                <a href="<?= $pdf_file; ?>" target="_blank" rel="noopener noreferrer">Invoice</a>
+                <br><br>
+                Klik <a href="<?= $pdf_file; ?>" target="_blank" rel="noopener noreferrer">Disini untuk Invoice</a>
             </div>
             <!-- /.mailbox-read-message -->
         </div>
