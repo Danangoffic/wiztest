@@ -56,4 +56,31 @@ class LayananTestModel extends Model
             ->countAll();
         return $query;
     }
+
+    public function get_by_key($key = null, $value = null)
+    {
+        if ($key == null) {
+            return null;
+        }
+        $builder = db_connect()->table('data_layanan_test');
+        if (is_array($key)) {
+            $builder->where($key);
+        } else {
+            if ($value == null) {
+                return null;
+            }
+            $builder->where($key, $value);
+        }
+        return $builder->get();
+    }
+
+    public function get_by_id_layanan($id_layanan = null)
+    {
+        if ($id_layanan == null) {
+            return null;
+        }
+
+        $builder = db_connect()->table('data_layanan_test')->where('id_layanan', $id_layanan)->get();
+        return $builder->getResultArray();
+    }
 }

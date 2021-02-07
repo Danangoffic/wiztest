@@ -59,8 +59,8 @@ $routes->get("/api/direct-print-barcode/(:any)", "backoffice\Layanan::direct_pri
 $routes->get("/api/detail-paket-pemeriksaan", "backoffice\Settings::detail_paket_pemeriksaan");
 $routes->post("/api/home-service", "backoffice\Home_service::save");
 $routes->post("/api/kirim_hasil", "backoffice\layanan::kirim_hasil");
-$routes->get("/api/antrian", "backoffice\Antrian::get_data_antrian");
-$routes->get("/api/on_call", "backoffice\Antrian::get_data_on_call");
+$routes->get("/api/antrian", "Antrian::get_data_antrian");
+$routes->get("/api/on_call", "Antrian::get_data_on_call");
 
 $routes->get("/api/print_invoice/no-ttd/(:any)", "backoffice\Finance::print_invoice/no-ttd/$2");
 
@@ -193,7 +193,8 @@ $routes->add('/marketing/(:segment)', 'backoffice\Marketing::$1');
 $routes->add('/marketing/(:segment)/(:num)', 'backoffice\Marketing::$1/$2');
 $routes->get("/backoffice/laporan/hasil", "backoffice\Laboratorium::hasil");
 
-$routes->get("/led/(:num)", "Antrian::$1");
+$routes->get("led/", "Antrian::bilik");
+$routes->get("led/(:num)", "Antrian::bilik/$1");
 
 $routes->get("/api/wa", "backoffice\Whatsapp_service::coba_wa");
 $routes->post("/api/save-hs", "Customer::home_service_registration");
