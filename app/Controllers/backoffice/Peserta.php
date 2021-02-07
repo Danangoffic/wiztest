@@ -780,27 +780,40 @@ class Peserta extends BaseController
                 $this->session->setFlashdata("error", $responseMessage);
                 break;
         }
+        $customerDetail = $this->customerModel->detail_customer($id_peserta);
+        $nama_customer = $customerDetail['nama'];
+        $order_id = $customerDetail['customer_unique'];
+        $invoice_number = $customerDetail['invoice_number'];
+        $bilik = $customerDetail['bilik'];
+        $no_antrian = $customerDetail['no_antrian'];
         if ($responseCode == "00" || $responseCode == "10") {
-
-            $customerDetail = $this->customerModel->find($id_peserta);
-            $nama_customer = $customerDetail['nama'];
-            $order_id = $customerDetail['customer_unique'];
             $message = "Tanggal: " . date_format($customerDetail['tgl_kunjungan'], 'd-m-Y') . ", pukul " . date_format($customerDetail['jam_kunjungan'], 'H:i');
         } else {
+            $message = $responseMessage;
         }
-        if ($update_peserta_by_qr == "hadir") {
-        } else {
-            $message = $update_peserta_by_qr;
-        }
-        return view("customer/kehadiran", $update_peserta_by_qr);
+
+        $data = [
+            'title' => "Kehadiran Peserta",
+            'response' => $update_peserta_by_qr,
+            'page' => "peserta",
+            'nama' => $nama_customer,
+            'order_id' => $order_id,
+            'message' => $message,
+            'invoice_number' => $invoice_number,
+            'bilik' => $bilik,
+            'no_antrian' => $no_antrian
+        ];
+        return view("customer/kehadiran", $data);
     }
 
-    protected function updated_by_qr($id_peserta)
+    protected function updated_by_qr($id_peserta): array
     {
-        $customerDetail = $this->customerModel->find($id_peserta);
-        if ($customerDetail != null) {
+        $customerDetail = $this->customerModel->detail_customer($id_peserta);
+        $pembayaran_detail = $this->pembayaran_model->pembayaran_by_customer($id_peserta);
+        if ($customerDetail != null && $pembayaran_detail != null) {
+
             $statusKehadiran = intval($customerDetail['kehadiran']);
-            $statusPembayaran = lcfirst($customerDetail['status_pembayaran']);
+            $statusPembayaran = lcfirst($pembayaran_detail['status_pembayaran']);
             if ($statusKehadiran == 20 && ($statusPembayaran == 'settlement' || $statusPembayaran == 'invoice' || $statusPembayaran == "lunas")) {
                 $dataCustomer = array(
                     'kehadiran' => 21
