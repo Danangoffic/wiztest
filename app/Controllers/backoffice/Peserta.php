@@ -786,11 +786,7 @@ class Peserta extends BaseController
         $invoice_number = $customerDetail['invoice_number'];
         $bilik = $customerDetail['nomor_bilik'];
         $no_antrian = $customerDetail['no_antrian'];
-        if ($responseCode == "00" || $responseCode == "10") {
-            $message = "Tanggal: " . date_format($customerDetail['tgl_kunjungan'], 'd-m-Y') . ", pukul " . date_format($customerDetail['jam_kunjungan'], 'H:i');
-        } else {
-            $message = $responseMessage;
-        }
+        // $message = $responseMessage;
 
         $data = [
             'title' => "Kehadiran Peserta",
@@ -798,7 +794,7 @@ class Peserta extends BaseController
             'page' => "peserta",
             'nama' => $nama_customer,
             'order_id' => $order_id,
-            'message' => $message,
+            'message' => $responseMessage,
             'invoice_number' => $invoice_number,
             'bilik' => $bilik,
             'no_antrian' => $no_antrian
@@ -814,9 +810,9 @@ class Peserta extends BaseController
 
             $statusKehadiran = intval($customerDetail['kehadiran']);
             $statusPembayaran = lcfirst($pembayaran_detail['status_pembayaran']);
-            if ($statusKehadiran == 20 && ($statusPembayaran == 'settlement' || $statusPembayaran == 'invoice' || $statusPembayaran == "lunas")) {
+            if ($statusKehadiran == 22 && ($statusPembayaran == 'settlement' || $statusPembayaran == 'invoice' || $statusPembayaran == "lunas")) {
                 $dataCustomer = array(
-                    'kehadiran' => 21
+                    'kehadiran' => 23
                 );
                 $updateCustomer = $this->customerModel->update($id_peserta, $dataCustomer);
                 $insertDataHadir = array('id_customer' => $id_peserta);
@@ -837,16 +833,16 @@ class Peserta extends BaseController
                     );
                     return $array_return;
                 }
-            } else if ($statusKehadiran == 21) {
+            } else if ($statusKehadiran == 23) {
                 $array_return = array(
                     'statusMessage' => "success",
-                    'message' => "sudah hadir",
+                    'message' => "Peserta sudah hadir",
                     'responseCode' => "10"
                 );
                 return $array_return;
 
                 // return false;
-            } else {
+            } elseif ($statusPembayaran == "pending" || $statusPembayaran == "belum lunas") {
                 $this->session->setFlashdata('error', 'Peserta belum melakukan pelunasan');
                 $array_return = array(
                     'statusMessage' => "failed",

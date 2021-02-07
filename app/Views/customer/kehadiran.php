@@ -29,6 +29,7 @@
             </div>
             <div class="row" id="menus">
                 <div class="col-md-6">
+                    Peserta dengan nama <?= $nama; ?> dan nomor registrasi <?= $order_id; ?>
                     <?= $message; ?>
                     <br><br>
                     <h5>Silahkan menunggu pada bilik <strong><?= $bilik; ?></strong> dengan antrian <strong><?= $no_antrian; ?></strong></h5>
