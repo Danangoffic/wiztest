@@ -93,19 +93,7 @@ class Midtrans_handlers extends ResourceController
                 $id_customer = $customer_check['id'];
 
                 // send email and whatsapp first then update //
-                if ($transaction == "settlement" || $transaction == "capture") {
-                    try {
-                        $this->sendEmailCustomer($order_id, $notification_receiver);
-                    } catch (\Throwable $th) {
-                        return $this->respond(['status_message' => "Failed to send email . " . $th->getMessage()], 400, "failed");
-                    }
 
-                    try {
-                        $this->send_whatsapp($id_customer);
-                    } catch (\Throwable $th) {
-                        return $this->respond(['status_message' => "Failed to send whatsapp . " . $th->getMessage()], 400, "failed");
-                    }
-                }
 
                 $id_layanan_test = $customer_check['jenis_test'];
                 $payemnt_check = $this->PembayaranModel->pembayaran_by_customer($id_customer);
@@ -151,6 +139,21 @@ class Midtrans_handlers extends ResourceController
                             'fraud' => $fraud,
                             'midtrans_response' => (array) $notification_receiver
                         );
+                        if ($transaction == "settlement" || $transaction == "capture") {
+                            $this->sendEmailCustomer($order_id, $notification_receiver);
+                            $this->send_whatsapp($id_customer);
+                            // try {
+
+                            // } catch (\Throwable $th) {
+                            //     return $this->respond(['status_message' => "Failed to send email . " . $th->getMessage()], 400, "failed");
+                            // }
+
+                            // try {
+
+                            // } catch (\Throwable $th) {
+                            //     return $this->respond(['status_message' => "Failed to send whatsapp . " . $th->getMessage()], 400, "failed");
+                            // }
+                        }
                     } else {
                         $responseStatus = $notification_receiver->status_message;
                         $responseMessage = "Failed update customer";
