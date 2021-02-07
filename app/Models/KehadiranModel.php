@@ -14,7 +14,7 @@ class KehadiranModel extends Model
 
     protected $allowedFields = [
         'id_customer',
-        'id_petugas',
+        'created_by',
     ];
 
     protected $useTimestamps = true;
