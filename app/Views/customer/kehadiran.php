@@ -29,11 +29,15 @@
             </div>
             <div class="row" id="menus">
                 <div class="col-md-6">
-                    Peserta dengan nama <?= $nama; ?> dan nomor registrasi <?= $order_id; ?>
+                    <?php if ($status == "success") : ?>
+                        Peserta dengan nama <?= $nama; ?> dan nomor registrasi <?= $order_id; ?>
+                    <?php endif; ?>
                     <?= $message; ?>
                     <br><br>
-                    <h5>Silahkan menunggu pada bilik <strong class="badge badge-info"><?= $bilik; ?></strong>
-                        dengan antrian <strong class="badge badge-primary"><?= $no_antrian; ?></strong></h5>
+                    <?php if ($status == "success") : ?>
+                        <h5>Silahkan menunggu pada bilik <strong class="badge badge-info"><?= $bilik; ?></strong>
+                            dengan antrian <strong class="badge badge-primary"><?= $no_antrian; ?></strong></h5>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

@@ -760,6 +760,7 @@ class Peserta extends BaseController
         $update_peserta_by_qr = $this->updated_by_qr($id_peserta);
         $responseCode = $update_peserta_by_qr['responseCode'];
         $responseMessage = $update_peserta_by_qr['message'];
+        $statusMessage = $update_peserta_by_qr['statusMessage'];
         switch ($responseCode) {
             case '00':
                 $this->session->setFlashdata("success", $responseMessage);
@@ -788,7 +789,8 @@ class Peserta extends BaseController
             'message' => $responseMessage,
             'invoice_number' => $invoice_number,
             'bilik' => $bilik,
-            'no_antrian' => $no_antrian
+            'no_antrian' => $no_antrian,
+            'status' => $statusMessage
         ];
         return view("customer/kehadiran", $data);
     }
