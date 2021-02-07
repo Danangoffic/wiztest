@@ -180,6 +180,15 @@ class CustomerModel extends Model
         $builder = db_connect()->table('customers')->where('customer_unique', $customer_unique)->get(1);
         return $builder->getRowArray();
     }
+
+    public function detail_customer($id_customer = null)
+    {
+        if ($id_customer == null) {
+            return null;
+        }
+        $builder = db_connect()->table('customers')->where('id', $id_customer)->limit(1);
+        return $builder->get()->getRowArray();
+    }
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at';
