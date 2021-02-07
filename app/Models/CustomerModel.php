@@ -78,14 +78,16 @@ class CustomerModel extends Model
 
     public function getCustomerAvailableByDate($jenis_test, $jenis_pemeriksaan, $jenis_layanan, $faskes_asal = '1', $tgl_kunjungan)
     {
-        $query = $this->where([
-            'jenis_test' => $jenis_test,
-            'jenis_pemeriksaan' => $jenis_pemeriksaan,
-            'jenis_layanan' => $jenis_layanan,
-            'faskes_asal' => $faskes_asal,
-            'tgl_kunjungan' => $tgl_kunjungan,
-            'kehadiran' => '0'
-        ])->orderBy('id', 'DESC')->limit(1);
+        $query = db_connect()
+            ->table('customers')
+            ->where([
+                'jenis_test' => $jenis_test,
+                'jenis_pemeriksaan' => $jenis_pemeriksaan,
+                'jenis_layanan' => $jenis_layanan,
+                'faskes_asal' => $faskes_asal,
+                'tgl_kunjungan' => $tgl_kunjungan,
+                'kehadiran' => '0'
+            ])->orderBy('id', 'DESC')->limit(1);
         return $query->get();
     }
 
