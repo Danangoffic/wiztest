@@ -784,7 +784,7 @@ class Peserta extends BaseController
         $nama_customer = $customerDetail['nama'];
         $order_id = $customerDetail['customer_unique'];
         $invoice_number = $customerDetail['invoice_number'];
-        $bilik = $customerDetail['bilik'];
+        $bilik = $customerDetail['nomor_bilik'];
         $no_antrian = $customerDetail['no_antrian'];
         if ($responseCode == "00" || $responseCode == "10") {
             $message = "Tanggal: " . date_format($customerDetail['tgl_kunjungan'], 'd-m-Y') . ", pukul " . date_format($customerDetail['jam_kunjungan'], 'H:i');
