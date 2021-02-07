@@ -1,6 +1,6 @@
 <?= $this->extend('template/layout'); ?>
 <?= $this->section('content'); ?>
-<div class="container-fluid">
+<div class="container">
     <div class="row mt-5">
         <div class="col-lg-3">&nbsp;</div>
         <div class="col-lg-9">
