@@ -58,7 +58,7 @@ class Midtrans_handlers extends ResourceController
 
             $responseMessage = "";
             $responseStatus = "success";
-            $customer_check = $this->CustomerModel->where(['customer_unique' => $order_id])->get()->getRowArray();
+            $customer_check = $this->CustomerModel->get_by_customer_unique($order_id);
             // return $customer_check;
             // if ($transaction == 'capture') {
             //     // For credit card transaction, we need to check whether transaction is challenge by FDS or not
@@ -108,7 +108,7 @@ class Midtrans_handlers extends ResourceController
                 }
 
                 $id_layanan_test = $customer_check['jenis_test'];
-                $payemnt_check = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
+                $payemnt_check = $this->PembayaranModel->pembayaran_by_customer($id_customer);
 
                 $tgl_kunjungan = $customer_check['tgl_kunjungan'];
                 $jam_kunjungan = $customer_check['jam_kunjungan'];
@@ -149,7 +149,7 @@ class Midtrans_handlers extends ResourceController
                             'detailPaymentCustomer' => $payemnt_check,
                             'statusCode' => $status_code,
                             'fraud' => $fraud,
-                            'midtrans_response' => $notification_receiver
+                            'midtrans_response' => (array) $notification_receiver
                         );
                     } else {
                         $responseStatus = $notification_receiver->status_message;
@@ -233,10 +233,11 @@ class Midtrans_handlers extends ResourceController
 
         $responseMessage = "";
         $responseStatus = "success";
-        $customer_check = $this->CustomerModel->where(['customer_unique' => $order_id])->first();
+        $customer_check = $this->CustomerModel->get_by_customer_unique($order_id);
         // return $customer_check;
         if ($customer_check) {
-            $payemnt_check = $this->PembayaranModel->where(['id_customer' => $customer_check['id']]);
+            $id_customer = $customer_check['id'];
+            $payemnt_check = $this->PembayaranModel->pembayaran_by_customer($id_customer);
             if ($payemnt_check) {
                 $arrayCustomerUpdate = array(
                     'status_pembayaran' => $transaction
@@ -274,48 +275,6 @@ class Midtrans_handlers extends ResourceController
     }
 
     /**
-     * store response message from midtrans report
-     * @return string responseMessage from midtrans status
-     */
-    public function midtrans_report(): string
-    {
-        $responseMessage = "";
-        $notif = $this->notif;
-        $transaction = $notif->transaction_status;
-        $type = $notif->payment_type;
-        $order_id = $notif->order_id;
-        $fraud = $notif->fraud_status;
-        if ($transaction == 'capture') {
-            // For credit card transaction, we need to check whether transaction is challenge by FDS or not
-            if ($type == 'credit_card') {
-                if ($fraud == 'challenge') {
-                    // TODO set payment status in merchant's database to 'Challenge by FDS'
-                    // TODO merchant should decide whether this transaction is authorized or not in MAP
-                    // echo "Transaction order_id: " . $order_id . " is challenged by FDS";
-                    $responseMessage = "Transaction order_id: " . $order_id . " is challenged by FDS";
-                } else {
-                    // TODO set payment status in merchant's database to 'Success'
-                    echo "Transaction order_id: " . $order_id . " successfully captured using " . $type;
-                    $responseMessage = "Transaction order_id: " . $order_id . " successfully captured using " . $type;
-                }
-            }
-        } else if ($transaction == 'settlement') {
-            // TODO set payment status in merchant's database to 'Settlement'
-            // echo "Transaction order_id: " . $order_id . " successfully transfered using " . $type;
-            $responseMessage = "Transaction order_id: " . $order_id . " successfully transfered using " . $type;
-        } else if ($transaction == 'pending') {
-            // TODO set payment status in merchant's database to 'Pending'
-            // echo "Waiting customer to finish transaction order_id: " . $order_id . " using " . $type;
-            $responseMessage = "Waiting customer to finish transaction order_id: " . $order_id . " using " . $type;
-        } else if ($transaction == 'deny') {
-            // TODO set payment status in merchant's database to 'Denied'
-            // echo "Payment using " . $type . " for transaction order_id: " . $order_id . " is denied.";
-            $responseMessage = "Payment using " . $type . " for transaction order_id: " . $order_id . " is denied.";
-        }
-        return $responseMessage;
-    }
-
-    /**
      * Send email to customer user 
      * 
      */
@@ -329,13 +288,13 @@ class Midtrans_handlers extends ResourceController
 
         // $Email->initialize($config);
 
-        $CustomerDetail = $this->CustomerModel->where(['customer_unique' => $order_id])->first();
+        $CustomerDetail = $this->CustomerModel->get_by_customer_unique($order_id);
         $emailCustomer = $CustomerDetail['email'];
         $id_customer = $CustomerDetail['id'];
         $nama_customer = $CustomerDetail['nama'];
         $invoice_number = $CustomerDetail['invoice_number'];
 
-        $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
+        $PaymentDetail = $this->PembayaranModel->pembayaran_by_customer($id_customer);
         $qr_image = $Layanan->getUrlQRCode(base_url('api/hadir/' . $id_customer));
 
         // $img = file_get_contents($attachment);
@@ -443,5 +402,47 @@ class Midtrans_handlers extends ResourceController
             $data = $Email->printDebugger(['headers']);
             print_r($data);
         }
+    }
+
+    /**
+     * store response message from midtrans report
+     * @return string responseMessage from midtrans status
+     */
+    public function midtrans_report(): string
+    {
+        $responseMessage = "";
+        $notif = $this->notif;
+        $transaction = $notif->transaction_status;
+        $type = $notif->payment_type;
+        $order_id = $notif->order_id;
+        $fraud = $notif->fraud_status;
+        if ($transaction == 'capture') {
+            // For credit card transaction, we need to check whether transaction is challenge by FDS or not
+            if ($type == 'credit_card') {
+                if ($fraud == 'challenge') {
+                    // TODO set payment status in merchant's database to 'Challenge by FDS'
+                    // TODO merchant should decide whether this transaction is authorized or not in MAP
+                    // echo "Transaction order_id: " . $order_id . " is challenged by FDS";
+                    $responseMessage = "Transaction order_id: " . $order_id . " is challenged by FDS";
+                } else {
+                    // TODO set payment status in merchant's database to 'Success'
+                    echo "Transaction order_id: " . $order_id . " successfully captured using " . $type;
+                    $responseMessage = "Transaction order_id: " . $order_id . " successfully captured using " . $type;
+                }
+            }
+        } else if ($transaction == 'settlement') {
+            // TODO set payment status in merchant's database to 'Settlement'
+            // echo "Transaction order_id: " . $order_id . " successfully transfered using " . $type;
+            $responseMessage = "Transaction order_id: " . $order_id . " successfully transfered using " . $type;
+        } else if ($transaction == 'pending') {
+            // TODO set payment status in merchant's database to 'Pending'
+            // echo "Waiting customer to finish transaction order_id: " . $order_id . " using " . $type;
+            $responseMessage = "Waiting customer to finish transaction order_id: " . $order_id . " using " . $type;
+        } else if ($transaction == 'deny') {
+            // TODO set payment status in merchant's database to 'Denied'
+            // echo "Payment using " . $type . " for transaction order_id: " . $order_id . " is denied.";
+            $responseMessage = "Payment using " . $type . " for transaction order_id: " . $order_id . " is denied.";
+        }
+        return $responseMessage;
     }
 }

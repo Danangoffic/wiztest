@@ -171,6 +171,15 @@ class CustomerModel extends Model
     {
         return db_connect()->table('customers')->where('invoice_number', $invoice_number)->get(1)->getRowArray();
     }
+
+    public function get_by_customer_unique($customer_unique = null)
+    {
+        if ($customer_unique == null) {
+            return null;
+        }
+        $builder = db_connect()->table('customers')->where('customer_unique', $customer_unique)->get(1);
+        return $builder->getRowArray();
+    }
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at';

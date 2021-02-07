@@ -102,7 +102,7 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
 
-        $data_walkin = $this->layananTestModel->where(['id_pemeriksaan' => "1"])->get()->getResultArray();
+        $data_walkin = $this->layananTestModel->get_by_key('id_pemeriksaan', "1")->getResultArray();
 
         $ids_test = array();
         foreach ($data_walkin as $key => $lt) {
@@ -164,7 +164,7 @@ class Peserta extends BaseController
         $dataMarketing = $this->marketingModel->findAll();
 
         $kondisi_layanan_test = ['id_segmen' => "1", 'id_pemeriksaan' => "1"];
-        $dataLayananTest = $this->layananTestModel->where($kondisi_layanan_test)->get()->getResultArray();
+        $dataLayananTest = $this->layananTestModel->get_by_key($kondisi_layanan_test)->getResultArray();
         $data = array(
             'title' => "Form Registrasi Peserta Baru",
             'page' => "registrasi",
@@ -230,18 +230,21 @@ class Peserta extends BaseController
         $pemeriksa =  $this->request->getPost('nama_pemeriksa');
         // var_dump($this->request->getPost());
         // exit();
-        $customer_UNIQUE = $this->customerPublic->getOrderId($id_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
+
         // echo db_connect()->showLastQuery();
         // exit();
         // dd($customer_UNIQUE);
+        // $Layanan = new Layanan();
+        // $dataLayanan = $this->layananModel->find($jenis_layanan);
+        // $dataTest = $this->testModel->find($id_test);
         try {
-            $Layanan = new Layanan();
-            $dataLayanan = $this->layananModel->find($jenis_layanan);
-            $dataTest = $this->testModel->find($id_test);
-            $data_layanan_test = $this->layananTestModel->where(['id_layanan' => $id_layanan, 'id_test' => $id_test, 'id_pemeriksaan' => $id_pemeriksaan])->first();
+            $customer_UNIQUE = $this->customerPublic->getOrderId($id_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
+            $no_urutan = $this->customerPublic->getUrutan($id_test, $tgl_kunjungan, $id_pemeriksaan, $id_layanan);
+
+            $data_layanan_test = $this->layananTestModel->get_by_key(['id_layanan' => $id_layanan, 'id_test' => $id_test, 'id_pemeriksaan' => $id_pemeriksaan])->getRowArray();
             $id_jenis_test_customer = $data_layanan_test['id'];
             $amount_test = intval($data_layanan_test['biaya']);
-            $no_urutan = $this->customerPublic->getUrutan($id_test, $tgl_kunjungan, $id_pemeriksaan, $id_layanan);
+
             // echo "Urutan : " . $no_urutan;
 
             // var_dump($data);
@@ -351,7 +354,7 @@ class Peserta extends BaseController
         $paymentType = null;
         $bank = null;
 
-        $detail_pembayaran = $this->pembayaran_model->where(['id_customer' => $id])->get()->getRowArray();
+        $detail_pembayaran = $this->pembayaran_model->pembayaran_by_customer($id);
         // dd($detail_pembayaran);
         $tipe_pembayaran = $detail_pembayaran['tipe_pembayaran'];
         if ($tipe_pembayaran == "midtrans") {
@@ -494,7 +497,7 @@ class Peserta extends BaseController
         $dataFaskes = $this->faskesModel->findAll();
         $dataInstanasi = $this->instansiModel->findAll();
         $dataMarketing = $this->marketingModel->findAll();
-        $dataLayananTest = $this->layananTestModel->where(['id_pemeriksaan' => "1", 'id_segmen' => "1"])->get()->getResultArray();
+        $dataLayananTest = $this->layananTestModel->get_by_key(['id_pemeriksaan' => "1", 'id_segmen' => "1"])->getResultArray();
         $data = array(
             'title' => "Ubah Customer",
             'page' => "registrasi",

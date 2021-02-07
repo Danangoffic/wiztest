@@ -37,24 +37,24 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h2 style="vertical-align: middle; margin-top: 0.5em; margin-left: 2em;">Jam Operasional</h2>
+                            <h2 style="vertical-align: middle;" class="text-center my-5">Jam Operasional</h2>
                         </div>
                         <div class="col-md-6">
                             <table class="table">
                                 <tr>
-                                    <td>
+                                    <td class="align-middle">
                                         <h5>Week days</h5>
                                     </td>
-                                    <td>
+                                    <td class="align-middle">
                                         <h5>(07.00-22.00)</h5><br>
                                         <small>Tidak termasuk libur nasional</small>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
+                                    <td class="align-middle">
                                         <h5>Week end</h5>
                                     </td>
-                                    <td>
+                                    <td class="align-middle">
                                         <h5>(07.00 - 22.00)</h5>
                                     </td>
                                 </tr>
@@ -332,14 +332,14 @@
             `;
                 menus += title_menu;
                 $.each(e, (i, v) => {
-                    menus += `<div class="col-lg-4 my-3">
+                    menus += `<div class="col-lg-4 my-5">
                     <div class="card" onclick="modalRegistrasi(${v.id_jenis_test})">
                         <div class="card-body">
                             <img src="<?= base_url('assets'); ?>/${v.img_url}" class="card-img-top" alt="${v.keterangan}">
                             <h5 class="card-title text-center" style="margin-top: 1.25em">${v.keterangan}</h5>
                         </div>
                         <div class="card-footer">
-                            <a href="#" class="btn btn-danger btn-block">CHECK OUT</a>
+                            <a href="#" class="btn btn-outline-danger btn-block"><strong>CHECK OUT</strong></a>
                         </div>
                     </div>
                 </div>`;
