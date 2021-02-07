@@ -806,7 +806,8 @@ class Peserta extends BaseController
             if ($today != $tgl_kunjungan) {
                 $array_return = array(
                     'statusMessage' => "failed",
-                    'message' => "<span class='badge badge-danger'>Gagal absen untuk hadir karena tidak sesuai tanggal kunjungan</span>",
+                    'message' => "<h4 class='badge badge-danger'>Gagal absen untuk hadir karena tidak sesuai tanggal kunjungan. 
+                    Silahkan melakukan validasi absensi kehadiran pada klinik pada tanggal: {$tgl_kunjungan}</h4>",
                     'responseCode' => "01"
                 );
                 return $array_return;
