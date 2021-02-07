@@ -343,7 +343,7 @@ class Midtrans_handlers extends ResourceController
         // write_file("assets/qr_code/" . $file_img, $img);
         // $img_QR_att =
         // $attachment_name = $file_img;
-        $pdf_file = base_url('api/print_invoice/no-ttd/' . $invoice_number . "?attachment=0");
+        $pdf_file = base_url('api/print_invoice/no-ttd/' . $invoice_number . "?attachment=1");
         $data_email = array(
             'detail_pembayaran' => $PaymentDetail,
             'detail_customer' => $CustomerDetail,
