@@ -757,18 +757,6 @@ class Peserta extends BaseController
 
     public function kehadiran_by_scanning_qr($id_peserta)
     {
-        // if (!$this->session->has("logged_in")) {
-        //     $this->session->setFlashData("error", "Anda harus login");
-        //     return redirect()->to("/backoffice/login");
-        // }
-        // $user_level = intval($this->session->get("user_level"));
-        // if ($user_level == 1 || $user_level == 100 || $user_level == 4) {
-        // } else {
-        //     $this->session->setFlashData("error", "Anda tidak memiliki akses");
-        //     return redirect()->to("/backoffice/login");
-        // }
-
-
         $update_peserta_by_qr = $this->updated_by_qr($id_peserta);
         $responseCode = $update_peserta_by_qr['responseCode'];
         $responseMessage = $update_peserta_by_qr['message'];
@@ -807,11 +795,20 @@ class Peserta extends BaseController
 
     protected function updated_by_qr($id_peserta): array
     {
-
+        $today = date("Y-m-d");
         $customerDetail = $this->customerModel->detail_customer($id_peserta);
         $pembayaran_detail = $this->pembayaran_model->pembayaran_by_customer($id_peserta);
         if ($customerDetail != null && $pembayaran_detail != null) {
+            $tgl_kunjungan = $customerDetail['tgl_kunjungan'];
 
+            if ($today != $tgl_kunjungan) {
+                $array_return = array(
+                    'statusMessage' => "failed",
+                    'message' => "<span class='badge badge-danger'>Gagal absen untuk hadir karena tidak sesuai tanggal kunjungan</span>",
+                    'responseCode' => "01"
+                );
+                return $array_return;
+            }
             $statusKehadiran = intval($customerDetail['kehadiran']);
             $statusPembayaran = lcfirst($pembayaran_detail['status_pembayaran']);
             if ($statusKehadiran == 22 && ($statusPembayaran == 'settlement' || $statusPembayaran == 'invoice' || $statusPembayaran == "lunas")) {
