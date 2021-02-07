@@ -130,17 +130,17 @@ class Customer extends ResourceController
         $jam_kunjungan = $dataJamKunjungan['jam'];
         // var_dump($this->request->getPost());
         // exit();
-        $customer_UNIQUE = $this->getOrderId($jenis_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
-        // echo db_connect()->showLastQuery();
-        // exit();
-        // dd($customer_UNIQUE);
         try {
+            $customer_UNIQUE = $this->getOrderId($jenis_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
+            $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
+            // echo db_connect()->showLastQuery();
+            // exit();
+            // dd($customer_UNIQUE);
+
             $Layanan = new Layanan();
             $dataMarketing = $this->marketing_model->find($marketing);
             $dataLayanan = $this->layananModel->find($jenis_layanan);
 
-
-            $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
             if ($jenis_test == 2 || $jenis_test == "2") {
                 $nomor_bilik = 1;
             } else if ($jenis_test == 3 || $jenis_test == "3") {
@@ -268,7 +268,7 @@ class Customer extends ResourceController
         $awal = $awal . $rand_number . date('d') . substr($jam_kunjungan, 0, 2);
         $urutan = $this->getUrutan($type_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
 
-        $ID = str_pad($urutan, 3, '0', STR_PAD_LEFT);
+        $ID = str_pad($urutan, 4, '0', STR_PAD_LEFT);
         $NEWID = $awal . $ID;
         return $NEWID;
     }
@@ -294,7 +294,7 @@ class Customer extends ResourceController
         // echo $data['no_antrian'];
         // exit();
         $word1 = 'INV-';
-        $date = date('ymd');
+        $random = rand(1000, 9999);
         if (!is_array($id_customer)) {
             $urutan = $data['no_antrian'];
         } else {
@@ -304,7 +304,7 @@ class Customer extends ResourceController
         $generateUrutan = str_pad($urutan, 3, '0', STR_PAD_LEFT);
         // echo $date;
         // exit();
-        $invoice = $word1 . $date . $generateUrutan;
+        $invoice = $word1 . $random . $generateUrutan;
         // echo $invoice;
         // exit();
         return $invoice;

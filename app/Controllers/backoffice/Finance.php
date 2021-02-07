@@ -143,12 +143,13 @@ class Finance extends BaseController
         // if (!$this->session->get('logged_in') || !$this->session->get('id_user')) {
         //     return redirect()->to('/backoffice/login');
         // }
+        $attachment = ($this->request->getGet("attachment")) ? $this->request->getGet("attachment") : 1;
         switch ($type_invoice) {
             case 'ttd':
-                return $this->pdf_customer_ttd($invoice_number);
+                return $this->pdf_customer_ttd($invoice_number, $attachment);
                 break;
             case 'no-ttd':
-                return $this->pdf_customer($invoice_number);
+                return $this->pdf_customer($invoice_number, $attachment);
                 break;
             default:
                 # code...
@@ -172,9 +173,17 @@ class Finance extends BaseController
         $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 0]);
     }
 
-    public function pdf_customer($invoice_number)
+    public function pdf_customer($invoice_number = null, $attachment = 1)
     {
-        $customer = $this->CustomerModel->where(['invoice_number' => $invoice_number])->get()->getRowArray();
+        if ($invoice_number == null) {
+            echo "Invoice number kosong";
+            return false;
+        }
+        $customer = $this->CustomerModel->get_customer_by_invoice($invoice_number);
+        if ($customer == null) {
+            echo "Customer tidak ditemukan";
+            return false;
+        }
         $id_customer = $customer['id'];
         $data_pembayaran = $this->pembayaran_model->where(['id_customer' => $id_customer])->get()->getRowArray();
         $data_layanan_test = db_connect()->table('data_layanan_test')->where('id', $customer['jenis_test'])->limit(1)->get()->getRowArray();
@@ -184,8 +193,10 @@ class Finance extends BaseController
         $nama_layanan = $data_layanan['nama_layanan'];
 
         $nama_paket = $nama_test . " ({$nama_layanan})";
+        $nama = $customer['nama'];
+        $title = "Invoice {$nama} - {$invoice_number}";
         $data = [
-            'title' => "Invoice " . $customer['nama'] . " - " . $invoice_number,
+            'title' => $title,
             'page' => "invoice_customer",
             'customer' => $customer,
             'data_pembayaran' => $data_pembayaran,
@@ -197,17 +208,17 @@ class Finance extends BaseController
         $dompdf->render();
         // $dompdf->set
         // $dompdf->
-        $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 1]);
+        $dompdf->stream($title . ".pdf", ['Attachment' => $attachment]);
     }
 
-    public function pdf_customer_ttd($invoice_number = null)
+    public function pdf_customer_ttd($invoice_number = null, $attachment = 1)
     {
         if ($invoice_number == null) {
             return null;
         }
-        $customer = $this->CustomerModel->where(['invoice_number' => $invoice_number])->get()->getRowArray();
+        $customer = $this->CustomerModel->get_customer_by_invoice($invoice_number);
         if ($customer == null) {
-            return null;
+            echo "Customer tidak ditemukan";
         }
         $id_customer = $customer['id'];
         $data_pembayaran = $this->pembayaran_model->where(['id_customer' => $id_customer])->get()->getRowArray();
@@ -231,7 +242,7 @@ class Finance extends BaseController
         $dompdf->render();
         // $dompdf->set
         // $dompdf->
-        $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 1]);
+        $dompdf->stream($data['title'] . ".pdf", ['Attachment' => $attachment]);
     }
 
     /**

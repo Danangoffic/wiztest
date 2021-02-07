@@ -24,6 +24,8 @@ class Midtrans_handlers extends ResourceController
     protected $notif;
     protected $production_mode;
     protected $Midtrans_bo;
+    protected $pdf_file;
+    protected $qr_code;
     public function __construct()
     {
         // parent::__construct();
@@ -92,11 +94,16 @@ class Midtrans_handlers extends ResourceController
 
                 // send email and whatsapp first then update //
                 if ($transaction == "settlement" || $transaction == "capture") {
-                    if (!$this->sendEmailCustomer($order_id, $notification_receiver)) {
-                        return $this->respond(['status_message' => "Failed to send email"], 400, "failed");
+                    try {
+                        $this->sendEmailCustomer($order_id, $notification_receiver);
+                    } catch (\Throwable $th) {
+                        return $this->respond(['status_message' => "Failed to send email . " . $th->getMessage()], 400, "failed");
                     }
-                    if (!$this->send_whatsapp($id_customer)) {
-                        return $this->respond(['status_message' => "Failed to send whatsapp"], 400, "failed");
+
+                    try {
+                        $this->send_whatsapp($id_customer);
+                    } catch (\Throwable $th) {
+                        return $this->respond(['status_message' => "Failed to send whatsapp . " . $th->getMessage()], 400, "failed");
                     }
                 }
 
@@ -329,20 +336,20 @@ class Midtrans_handlers extends ResourceController
         $invoice_number = $CustomerDetail['invoice_number'];
 
         $PaymentDetail = $this->PembayaranModel->where(['id_customer' => $id_customer])->first();
-        $attachment = $Layanan->getUrlQRCode(base_url('api/hadir/' . $id_customer));
+        $qr_image = $Layanan->getUrlQRCode(base_url('api/hadir/' . $id_customer));
 
         // $img = file_get_contents($attachment);
         // $file_img = basename($img);
         // write_file("assets/qr_code/" . $file_img, $img);
         // $img_QR_att =
         // $attachment_name = $file_img;
-        $pdf_file = base_url('backoffice/finance/print_invoice/no_ttd/' . $invoice_number);
+        $pdf_file = base_url('api/print_invoice/no-ttd/' . $invoice_number . "?attachment=1");
         $data_email = array(
             'detail_pembayaran' => $PaymentDetail,
             'detail_customer' => $CustomerDetail,
             'notif' => $notif_modtrans,
             'title' => 'Informasi Pembayaran dan Pendaftaran',
-            'qr_image' => $attachment,
+            'qr_image' => $qr_image,
             'pdf_file' => $pdf_file
         );
 
@@ -354,10 +361,10 @@ class Midtrans_handlers extends ResourceController
         $Email->setFrom('pendaftaran@quicktest.id', 'Pendaftaran QuickTest.id');
         $Email->setSubject("Informasi Pembayaran dan Pendaftaran Quictest.id");
         $Email->setMessage($emailMessage);
-        $Email->attach($attachment, 'attachment', "qr_code_quictest.png", "image/png");
+        $Email->attach($qr_image, 'inline', "qr_code_quictest.png", "image/png");
         $Email->attach(
-            base_url('api/print_invoice/no-ttd/' . $invoice_number),
-            'attachment',
+            $pdf_file,
+            'inline',
             "Invoice " . $CustomerDetail['nama'] . " - {$invoice_number}.pdf",
             "application/pdf"
         );
@@ -373,12 +380,8 @@ class Midtrans_handlers extends ResourceController
     {
         if ($id_customer != null) {
             $whatsapp_service = new Whatsapp_service;
-            if (!$whatsapp_service->send_whatsapp_QR($id_customer)) {
-                return false;
-            }
-            if (!$whatsapp_service->send_whatsapp_invoice($id_customer)) {
-                return false;
-            }
+            $whatsapp_service->send_whatsapp_QR($id_customer);
+            $whatsapp_service->send_whatsapp_invoice($id_customer);
         } else {
             return false;
         }

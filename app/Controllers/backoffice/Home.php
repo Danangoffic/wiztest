@@ -62,7 +62,8 @@ class Home extends BaseController
         $data = [
             'date1' => $date1,
             'date2' => $date2,
-            'session' => $this->session, 'title' => 'Dashboard',
+            'session' => $this->session,
+            'title' => 'Dashboard',
             'page' => 'dashboard', 'date_now' => $date_now,
             'jenis_layanan' => $JenisLayanan,
             'jenis_pemeriksaan' => $JenisPemeriksaan,

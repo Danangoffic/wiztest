@@ -78,14 +78,16 @@ class CustomerModel extends Model
 
     public function getCustomerAvailableByDate($jenis_test, $jenis_pemeriksaan, $jenis_layanan, $faskes_asal = '1', $tgl_kunjungan)
     {
-        $query = $this->where([
-            'jenis_test' => $jenis_test,
-            'jenis_pemeriksaan' => $jenis_pemeriksaan,
-            'jenis_layanan' => $jenis_layanan,
-            'faskes_asal' => $faskes_asal,
-            'tgl_kunjungan' => $tgl_kunjungan,
-            'kehadiran' => '0'
-        ])->orderBy('id', 'DESC')->limit(1);
+        $query = db_connect()
+            ->table('customers')
+            ->where([
+                'jenis_test' => $jenis_test,
+                'jenis_pemeriksaan' => $jenis_pemeriksaan,
+                'jenis_layanan' => $jenis_layanan,
+                'faskes_asal' => $faskes_asal,
+                'tgl_kunjungan' => $tgl_kunjungan,
+                'kehadiran' => '0'
+            ])->orderBy('id', 'DESC')->limit(1);
         return $query->get();
     }
 
@@ -163,6 +165,11 @@ class CustomerModel extends Model
         }
         $builder->orderBy('a.id', 'DESC');
         return $builder;
+    }
+
+    public function get_customer_by_invoice($invoice_number = null)
+    {
+        return db_connect()->table('customers')->where('invoice_number', $invoice_number)->get(1)->getRowArray();
     }
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
