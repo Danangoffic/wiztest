@@ -49,7 +49,7 @@
                                     // dd($data_bilik);
                                     foreach ($data_bilik as $key => $bilik_swabber) {
                                         $id_swabber = $bilik_swabber['assigned_to'];
-                                        $swabber = $detail_swabber->where(['id_user' => $id_swabber])->first();
+                                        $swabber = $detail_user->where(['id_user' => $id_swabber])->first();
                                         // dd(db_connect()->showLastQuery());
                                         $nama = $swabber['nama'];
                                         $nama = ucwords($nama);
@@ -96,7 +96,7 @@
                 <?php
                 if ($data_bilik != null) :
                     foreach ($data_bilik as $key => $bilik_swabber) {
-                        $swabber = $detail_swabber->find($bilik_swabber['assigned_to']);
+                        $swabber = $detail_user->find($bilik_swabber['assigned_to']);
                 ?>
                         <div class="col-md-6">
                             <div class="card card-primary">
@@ -155,6 +155,7 @@
 <script>
     $(document).ready(function() {
         load_detail_antrian();
+        setInterval(load_detail_antrian, 5000);
         $("table").DataTable({
             paging: false,
             ordering: false,
@@ -165,50 +166,52 @@
     });
 
     function load_detail_antrian() {
+        let api_get = "<?= base_url("api/get_antrian_swabber"); ?>";
         <?php
         if ($data_bilik != null) :
-            foreach ($data_bilik as $key => $bilik_swabber) {
-                $detail_swabber = $detail_swabber->find($bilik_swabber['assigned_to']);
+            foreach ($data_bilik as $key => $bilik) {
+                $id_swabber = $bilik['assigned_to'];
+                $detail_swabber = $detail_user->find($id_swabber);
         ?>
-                let api_get = "<?= base_url("api/get_antrian_swabber"); ?>";
-                let data = {
-                    nomor_bilik: '<?= $bilik_swabber['nomor_bilik']; ?>',
+
+                let data<?= $id_swabber ?> = {
+                    nomor_bilik: '<?= $bilik['nomor_bilik']; ?>',
                     requested_by: "<?= $session->get("id_user"); ?>"
                 }
                 $.ajax({
                     url: api_get,
                     type: "GET",
-                    data: data,
+                    data: data<?= $id_swabber ?>,
                     success: function(data, status, xhqr) {
                         let antrian_swabber = data.antrian_swabber,
                             booking_antrian = data.booking_antrian;
                         var html_antrian = "";
                         $.each(antrian_swabber, (k, v) => {
                             let str_jam = v.jam_kunjungan;
-                            let prefix_urutan = str_jam.substring(0, 2);
-                            let urutan = (v.urutan < 10) ? '00' + v.urutan : (v.urutan > 9 && v.urutan < 100) ? '0' + v.urutan : v.urutan;
-                            let new_urutan = prefix_urutan + "" + urutan;
-                            html_antrian += `<tr><td>${new_urutan}</td>
-                                    <td>${v.nama}</td>
-                                    <td>${v.customer_unique}</td>
-                                    <td>${prefix_urutan}</td></tr>`;
+                            // let prefix_urutan = str_jam.substring(0, 2);
+                            // let urutan = (v.urutan < 10) ? '00' + v.urutan : (v.urutan > 9 && v.urutan < 100) ? '0' + v.urutan : v.urutan;
+                            // let new_urutan = prefix_urutan + "" + v.no_urutan;
+                            html_antrian += `<tr><td>${v.no_antrian}</td>
+                            <td>${v.nama}</td>
+                            <td>${v.customer_unique}</td>
+                            <td><button type="button" onclick="return print_barcode_customer('${v.id}')" class="btn btn-primary">Barcode</button></td></tr>`;
                         });
                         var html_booking = "";
                         $.each(booking_antrian, (k, v) => {
                             let str_jam = v.jam_kunjungan;
                             let prefix_urutan = str_jam.substring(0, 2);
-                            let urutan = (v.urutan < 10) ? '00' + v.urutan : (v.urutan > 9 && v.urutan < 100) ? '0' + v.urutan : v.urutan;
-                            let new_urutan = prefix_urutan + "" + urutan;
-                            html_booking += `<tr><td>${new_urutan}</td>
-                                    <td>${v.nama}</td>
-                                    <td>${v.customer_unique}</td>
-                                    <td>${prefix_urutan} <button type="button" onclick="print_barcode_customer('${v.id}')" class="btn btn-primary">Barcode</button></td></tr>`;
+                            // let urutan = (v.urutan < 10) ? '00' + v.urutan : (v.urutan > 9 && v.urutan < 100) ? '0' + v.urutan : v.urutan;
+                            // let new_urutan = prefix_urutan + "" + v.no_urutan;
+                            html_booking += `<tr><td>${v.no_antrian}</td>
+                            <td>${v.nama}</td>
+                            <td>${v.customer_unique}</td>
+                            <td>${prefix_urutan}</td></tr>`;
                         });
-                        $("#antrian_bilik_" + data.nomor_bilik).html(html_antrian);
-                        $("#booking_bilik_" + data.nomor_bilik).html(html_booking);
-                        setTimeout(load_detail_antrian, 5000);
+                        $("#antrian_bilik_" + <?= $bilik['nomor_bilik']; ?>).html(html_antrian);
+                        $("#booking_bilik_" + <?= $bilik['nomor_bilik']; ?>).html(html_booking);
+
                     }
-                })
+                });
         <?php
             }
         endif;
@@ -216,14 +219,12 @@
     }
 
     function print_barcode_customer(id_customer) {
-        for (let index = 0; index < 3; index++) {
-            $.post('<?= base_url('backoffice/swabber/print_it'); ?>', {
-                id_customer
-            }, function(data) {
+        $.post('<?= base_url('backoffice/swabber/print_it'); ?>', {
+            id_customer
+        }, function(data) {
 
-            });
-        }
-        setTimeout(window.location.reload(), 2000);
+        });
+        // setTimeout(window.location.reload(), 2000);
     }
 </script>
 <?= $this->endSection(); ?>

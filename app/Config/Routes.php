@@ -63,10 +63,13 @@ $routes->get("/api/antrian", "Antrian::get_data_antrian");
 $routes->get("/api/on_call", "Antrian::get_data_on_call");
 
 $routes->get("/api/print_invoice/no-ttd/(:any)", "backoffice\Finance::print_invoice/no-ttd/$1");
+$routes->get("/resepsionis/bilik/(:num)", "backoffice\Frontoffice::manajemen_antrian/$1");
+$routes->get("/api/get-antrian-panggilan", "backoffice\Frontoffice::antrian_panggilan");
 
 $routes->get('detail_form2', 'Customer::detail_form2');
 
 $routes->get("/api/get-print-pdf-peserta/(:num)", "backoffice\Layanan::print_pdf/$1");
+$routes->get("/api/get_hasil_lab/(:num)", "\backoffice\Laboratorium::print_hasil/$1");
 
 
 // $routes->get('/backoffice/peserta/edit/(:num)', 'backoffice\Registrasi::edit_peserta/$1');
@@ -198,6 +201,7 @@ $routes->get("led/(:num)", "Antrian::bilik/$1");
 
 $routes->get("/api/wa", "backoffice\Whatsapp_service::coba_wa");
 $routes->post("/api/save-hs", "Customer::home_service_registration");
+$routes->get("swabber", "backoffice\Swabber::index");
 /**
  * --------------------------------------------------------------------
  * Additional Routing

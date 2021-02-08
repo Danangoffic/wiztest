@@ -31,7 +31,7 @@ class PembayaranModel extends Model
         if ($id_customer == null) {
             return null;
         }
-        $builder = db_connect()->table('data_pembayaran')->where('id_customer', $id_customer)->get(1);
+        $builder = db_connect()->table($this->table)->where('id_customer', $id_customer)->get(1);
         return $builder->getRowArray();
     }
 }

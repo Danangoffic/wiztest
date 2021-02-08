@@ -51,6 +51,7 @@ class Autoload extends AutoloadConfig
 			APP_NAMESPACE => APPPATH,                // For custom namespace
 			'Config'      => APPPATH . 'Config',
 			'Dompdf'      => APPPATH . 'ThirdParty/dompdf/src',
+			'Escpos'      => APPPATH . 'ThirdParty/Escpos'
 			// 'escpospos'	  => ROOTPATH . "vendor/autoload.php"
 		];
 

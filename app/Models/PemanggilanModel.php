@@ -17,13 +17,33 @@ class PemanggilanModel extends Model
         'id_layanan_test',
         'status_pemanggilan',
         'tgl_kunjungan',
-        'jam_kunjungan'
+        'jam_kunjungan',
+        'bilik',
+        'antrian'
     ];
 
     protected $useTimestamps = true;
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at';
+
+    public function get_by_customer($id_customer = null)
+    {
+        $builder = db_connect()->table($this->table)->where('id_customer', $id_customer);
+        return $builder->get();
+    }
+
+    public function belum_dipanggil()
+    {
+        $builder = db_connect()->table($this->table)->where('status_pemanggilan', "11")->orderBy('antrian', 'ASC');
+        return $builder->get(1);
+    }
+
+    public function by_nomor_bilik($nomor_bilik = 1)
+    {
+        $builder = db_connect()->table($this->table)->where('nomor_bilik', $nomor_bilik)->orderBy('antrian', 'ASC');
+        return $builder;
+    }
 
     public function get_nomor_antrian_bilik($nomor_bilik = 1)
     {
