@@ -43,12 +43,6 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label class="col-md-4" for="file_name">Group / Name</label>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" id="file_name" name="file_name" required autocomplete="off" placeholder="Nama Import">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
                                     <label class="col-md-4" for="excel">File Excel</label>
                                     <div class="col-md-8">
                                         <input type="file" class="btn btn-default form-control" name="excel" id="excel" required accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">

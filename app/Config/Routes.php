@@ -202,6 +202,8 @@ $routes->get("led/(:num)", "Antrian::bilik/$1");
 $routes->get("/api/wa", "backoffice\Whatsapp_service::coba_wa");
 $routes->post("/api/save-hs", "Customer::home_service_registration");
 $routes->get("swabber", "backoffice\Swabber::index");
+
+$routes->get("/backoffice/reporting/(:segment)", "backoffice\Reporting::$1");
 /**
  * --------------------------------------------------------------------
  * Additional Routing

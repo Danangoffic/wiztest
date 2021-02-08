@@ -219,23 +219,23 @@ class Laboratorium extends ResourceController
                     //ambil sheet active
                     $sheet    = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
                     //looping untuk mengambil data
-                    $table = "<table width='100%' border='1'>";
-                    $table .= "<thead><tr>";
-                    $table .= "<td>Well</td>";
-                    $table .= "<td>SampleID</td>";
-                    $table .= "<td>Sample</td>";
-                    $table .= "<td>SampleType</td>";
-                    $table .= "<td>gene</td>";
-                    $table .= "<td>Dye</td>";
-                    $table .= "<td>ct</td>";
-                    $table .= "<td>concentration</td>";
-                    $table .= "<td>c_unit</td>";
-                    $table .= "<td>standard_c</td>";
-                    $table .= "<td>ref_dye</td>";
-                    $table .= "<td>unique_ID</td>";
-                    $table .= "<td>replicate</td>";
-                    $table .= "<td>QC</td>";
-                    $table .= "</tr></thead>";
+                    // $table = "<table width='100%' border='1'>";
+                    // $table .= "<thead><tr>";
+                    // $table .= "<td>Well</td>";
+                    // $table .= "<td>SampleID</td>";
+                    // $table .= "<td>Sample</td>";
+                    // $table .= "<td>SampleType</td>";
+                    // $table .= "<td>gene</td>";
+                    // $table .= "<td>Dye</td>";
+                    // $table .= "<td>ct</td>";
+                    // $table .= "<td>concentration</td>";
+                    // $table .= "<td>c_unit</td>";
+                    // $table .= "<td>standard_c</td>";
+                    // $table .= "<td>ref_dye</td>";
+                    // $table .= "<td>unique_ID</td>";
+                    // $table .= "<td>replicate</td>";
+                    // $table .= "<td>QC</td>";
+                    // $table .= "</tr></thead>";
                     $reader_index = 1;
                     $indx = 0;
                     try {
@@ -332,22 +332,22 @@ class Laboratorium extends ResourceController
                             }
 
 
-                            $table .= "<tr>";
-                            $table .= "<td>" . $Well . "</td>";
-                            $table .= "<td>" . $SampleID . "</td>";
-                            $table .= "<td>" . $Sample . "</td>";
-                            $table .= "<td>" . $SampleType . "</td>";
-                            $table .= "<td>" . $gene . "</td>";
-                            $table .= "<td>" . $Dye . "</td>";
-                            $table .= "<td>" . $ct . "</td>";
-                            $table .= "<td>" . $concentration . "</td>";
-                            $table .= "<td>" . $c_unit . "</td>";
-                            $table .= "<td>" . $standard_c . "</td>";
-                            $table .= "<td>" . $ref_dye . "</td>";
-                            $table .= "<td>" . $unique_ID . "</td>";
-                            $table .= "<td>" . $replicate . "</td>";
-                            $table .= "<td>" . $QC . "</td>";
-                            $table .= "</tr>";
+                            // $table .= "<tr>";
+                            // $table .= "<td>" . $Well . "</td>";
+                            // $table .= "<td>" . $SampleID . "</td>";
+                            // $table .= "<td>" . $Sample . "</td>";
+                            // $table .= "<td>" . $SampleType . "</td>";
+                            // $table .= "<td>" . $gene . "</td>";
+                            // $table .= "<td>" . $Dye . "</td>";
+                            // $table .= "<td>" . $ct . "</td>";
+                            // $table .= "<td>" . $concentration . "</td>";
+                            // $table .= "<td>" . $c_unit . "</td>";
+                            // $table .= "<td>" . $standard_c . "</td>";
+                            // $table .= "<td>" . $ref_dye . "</td>";
+                            // $table .= "<td>" . $unique_ID . "</td>";
+                            // $table .= "<td>" . $replicate . "</td>";
+                            // $table .= "<td>" . $QC . "</td>";
+                            // $table .= "</tr>";
                         }
                         // exit();
                         $this->session->setFlashdata("success", "Berhasil Upload excel");
