@@ -79,7 +79,7 @@ class CustomerModel extends Model
             ->where('tgl_kunjungan', $tgl_kunjungan)->get();
     }
 
-    public function getCustomerAvailableByDate($jenis_test, $jenis_pemeriksaan, $jenis_layanan, $faskes_asal = '1', $tgl_kunjungan)
+    public function getCustomerAvailableByDate($jenis_test, $jenis_pemeriksaan, $jenis_layanan, $faskes_asal = '1', $tgl_kunjungan, $jam_kunjungan = null)
     {
         $query = db_connect()
             ->table('customers')
@@ -89,7 +89,8 @@ class CustomerModel extends Model
                 'jenis_layanan' => $jenis_layanan,
                 'faskes_asal' => $faskes_asal,
                 'tgl_kunjungan' => $tgl_kunjungan,
-                'kehadiran' => '0'
+                'jam_kunjungan' => $jam_kunjungan,
+                'kehadiran' => '22'
             ])->orderBy('id', 'DESC')->limit(1);
         return $query->get();
     }

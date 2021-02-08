@@ -34,7 +34,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="callout callout-info">
-                        <h5>Data Antrian Bilik</h5>
+                        <h5>Data Antrian Bilik <?= $nomor_bilik; ?></h5>
                     </div>
                     <!-- <a href="/backoffice/swabber/create_bilik" class="btn btn-primary btn-sm mb-3">Tambah Data Bilik</a> -->
                 </div>
