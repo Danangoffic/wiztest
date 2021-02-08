@@ -242,7 +242,7 @@ class Peserta extends BaseController
         // $dataTest = $this->testModel->find($id_test);
         try {
             $customer_UNIQUE = $this->customerPublic->getOrderId($id_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
-            $no_urutan = $this->customerPublic->getUrutan($id_test, $tgl_kunjungan, $id_pemeriksaan, $id_layanan);
+            $no_urutan = $this->customerPublic->getUrutan($id_test, $tgl_kunjungan, $id_pemeriksaan, $id_layanan, $jam_kunjungan);
 
             $data_layanan_test = $this->layananTestModel->get_by_key(['id_layanan' => $id_layanan, 'id_test' => $id_test, 'id_pemeriksaan' => $id_pemeriksaan])->getRowArray();
             $id_jenis_test_customer = $data_layanan_test['id'];
@@ -360,45 +360,17 @@ class Peserta extends BaseController
         $detail_pembayaran = $this->pembayaran_model->pembayaran_by_customer($id);
         // dd($detail_pembayaran);
         $tipe_pembayaran = $detail_pembayaran['tipe_pembayaran'];
-        if ($tipe_pembayaran == "midtrans") {
-            $detail_payment = $Midtrans->getStatusByOrderId($orderId);
-            // dd($detail_payment);
-            if ($detail_payment) {
-                if ($detail_payment->status_code != '404') {
-                    $payment_type = $detail_payment->payment_type;
-                    if ($payment_type == "bank_transfer" || $payment_type == "credit_card") {
-                        if ($detail_payment->va_numbers[0]) {
-                            $va_numbers = $detail_payment->va_numbers[0];
-                            $bank = ($va_numbers->bank) ? $va_numbers->bank : null;
-                            $va = ($va_numbers->va_number) ? $va_numbers->va_number : null;
-                        }
-                    } elseif ($payment_type == "echannel") {
-                        $va = "<p>Biller Code : " . $detail_payment->biller_code . "</p>";
-                        $va .= "<p>Bill Key : " . $detail_payment->bill_key . "</p>";
-                    }
-                    if ($detail_payment->gross_amount) {
-                        $amt = 'Rp ' . number_format(intval($detail_payment->gross_amount), 0, ',', '.');
-                    }
 
-                    if ($detail_payment->payment_type) {
-                        $paymentType = ucwords(str_replace('_', ' ', $detail_payment->payment_type));
-                    }
-                    if ($detail_payment->transaction_status) {
-                        $transactionStatus = ucwords($detail_payment->transaction_status);
-                    }
-                }
-            }
-        } else {
-            $amount = $detail_pembayaran['amount'];
-            $jenis_pembayaran = $detail_pembayaran['jenis_pembayaran'];
-            $status_pembayaran = $detail_pembayaran['status_pembayaran'];
-            $va_numbers = "";
-            $bank = "";
-            $va = "";
-            $amt = 'Rp ' . number_format($amount, 0, ",", ".");
-            $payment_type = ucwords($jenis_pembayaran);
-            $transactionStatus = ucwords($status_pembayaran);
-        }
+        $amount = $detail_pembayaran['amount'];
+        $jenis_pembayaran = $detail_pembayaran['jenis_pembayaran'];
+        $status_pembayaran = $detail_pembayaran['status_pembayaran'];
+        $va_numbers = "";
+        $bank = "";
+        $va = "";
+        $amt = 'Rp ' . number_format($amount, 0, ",", ".");
+        $payment_type = ucwords($jenis_pembayaran);
+        $transactionStatus = ucwords($status_pembayaran);
+        // }
 
         // dd($DetailPayment);
 
@@ -575,7 +547,7 @@ class Peserta extends BaseController
             $dataLayanan = $this->layananModel->find($jenis_layanan);
             $dataTest = $this->testModel->find($layanan_test);
 
-            $no_urutan = $this->customerPublic->getUrutan($layanan_test, $tgl_kunjungan, $id_pemeriksaan, $id_layanan);
+            $no_urutan = $this->customerPublic->getUrutan($layanan_test, $tgl_kunjungan, $id_pemeriksaan, $id_layanan, $jam_kunjungan);
             // echo "Urutan : " . $no_urutan;
 
             // var_dump($data);
