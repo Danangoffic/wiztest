@@ -48,25 +48,28 @@ class CustomerModel extends Model
         'id_cust_corporate'
     ];
 
-    public function db_this()
+    public function customer()
     {
-        return db_connect();
+        return db_connect()->table($this->table);
     }
 
-    public function db_table()
-    {
-        return $this->db_this->table($this->table);
-    }
+    // public function db_table()
+    // {
+    //     return $this->db_this->table($this->table);
+    // }
+
+    protected $useTimestamps = true;
 
     public function customer_jenis_test_filtering_date_between($select = "*", $id_jenis_test, $id_jenis_layanan, $date1, $date2)
     {
-        $query = $this->db_this()->query("select {$select} from {$this->table} where jenis_test = '{$id_jenis_test}' AND jenis_layanan = '{$id_jenis_layanan}' AND tgl_kunjungan BETWEEN '{$date1}' AND '{$date2}'");
-        return $query->getFirstRow();
+        $builder = $this->customer()->select($select)
+            ->where('jenis_test', $id_jenis_test)
+            ->where('jenis_layanan', $id_jenis_layanan)
+            ->where("tgl_kunjungan BETWEEN '{$date1}' AND '{$date2}'");
+        return $builder->get()->getFirstRow();
+        // $query = $this->db_this()->query("select {$select} from {$this->table} where jenis_test = '{$id_jenis_test}' AND jenis_layanan = '{$id_jenis_layanan}' AND tgl_kunjungan BETWEEN '{$date1}' AND '{$date2}'");
+        // return $query->getFirstRow();
     }
-
-
-
-    protected $useTimestamps = true;
 
     public function findCustomerCounter($jenis_layanan = '1', $tgl_kunjungan)
     {
@@ -76,7 +79,7 @@ class CustomerModel extends Model
             ->where('tgl_kunjungan', $tgl_kunjungan)->get();
     }
 
-    public function getCustomerAvailableByDate($jenis_test, $jenis_pemeriksaan, $jenis_layanan, $faskes_asal = '1', $tgl_kunjungan)
+    public function getCustomerAvailableByDate($jenis_test, $jenis_pemeriksaan, $jenis_layanan, $faskes_asal = '1', $tgl_kunjungan, $jam_kunjungan = null)
     {
         $query = db_connect()
             ->table('customers')
@@ -86,7 +89,8 @@ class CustomerModel extends Model
                 'jenis_layanan' => $jenis_layanan,
                 'faskes_asal' => $faskes_asal,
                 'tgl_kunjungan' => $tgl_kunjungan,
-                'kehadiran' => '0'
+                'jam_kunjungan' => $jam_kunjungan,
+                'kehadiran' => '22'
             ])->orderBy('id', 'DESC')->limit(1);
         return $query->get();
     }
@@ -121,7 +125,7 @@ class CustomerModel extends Model
         return $builder->get();
     }
 
-    public function customerPayment($paymentStatus = "unpaid", $id_data_jenis_test, $tgl_kunjungan = '')
+    public function customerPayment($paymentStatus = "pending", $id_data_jenis_test, $tgl_kunjungan = '')
     {
         # code...
         $builder = db_connect()->table('customers a')
@@ -140,7 +144,7 @@ class CustomerModel extends Model
      */
     public function total_customer_same_test_hs($id_hs, $jenis_test): int
     {
-        return db_connect()->table($this->table)->where(['id_hs' => $id_hs, 'jenis_test' => $jenis_test])->countAllResults();
+        return $this->customer()->where(['id_hs' => $id_hs, 'jenis_test' => $jenis_test])->countAllResults();
     }
 
     public function customersBooking($id_data_jenis_test, $tgl_kunjungan = false, $jam_kunjungan = false, $paymentStatus = 'settlement', $kehadiran = '22')
@@ -169,7 +173,65 @@ class CustomerModel extends Model
 
     public function get_customer_by_invoice($invoice_number = null)
     {
-        return db_connect()->table('customers')->where('invoice_number', $invoice_number)->get(1)->getRowArray();
+        return $this->customer()->where('invoice_number', $invoice_number)->get(1)->getRowArray();
+    }
+
+    public function get_by_customer_unique($customer_unique = null)
+    {
+        if ($customer_unique == null) {
+            return null;
+        }
+        $builder = $this->customer()->where('customer_unique', $customer_unique)->get(1);
+        return $builder->getRowArray();
+    }
+
+    public function detail_customer($id_customer = null)
+    {
+        if ($id_customer == null) {
+            return null;
+        }
+        $builder = $this->customer()->where('id', $id_customer)->limit(1);
+        return $builder->get()->getRowArray();
+    }
+
+    public function customers_corporate($id_instansi = null)
+    {
+        if ($id_instansi == null) {
+            return null;
+        }
+
+        $builder = $this->customer()->where('instansi', $id_instansi)->orderBy('nama', 'ASC');
+        return $builder->get()->getResultArray();
+    }
+
+    public function customers_hs($id_hs = null)
+    {
+        if ($id_hs = null) {
+            return null;
+        }
+        $is_hs = "yes";
+        $builder = $this->customer()->where('is_hs', $is_hs)->where('id_hs', $id_hs)->orderBy('nama', ' ASC')->get();
+        return $builder->getResultArray();
+    }
+
+    public function antrian_swabber($tanggal = null, $jam = null, $nomor_bilik = null, $tipe = "booking")
+    {
+        $builder = $this->customer();
+        $builder->where(['tgl_kunjungan' => $tanggal, 'jam_kunjungan' => $jam, 'nomor_bilik' => $nomor_bilik]);
+        if ($tipe == "antrian") {
+            $builder->where('kehadiran', '23');
+        }
+        $builder->where('is_printed', "0");
+        $builder->orderBy('no_antrian', 'ASC');
+        return $builder->get();
+    }
+
+    public function by_nomor_bilik($nomor_bilik = 1)
+    {
+        $builder = db_connect()->table($this->table)->where('nomor_bilik', $nomor_bilik)
+            ->where(['kehadiran' => "23", "tgl_kunjungan" => date('Y-m-d'), 'jam_kunjungan' => date("H") . ":00:00"])
+            ->orderBy('no_antrian', 'ASC')->get();
+        return $builder;
     }
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';

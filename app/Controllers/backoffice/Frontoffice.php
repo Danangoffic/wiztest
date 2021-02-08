@@ -2,11 +2,13 @@
 
 namespace App\Controllers\backoffice;
 
+use App\Models\BilikSwabberModel;
 use App\Models\CustomerModel;
 use App\Models\KuotaModel;
 use App\Models\LayananModel;
 use App\Models\LayananTestModel;
 use App\Models\MarketingModel;
+use App\Models\PemanggilanModel;
 use App\Models\PemeriksaanModel;
 use App\Models\StatusHasilModel;
 use App\Models\TestModel;
@@ -27,6 +29,9 @@ class Frontoffice extends ResourceController
     protected $layananModel;
     protected $testModel;
     protected $statusModel;
+    protected $pemanggilan_model;
+    protected $bilik_swabber_model;
+    protected $layanan_test_model;
     public function __construct()
     {
         $this->customerModel = new CustomerModel();
@@ -39,6 +44,9 @@ class Frontoffice extends ResourceController
         $this->layananModel = new LayananModel();
         $this->testModel = new TestModel();
         $this->statusModel = new StatusHasilModel();
+        $this->pemanggilan_model = new PemanggilanModel();
+        $this->bilik_swabber_model = new BilikSwabberModel();
+        $this->layanan_test_model = new LayananTestModel();
         if (!$this->session->has('logged_in')) {
             return redirect()->to('/backoffice/login');
         }
@@ -229,6 +237,94 @@ class Frontoffice extends ResourceController
         // echo db_connect()->showLastQuery() . "<br>";
         $data = array('antrian_swabber' => $antrian_swabber, 'booking_antrian' => $booking_antrian);
         return $this->respond($data, 200, 'success');
+    }
+
+    public function manajemen_antrian($nomor_bilik = 1)
+    {
+        $date_now = date('Y-m-d');
+        $jam_now = date("H") . ":00:00";
+        // $jenis_test = $this->layanan_test_model->get_by_key(['id_segmen' => "1", "id_pemeriksaan" => "1"])->getResultArray();
+        $data_customer = $this->customerModel->by_nomor_bilik($nomor_bilik)->getResultArray();
+
+        $db_bilik = $this->bilik_swabber_model->by_nomor_bilik($nomor_bilik)->getRowArray();
+        // $user_swabber = $this->user_model;
+        // dd($this->session->get('user_level'));
+        // $data_bilik = $db_bilik->where('nomor_bilik', $nomor_bilik)->get()->getRowArray();
+
+        $data = array(
+            'title' => "Antrian Bilik " . $nomor_bilik,
+            'page' => "frontoffice",
+            'data_customer' => $data_customer,
+            'session' => $this->session,
+            'data_bilik' => $db_bilik,
+            'nomor_bilik' => $nomor_bilik,
+        );
+        return view("backoffice/frontoffice/manajemen_antrian", $data);
+    }
+
+    public function antrian_panggilan()
+    {
+        $bilik = $this->request->getVar('nomor_bilik');
+        $data_panggilan = $this->dalam_panggilan($bilik);
+        $data_antrian = $this->antrian_menunggu($bilik);
+
+        if ($data_panggilan != null) {
+            $id_customer = $data_panggilan['id_customer'];
+            $id_customer_antrian = $data_antrian['id_customer'];
+            $customer_panggilan = $this->customerModel->detail_customer($id_customer);
+            $customer_antrian = $this->customerModel->detail_customer($id_customer_antrian);
+            $return_array = array(
+                'panggilan' => $customer_panggilan,
+                'antrian' => $customer_antrian
+            );
+            return $this->respond($return_array, 200, "success");
+        } else {
+            $return_array = array(
+                'antrian' => []
+            );
+            return $this->respond($return_array, 404, "not found");
+        }
+    }
+
+    protected function dalam_panggilan($bilik)
+    {
+        return $this->pemanggilan_model->by_jenis_antrian('12', $bilik)->get(1)->getRowArray();
+    }
+
+    protected function antrian_menunggu($bilik)
+    {
+        return $this->pemanggilan_model->by_jenis_antrian('11', $bilik)->get(1)->getRowArray();
+    }
+
+    public function next_antrian()
+    {
+        $id_customer =  $this->request->getVar('id_customer');
+        try {
+            $cek = $this->customerModel->detail_customer($id_customer);
+            if ($cek == null) return $this->respond(['status' => "failed", 'message' => "peserta tidak ditemukan"], 400, "failed");
+
+            $data_pemanggilan = array('status_pemanggilan' => "12");
+            $get_pemanggilan = $this->pemanggilan_model->get_by_customer($id_customer);
+            $detail_pemanggilan = $get_pemanggilan->getRowArray();
+            $id_pemanggilan = $detail_pemanggilan['id'];
+            $update_pemanggilan1 = $this->pemanggilan_model->update($id_pemanggilan, $data_pemanggilan);
+            $get = $this->pemanggilan_model->belum_dipanggil()->getRowArray();
+            $id_get = $get['id'];
+            $customer_id_get = $get['id_customer'];
+
+            $array_update2 = array('status_pemanggilan' => "12");
+            $update_pemanggilan2 = $this->pemanggilan_model->update($id_get, $array_update2);
+
+            $customer_data_next = $this->customerModel->detail_customer($customer_id_get);
+            $tgl_kunjungan = $customer_data_next['tgl_kunjungan'];
+            $jam_kunjungan = $customer_data_next['jam_kunjungan'];
+            $date_now = date("Y-m-d");
+            $jam = date("H") . ":00:00";
+            if ($date_now == $tgl_kunjungan && $jam_kunjungan == $jam) {
+                return $this->respond($customer_data_next, 200, "success");
+            }
+        } catch (\Throwable $th) {
+        }
     }
 
     //--------------------------------------------------------------------

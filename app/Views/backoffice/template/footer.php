@@ -5,9 +5,5 @@
     <strong>Developed by <a href="https://danangoffic.xyz">DNG.TEAM</a> &copy;.</strong> All rights reserved.
 </footer>
 
-<!-- Control Sidebar -->
-<aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-</aside>
 <!-- /.control-sidebar -->
 </div>

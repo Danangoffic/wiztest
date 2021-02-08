@@ -18,6 +18,7 @@ use App\Controllers\BaseController;
 use App\Models\CustomerHomeServiceModel;
 use App\Models\CustomerOverloadModel;
 use App\Models\HasilLaboratoriumModel;
+use App\Models\KehadiranModel;
 use App\Models\PembayaranModel;
 use App\Models\UserDetailModel;
 use App\Models\UserModel;
@@ -51,6 +52,7 @@ class Peserta extends BaseController
     protected $user_model;
     protected $detail_user_model;
     public $dompdf;
+    protected $kehadiran_model;
     public function __construct()
     {
         $this->session = \Config\Services::session();
@@ -73,6 +75,7 @@ class Peserta extends BaseController
         $this->detail_user_model = new UserDetailModel();
         $layanan = new Layanan;
         $this->dompdf = $layanan->dompdf;
+        $this->kehadiran_model = new KehadiranModel();
     }
 
     protected function check_user_level()
@@ -102,7 +105,7 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
 
-        $data_walkin = $this->layananTestModel->where(['id_pemeriksaan' => "1"])->get()->getResultArray();
+        $data_walkin = $this->layananTestModel->get_by_key('id_pemeriksaan', "1")->getResultArray();
 
         $ids_test = array();
         foreach ($data_walkin as $key => $lt) {
@@ -164,7 +167,7 @@ class Peserta extends BaseController
         $dataMarketing = $this->marketingModel->findAll();
 
         $kondisi_layanan_test = ['id_segmen' => "1", 'id_pemeriksaan' => "1"];
-        $dataLayananTest = $this->layananTestModel->where($kondisi_layanan_test)->get()->getResultArray();
+        $dataLayananTest = $this->layananTestModel->get_by_key($kondisi_layanan_test)->getResultArray();
         $data = array(
             'title' => "Form Registrasi Peserta Baru",
             'page' => "registrasi",
@@ -230,18 +233,21 @@ class Peserta extends BaseController
         $pemeriksa =  $this->request->getPost('nama_pemeriksa');
         // var_dump($this->request->getPost());
         // exit();
-        $customer_UNIQUE = $this->customerPublic->getOrderId($id_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
+
         // echo db_connect()->showLastQuery();
         // exit();
         // dd($customer_UNIQUE);
+        // $Layanan = new Layanan();
+        // $dataLayanan = $this->layananModel->find($jenis_layanan);
+        // $dataTest = $this->testModel->find($id_test);
         try {
-            $Layanan = new Layanan();
-            $dataLayanan = $this->layananModel->find($jenis_layanan);
-            $dataTest = $this->testModel->find($id_test);
-            $data_layanan_test = $this->layananTestModel->where(['id_layanan' => $id_layanan, 'id_test' => $id_test, 'id_pemeriksaan' => $id_pemeriksaan])->first();
+            $customer_UNIQUE = $this->customerPublic->getOrderId($id_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
+            $no_urutan = $this->customerPublic->getUrutan($id_test, $tgl_kunjungan, $id_pemeriksaan, $id_layanan, $jam_kunjungan);
+
+            $data_layanan_test = $this->layananTestModel->get_by_key(['id_layanan' => $id_layanan, 'id_test' => $id_test, 'id_pemeriksaan' => $id_pemeriksaan])->getRowArray();
             $id_jenis_test_customer = $data_layanan_test['id'];
             $amount_test = intval($data_layanan_test['biaya']);
-            $no_urutan = $this->customerPublic->getUrutan($id_test, $tgl_kunjungan, $id_pemeriksaan, $id_layanan);
+
             // echo "Urutan : " . $no_urutan;
 
             // var_dump($data);
@@ -351,48 +357,20 @@ class Peserta extends BaseController
         $paymentType = null;
         $bank = null;
 
-        $detail_pembayaran = $this->pembayaran_model->where(['id_customer' => $id])->get()->getRowArray();
+        $detail_pembayaran = $this->pembayaran_model->pembayaran_by_customer($id);
         // dd($detail_pembayaran);
         $tipe_pembayaran = $detail_pembayaran['tipe_pembayaran'];
-        if ($tipe_pembayaran == "midtrans") {
-            $detail_payment = $Midtrans->getStatusByOrderId($orderId);
-            // dd($detail_payment);
-            if ($detail_payment) {
-                if ($detail_payment->status_code != '404') {
-                    $payment_type = $detail_payment->payment_type;
-                    if ($payment_type == "bank_transfer" || $payment_type == "credit_card") {
-                        if ($detail_payment->va_numbers[0]) {
-                            $va_numbers = $detail_payment->va_numbers[0];
-                            $bank = ($va_numbers->bank) ? $va_numbers->bank : null;
-                            $va = ($va_numbers->va_number) ? $va_numbers->va_number : null;
-                        }
-                    } elseif ($payment_type == "echannel") {
-                        $va = "<p>Biller Code : " . $detail_payment->biller_code . "</p>";
-                        $va .= "<p>Bill Key : " . $detail_payment->bill_key . "</p>";
-                    }
-                    if ($detail_payment->gross_amount) {
-                        $amt = 'Rp ' . number_format(intval($detail_payment->gross_amount), 0, ',', '.');
-                    }
 
-                    if ($detail_payment->payment_type) {
-                        $paymentType = ucwords(str_replace('_', ' ', $detail_payment->payment_type));
-                    }
-                    if ($detail_payment->transaction_status) {
-                        $transactionStatus = ucwords($detail_payment->transaction_status);
-                    }
-                }
-            }
-        } else {
-            $amount = $detail_pembayaran['amount'];
-            $jenis_pembayaran = $detail_pembayaran['jenis_pembayaran'];
-            $status_pembayaran = $detail_pembayaran['status_pembayaran'];
-            $va_numbers = "";
-            $bank = "";
-            $va = "";
-            $amt = 'Rp ' . number_format($amount, 0, ",", ".");
-            $payment_type = ucwords($jenis_pembayaran);
-            $transactionStatus = ucwords($status_pembayaran);
-        }
+        $amount = $detail_pembayaran['amount'];
+        $jenis_pembayaran = $detail_pembayaran['jenis_pembayaran'];
+        $status_pembayaran = $detail_pembayaran['status_pembayaran'];
+        $va_numbers = "";
+        $bank = "";
+        $va = "";
+        $amt = 'Rp ' . number_format($amount, 0, ",", ".");
+        $payment_type = ucwords($jenis_pembayaran);
+        $transactionStatus = ucwords($status_pembayaran);
+        // }
 
         // dd($DetailPayment);
 
@@ -494,7 +472,7 @@ class Peserta extends BaseController
         $dataFaskes = $this->faskesModel->findAll();
         $dataInstanasi = $this->instansiModel->findAll();
         $dataMarketing = $this->marketingModel->findAll();
-        $dataLayananTest = $this->layananTestModel->where(['id_pemeriksaan' => "1", 'id_segmen' => "1"])->get()->getResultArray();
+        $dataLayananTest = $this->layananTestModel->get_by_key(['id_pemeriksaan' => "1", 'id_segmen' => "1"])->getResultArray();
         $data = array(
             'title' => "Ubah Customer",
             'page' => "registrasi",
@@ -569,7 +547,7 @@ class Peserta extends BaseController
             $dataLayanan = $this->layananModel->find($jenis_layanan);
             $dataTest = $this->testModel->find($layanan_test);
 
-            $no_urutan = $this->customerPublic->getUrutan($layanan_test, $tgl_kunjungan, $id_pemeriksaan, $id_layanan);
+            $no_urutan = $this->customerPublic->getUrutan($layanan_test, $tgl_kunjungan, $id_pemeriksaan, $id_layanan, $jam_kunjungan);
             // echo "Urutan : " . $no_urutan;
 
             // var_dump($data);
@@ -751,21 +729,10 @@ class Peserta extends BaseController
 
     public function kehadiran_by_scanning_qr($id_peserta)
     {
-        // if (!$this->session->has("logged_in")) {
-        //     $this->session->setFlashData("error", "Anda harus login");
-        //     return redirect()->to("/backoffice/login");
-        // }
-        // $user_level = intval($this->session->get("user_level"));
-        // if ($user_level == 1 || $user_level == 100 || $user_level == 4) {
-        // } else {
-        //     $this->session->setFlashData("error", "Anda tidak memiliki akses");
-        //     return redirect()->to("/backoffice/login");
-        // }
-
-
         $update_peserta_by_qr = $this->updated_by_qr($id_peserta);
         $responseCode = $update_peserta_by_qr['responseCode'];
         $responseMessage = $update_peserta_by_qr['message'];
+        $statusMessage = $update_peserta_by_qr['statusMessage'];
         switch ($responseCode) {
             case '00':
                 $this->session->setFlashdata("success", $responseMessage);
@@ -777,38 +744,60 @@ class Peserta extends BaseController
                 $this->session->setFlashdata("error", $responseMessage);
                 break;
         }
-        if ($responseCode == "00" || $responseCode == "10") {
+        $customerDetail = $this->customerModel->detail_customer($id_peserta);
+        $nama_customer = $customerDetail['nama'];
+        $order_id = $customerDetail['customer_unique'];
+        $invoice_number = $customerDetail['invoice_number'];
+        $bilik = $customerDetail['nomor_bilik'];
+        $no_antrian = $customerDetail['no_antrian'];
+        // $message = $responseMessage;
 
-            $customerDetail = $this->customerModel->find($id_peserta);
-            $nama_customer = $customerDetail['nama'];
-            $order_id = $customerDetail['customer_unique'];
-            $message = "Tanggal: " . date_format($customerDetail['tgl_kunjungan'], 'd-m-Y') . ", pukul " . date_format($customerDetail['jam_kunjungan'], 'H:i');
-        } else {
-        }
-        if ($update_peserta_by_qr == "hadir") {
-        } else {
-            $message = $update_peserta_by_qr;
-        }
-        return view("customer/kehadiran", $update_peserta_by_qr);
+        $data = [
+            'title' => "Kehadiran Peserta",
+            'response' => $update_peserta_by_qr,
+            'page' => "peserta",
+            'nama' => $nama_customer,
+            'order_id' => $order_id,
+            'message' => $responseMessage,
+            'invoice_number' => $invoice_number,
+            'bilik' => $bilik,
+            'no_antrian' => $no_antrian,
+            'status' => $statusMessage
+        ];
+        return view("customer/kehadiran", $data);
     }
 
-    protected function updated_by_qr($id_peserta)
+    protected function updated_by_qr($id_peserta): array
     {
-        $customerDetail = $this->customerModel->find($id_peserta);
-        if ($customerDetail != null) {
+        $today = date("Y-m-d");
+        $customerDetail = $this->customerModel->detail_customer($id_peserta);
+        $pembayaran_detail = $this->pembayaran_model->pembayaran_by_customer($id_peserta);
+        if ($customerDetail != null && $pembayaran_detail != null) {
+            $tgl_kunjungan = $customerDetail['tgl_kunjungan'];
+
+            if ($today != $tgl_kunjungan) {
+                $array_return = array(
+                    'statusMessage' => "failed",
+                    'message' => "<h4 class='badge badge-danger'>Gagal absen untuk hadir karena tidak sesuai tanggal kunjungan. 
+                    Silahkan melakukan validasi absensi kehadiran pada klinik pada tanggal: {$tgl_kunjungan}</h4>",
+                    'responseCode' => "01"
+                );
+                return $array_return;
+            }
             $statusKehadiran = intval($customerDetail['kehadiran']);
-            $statusPembayaran = lcfirst($customerDetail['status_pembayaran']);
-            if ($statusKehadiran == 20 && ($statusPembayaran == 'settlement' || $statusPembayaran == 'invoice' || $statusPembayaran == "lunas")) {
+            $statusPembayaran = lcfirst($pembayaran_detail['status_pembayaran']);
+            if ($statusKehadiran == 22 && ($statusPembayaran == 'settlement' || $statusPembayaran == 'invoice' || $statusPembayaran == "lunas")) {
+                $created_by = ($this->session->has('id_user')) ? $this->session->get('id_user') : '0';
                 $dataCustomer = array(
-                    'kehadiran' => 21
+                    'kehadiran' => 23
                 );
                 $updateCustomer = $this->customerModel->update($id_peserta, $dataCustomer);
-                $insertDataHadir = array('id_customer' => $id_peserta);
-                $insertKehadiran = db_connect()->table('kehadiran')->insert($insertDataHadir);
+                $insertDataHadir = array('id_customer' => $id_peserta, 'created_by' => $created_by);
+                $insertKehadiran = $this->kehadiran_model->insert($insertDataHadir);
                 if ($updateCustomer && $insertKehadiran) {
                     $array_return = array(
                         'statusMessage' => "success",
-                        'message' => "Berhasil absen untuk hadir",
+                        'message' => "<span class='badge badge-success'>Berhasil absen untuk hadir</span>",
                         'responseCode' => "00"
                     );
                     return $array_return;
@@ -816,25 +805,25 @@ class Peserta extends BaseController
                     $this->session->setFlashdata('error', 'Gagal update data peserta');
                     $array_return = array(
                         'statusMessage' => "failed",
-                        'message' => "Peserta Tidak Ditemukan",
+                        'message' => "<span class='badge badge-danger'>Peserta Tidak Ditemukan</span>",
                         'responseCode' => "01"
                     );
                     return $array_return;
                 }
-            } else if ($statusKehadiran == 21) {
+            } else if ($statusKehadiran == 23) {
                 $array_return = array(
                     'statusMessage' => "success",
-                    'message' => "sudah hadir",
+                    'message' => "<span class='badge badge-success'>Peserta sudah hadir</span>",
                     'responseCode' => "10"
                 );
                 return $array_return;
 
                 // return false;
-            } else {
+            } elseif ($statusPembayaran == "pending" || $statusPembayaran == "belum lunas") {
                 $this->session->setFlashdata('error', 'Peserta belum melakukan pelunasan');
                 $array_return = array(
                     'statusMessage' => "failed",
-                    'message' => "Peserta belum melakukan pelunasan",
+                    'message' => "<span class='badge badge-warning'>Peserta belum melakukan pelunasan</span>",
                     'responseCode' => "02"
                 );
                 return $array_return;
@@ -843,7 +832,7 @@ class Peserta extends BaseController
             $this->session->setFlashdata('error', 'Peserta tidak ditemukan');
             $array_return = array(
                 'statusMessage' => "failed",
-                'message' => "Peserta tidak ditemukan",
+                'message' => "<span class='badge badge-danger'>Peserta tidak ditemukan</span>",
                 'responseCode' => "03"
             );
             return $array_return;

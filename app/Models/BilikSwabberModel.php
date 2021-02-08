@@ -22,4 +22,13 @@ class BilikSwabberModel extends Model
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at';
+
+    public function by_nomor_bilik($nomor_bilik = 1)
+    {
+        $builder = db_connect()
+            ->table($this->table)
+            ->select()
+            ->where('nomor_bilik', $nomor_bilik)->get();
+        return $builder;
+    }
 }

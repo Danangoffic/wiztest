@@ -132,7 +132,7 @@ class Customer extends ResourceController
         // exit();
         try {
             $customer_UNIQUE = $this->getOrderId($jenis_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
-            $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
+            $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan);
             // echo db_connect()->showLastQuery();
             // exit();
             // dd($customer_UNIQUE);
@@ -187,7 +187,8 @@ class Customer extends ResourceController
                 return $this->failValidationError();
             }
             $InvoiceCustomer = $this->getInvoiceNumber($insert_id);
-            $this->customerModel->update($insert_id, ['invoice_number' => $InvoiceCustomer]);
+            $arr_invoice = ['invoice_number' => $InvoiceCustomer];
+            $this->customerModel->update($insert_id, $arr_invoice);
             $DetailLayananTest = $Layanan->detail_layanan($jenis_pemeriksaan);
             $productName = $DetailLayananTest['nama_test'] . ' ' . $DetailLayananTest['nama_layanan'];
             $params = array(
@@ -202,7 +203,7 @@ class Customer extends ResourceController
                     'last_name' => str_replace(explode(' ', $nama)[0], '', $nama),
                     'email' => $email,
                     'phone' => $phone,
-                    'Address' => $alamat
+                    'address' => $alamat
                 ),
             );
 
@@ -265,18 +266,18 @@ class Customer extends ResourceController
                 break;
         }
         $rand_number = rand(1000, 9999);
-        $awal = $awal . $rand_number . date('d') . substr($jam_kunjungan, 0, 2);
-        $urutan = $this->getUrutan($type_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
+        $awal = $awal . date('ymd') . $rand_number . substr($jam_kunjungan, 0, 2);
+        $urutan = $this->getUrutan($type_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan);
 
         $ID = str_pad($urutan, 4, '0', STR_PAD_LEFT);
         $NEWID = $awal . $ID;
         return $NEWID;
     }
 
-    public function getUrutan($type_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan)
+    public function getUrutan($type_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan)
     {
 
-        $data = $this->customerModel->getCustomerAvailableByDate($type_test, $jenis_pemeriksaan, $jenis_layanan, '1', $tgl_kunjungan)->getRowArray();
+        $data = $this->customerModel->getCustomerAvailableByDate($type_test, $jenis_pemeriksaan, $jenis_layanan, '1', $tgl_kunjungan, $jam_kunjungan)->getRowArray();
         // db_connect()->table()->select()->get()->getRowArray()
         // echo db_connect()->showLastQuery();
         // var_dump($data);
@@ -290,7 +291,7 @@ class Customer extends ResourceController
 
     public function getInvoiceNumber($id_customer): string
     {
-        $data = $this->customerModel->find($id_customer);
+        $data = $this->customerModel->detail_customer($id_customer);
         // echo $data['no_antrian'];
         // exit();
         $word1 = 'INV-';
@@ -301,10 +302,10 @@ class Customer extends ResourceController
             $urutan =  1;
         }
 
-        $generateUrutan = str_pad($urutan, 3, '0', STR_PAD_LEFT);
+        $generateUrutan = str_pad($urutan, 4, '0', STR_PAD_LEFT);
         // echo $date;
         // exit();
-        $invoice = $word1 . $random . $generateUrutan;
+        $invoice = $word1 . date("ymd") . $random . $generateUrutan;
         // echo $invoice;
         // exit();
         return $invoice;
