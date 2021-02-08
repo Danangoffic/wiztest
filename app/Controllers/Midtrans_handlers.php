@@ -91,7 +91,8 @@ class Midtrans_handlers extends ResourceController
             // exit();
             if ($customer_check) {
                 $id_customer = $customer_check['id'];
-
+                $bilik = $customer_check['nomor_bilik'];
+                $antrian = $customer_check['no_antrian'];
                 // send email and whatsapp first then update //
 
 
@@ -116,7 +117,9 @@ class Midtrans_handlers extends ResourceController
                         'id_layanan_test' => $id_layanan_test,
                         'status_pemanggilan' => '11',
                         'tgl_kunjungan' => $tgl_kunjungan,
-                        'jam_kunjungan' => $jam_kunjungan
+                        'jam_kunjungan' => $jam_kunjungan,
+                        'bilik' => $bilik,
+                        'antrian' => $antrian
                     );
 
                     $updateCustomer = $this->CustomerModel->update($id_customer, $arrayCustomerUpdate);

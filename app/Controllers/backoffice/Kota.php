@@ -13,9 +13,11 @@ class Kota extends BaseController
 {
     public $session;
     protected $kotaModel;
+    protected $validation;
     public function __construct()
     {
         $this->kotaModel = new KotaModel();
+        $this->validation = \Config\Services::validation();
         // $this->kotaModel = new KotaModel();
         $this->session = session();
     }
@@ -46,8 +48,8 @@ class Kota extends BaseController
             'title' => 'Tambah Data Kota',
             'page' => 'kota',
             // 'kota' => $this->kotaModel,
-            'validation' => \Config\Services::validation(),
-            'session' => session()
+            'validation' => $this->validation,
+            'session' => $this->session
         );
         // dd($this->session->get('nama'));
         return view('backoffice/kota/create_kota', $data);
@@ -89,8 +91,8 @@ class Kota extends BaseController
             'page' => 'kota',
             'data' => $this->kotaModel->find($id_kota),
             // 'kota' => $this->kotaModel,
-            'validation' => \Config\Services::validation(),
-            'session' => session(),
+            'validation' => $this->validation,
+            'session' => $this->session,
             'id' => $id_kota
         );
         // dd($this->session->get('nama'));
@@ -138,16 +140,27 @@ class Kota extends BaseController
             'page' => 'kota',
             'data' => $this->kotaModel->find($id_kota),
             // 'kota' => $this->kotaModel,
-            'validation' => \Config\Services::validation(),
-            'session' => session(),
+            'validation' => $this->validation,
+            'session' => $this->session,
             'id' => $id_kota
         );
         // dd($this->session->get('nama'));
         return view('backoffice/kota/delete_kota', $data);
     }
 
-    public function do_delete(int $id_faskes)
+    public function do_delete(int $id_kota)
     {
-        # code...
+        if (!$this->session->has('logged_in')) {
+            return redirect()->to('/backoffice/login');
+        }
+        if ($this->kotaModel->find($id_kota) != null) {
+            if ($this->kotaModel->delete($id_kota)) {
+                $this->session->setFlashdata('success', 'Berhasil Hapus data kota');
+                return redirect()->to('/backoffice/kota');
+            } else {
+                $this->session->setFlashdata('error', 'Gagal Hapus data kota');
+                return redirect()->to('/backoffice/kota');
+            }
+        }
     }
 }

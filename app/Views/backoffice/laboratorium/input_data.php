@@ -404,7 +404,7 @@
                             <div class="float-right">
                                 <button class="btn btn-secondary btn-sm" onclick="return window.close()">Kembali</button>
                                 <button href="" class="btn btn-success btn-sm">Simpan</button>
-                                <a href="/backoffice/layanan/printPDFCustomer/<?= $customer['id']; ?>" class="btn btn-primary btn-sm">Cetak Hasil(en)</a>
+                                <a href="/api/get_hasil_lab/<?= $customer['id']; ?>" class="btn btn-primary btn-sm">Cetak Hasil(en)</a>
                                 <button class="btn btn-primary btn-sm" type="button" onclick="kirim_hasil()">Kirim Hasil</button>
                             </div>
                         </div>

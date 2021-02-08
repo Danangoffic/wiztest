@@ -127,7 +127,7 @@ class Laboratorium extends ResourceController
         $data = [
             'page' => 'laboratorium',
             'title' => 'Hasil Laboratorium',
-            'session' => session(),
+            'session' => $this->session,
             // 'data' => $this->get_data_laboratorium()
         ];
         // dd($this->session->get('nama'));
@@ -166,9 +166,9 @@ class Laboratorium extends ResourceController
             $this->session->setFlashdata("error", "Anda tidak mempunyai akses");;
             return redirect()->to("/backoffice/login");
         }
-        $list_status_cov = $this->statusHasilModel->where('jenis_status', 'status_cov')->get()->getResultArray();
-        $list_status_gene = $this->statusHasilModel->where('jenis_status', 'status_gene')->get()->getResultArray();
-        $list_status_orf = $this->statusHasilModel->where('jenis_status', 'status_orf')->get()->getResultArray();
+        $list_status_cov = $this->statusHasilModel->by_jenis_status('status_cov')->get()->getResultArray();
+        $list_status_gene = $this->statusHasilModel->by_jenis_status('status_gene')->get()->getResultArray();
+        $list_status_orf = $this->statusHasilModel->by_jenis_status('status_orf')->get()->getResultArray();
         $data = array(
             'title' => "Import data",
             'page' => "lab",
@@ -475,5 +475,48 @@ class Laboratorium extends ResourceController
             'tgl_registrasi' => $tgl_registrasi
         );
         return view("backoffice/laboratorium/input_data", $data);
+    }
+
+    public function print_hasil($id_customer = null, $attachment = 1)
+    {
+        $customer = $this->customer->detail_customer($id_customer);
+        if ($customer == null) {
+            echo "peserta tidak ditemukan";
+        }
+        $invoice_number = $customer['invoice_number'];
+        if ($invoice_number == null) {
+            echo "Invoice number kosong";
+            return false;
+        }
+        $customer = $this->CustomerModel->get_customer_by_invoice($invoice_number);
+        if ($customer == null) {
+            echo "Customer tidak ditemukan";
+            return false;
+        }
+        $id_customer = $customer['id'];
+        $data_pembayaran = $this->pembayaran_model->where(['id_customer' => $id_customer])->get()->getRowArray();
+        $data_layanan_test = db_connect()->table('data_layanan_test')->where('id', $customer['jenis_test'])->limit(1)->get()->getRowArray();
+        $data_layanan = db_connect()->table('jenis_layanan')->where('id', $data_layanan_test['id_layanan'])->get()->getRowArray();
+        $data_test = db_connect()->table('jenis_test')->where('id', $data_layanan_test['id_test'])->get()->getRowArray();
+        $nama_test = $data_test['nama_test'];
+        $nama_layanan = $data_layanan['nama_layanan'];
+
+        $nama_paket = $nama_test . " ({$nama_layanan})";
+        $nama = $customer['nama'];
+        $title = "Invoice {$nama} - {$invoice_number}";
+        $data = [
+            'title' => $title,
+            'page' => "invoice_customer",
+            'customer' => $customer,
+            'data_pembayaran' => $data_pembayaran,
+            'nama_paket' => $nama_paket
+        ];
+        $dompdf = new \Dompdf\Dompdf();
+        $dompdf->loadHtml(view('backoffice/laboratorium/print_hasil_peserta', $data));
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        // $dompdf->set
+        // $dompdf->
+        $dompdf->stream($title . ".pdf", ['Attachment' => $attachment]);
     }
 }

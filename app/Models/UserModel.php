@@ -93,4 +93,13 @@ class UserModel extends Model
             return $this->db->table('users_detail')->update($data, ['id_user' => $idUser]);
         }
     }
+
+    public function get_by_user_level($user_level = null)
+    {
+        if ($user_level == null) {
+            return null;
+        }
+        $builder = db_connect()->table($this->table)->where('user_level', $user_level);
+        return $builder;
+    }
 }
