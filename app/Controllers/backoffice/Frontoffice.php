@@ -262,7 +262,7 @@ class Frontoffice extends ResourceController
             // 'detail_user' => $this->detail_user,
             'bilik' => $db_bilik
         );
-        return view("backoffice/front_office/manajemen_antrian", $data);
+        return view("backoffice/frontoffice/manajemen_antrian", $data);
     }
 
     public function antrian_panggilan()
