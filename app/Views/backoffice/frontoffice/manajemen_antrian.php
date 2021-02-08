@@ -1,4 +1,4 @@
-<?= $this->extend('backoffice/template/layout_swabber'); ?>
+<?= $this->extend('backoffice/template/layout_resepsionis'); ?>
 <?= $this->section('content'); ?>
 <div class="">
     <sectino class="content-header">
