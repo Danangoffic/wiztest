@@ -252,15 +252,12 @@ class Frontoffice extends ResourceController
         // $data_bilik = $db_bilik->where('nomor_bilik', $nomor_bilik)->get()->getRowArray();
 
         $data = array(
-            'title' => "Antrian",
-            'page' => "swabber",
+            'title' => "Antrian Bilik " . $nomor_bilik,
+            'page' => "frontoffice",
             'data_customer' => $data_customer,
             'session' => $this->session,
             'data_bilik' => $db_bilik,
             'nomor_bilik' => $nomor_bilik,
-            // 'data_swabber' => $data_swabber,
-            // 'detail_user' => $this->detail_user,
-            'bilik' => $db_bilik
         );
         return view("backoffice/frontoffice/manajemen_antrian", $data);
     }
