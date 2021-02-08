@@ -1,6 +1,6 @@
 <?= $this->extend('backoffice/template/layout_swabber'); ?>
 <?= $this->section('content'); ?>
-<div class="content-wrapper">
+<div class="">
     <sectino class="content-header">
         <div class="container-fluid">
             <div class="row">
