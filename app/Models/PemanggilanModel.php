@@ -26,8 +26,6 @@ class PemanggilanModel extends Model
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at';
-    protected $tgl_kunjungan = date('Y-m-d');
-    protected $jam_kunjungan = date("H:") . "00:00";
 
     public function get_by_customer($id_customer = null)
     {
@@ -49,11 +47,13 @@ class PemanggilanModel extends Model
 
     public function by_jenis_antrian($jenis = "11", $nomor_bilik = 1)
     {
+        $tgl_kunjungan = date("Y-m-d");
+        $jam_kunjungan = date("H:") . "00:00";
         $builder = db_connect()->table($this->table)
             ->where('bilik', $nomor_bilik)
             ->where('status_pemanggilan', $jenis)
-            ->where('tgl_kunjungan', $this->tgl_kunjungan)
-            ->where('jam_kunjungan', $this->jam_kunjungan)
+            ->where('tgl_kunjungan', $tgl_kunjungan)
+            ->where('jam_kunjungan', $jam_kunjungan)
             ->orderBy('antrian', 'ASC');
         return $builder;
     }
