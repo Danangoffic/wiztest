@@ -41,7 +41,7 @@ class PemanggilanModel extends Model
 
     public function by_nomor_bilik($nomor_bilik = 1)
     {
-        $builder = db_connect()->table($this->table)->where('nomor_bilik', $nomor_bilik)->orderBy('antrian', 'ASC');
+        $builder = db_connect()->table($this->table)->where('bilik', $nomor_bilik)->orderBy('antrian', 'ASC');
         return $builder;
     }
 
