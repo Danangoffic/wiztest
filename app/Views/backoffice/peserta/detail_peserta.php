@@ -56,7 +56,7 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="<?= base_url('backoffice/peserta/print_pdf/' . $data_customer->id); ?>" class="btn btn-primary btn-sm">Print Pdf</a>
+                    <a href="/api/print_invoice/no-ttd/<?= $data_customer->invoice_number; ?>" class="btn btn-primary btn-sm">Print Pdf</a>
                     <!-- <?= $data_customer->kehadiran; ?> -->
                     <?php
                     if ($data_customer->kehadiran == 0) {
