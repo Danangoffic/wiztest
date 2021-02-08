@@ -265,19 +265,17 @@ class Frontoffice extends ResourceController
     public function antrian_panggilan()
     {
         $bilik = $this->request->getVar('nomor_bilik');
-        $data_antrian_bilik = $this->pemanggilan_model->by_nomor_bilik($bilik)->limit(1)->get()->getRowArray();
+        $data_panggilan = $this->dalam_panggilan($bilik);
+        $data_antrian = $this->antrian_menunggu($bilik);
 
-        if ($data_antrian_bilik != null) {
-            $id_customer = $data_antrian_bilik['id_customer'];
-            $customer_data = $this->customerModel->detail_customer($id_customer);
+        if ($data_panggilan != null) {
+            $id_customer = $data_panggilan['id_customer'];
+            $id_customer_antrian = $data_antrian['id_customer'];
+            $customer_panggilan = $this->customerModel->detail_customer($id_customer);
+            $customer_antrian = $this->customerModel->detail_customer($id_customer_antrian);
             $return_array = array(
-                'antrian' => array(
-                    'jam_kunjungan' => $customer_data['jam_kunjungan'],
-                    'nomor_antrian' => $customer_data['no_antrian'],
-                    'nomor_bilik' => $customer_data['nomor_bilik'],
-                    'customer_unique' => $customer_data['customer_unique'],
-                    'id' => $customer_data['id']
-                )
+                'panggilan' => $customer_panggilan,
+                'antrian' => $customer_antrian
             );
             return $this->respond($return_array, 200, "success");
         } else {
@@ -288,9 +286,14 @@ class Frontoffice extends ResourceController
         }
     }
 
-    public function antrian_menunggu()
+    protected function dalam_panggilan($bilik)
     {
-        # code...
+        return $this->pemanggilan_model->by_jenis_antrian('12', $bilik)->get(1)->getRowArray();
+    }
+
+    protected function antrian_menunggu($bilik)
+    {
+        return $this->pemanggilan_model->by_jenis_antrian('11', $bilik)->get(1)->getRowArray();
     }
 
     public function next_antrian()

@@ -91,16 +91,26 @@
             type: "GET",
             data: data,
             success: function(data, status, xhqr) {
-                let v = data.antrian;
+                let a = data.antrian;
+                let p = data.panggilan
                 var html_antrian = "";
                 let str_jam = v.jam_kunjungan;
                 // let prefix_urutan = str_jam.substring(0, 2);
                 // let urutan = (v.urutan < 10) ? '00' + v.urutan : (v.urutan > 9 && v.urutan < 100) ? '0' + v.urutan : v.urutan;
                 // let new_urutan = prefix_urutan + "" + v.no_urutan;
-                html_antrian += `<tr><td>${v.no_antrian}</td>
-                            <td>${v.nomor_bilik}</td>
-                            <td>${v.customer_unique}</td>
-                            <td><button type="button" onclick="return next_antrian('${v.id}')" class="btn btn-primary">Antrian Selanjutnya</button></td></tr>`;
+                if (p != null) {
+                    html_antrian += `<tr><td>${p.no_antrian}</td>
+                            <td>${p.nomor_bilik}</td>
+                            <td>${p.nama}</td>
+                            <td><button type="button" onclick="return next_antrian('${p.id}')" class="btn btn-primary">Antrian Selanjutnya</button></td></tr>`;
+                }
+                if (a != null) {
+                    html_antrian += `<tr><td>${a.no_antrian}</td>
+                            <td>${a.nomor_bilik}</td>
+                            <td>${a.nama}</td>
+                            <td>Menunggu</td></tr>`;
+                }
+
 
                 $("#antrian_bilik").html(html_antrian);
 

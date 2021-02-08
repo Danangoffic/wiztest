@@ -17,7 +17,7 @@
                         </div>
 
                         <div class="card-body">
-                            <form action="" method="POST">
+                            <form action="/backoffice/frontoffice/walk_in" method="POST">
                                 <input type="hidden" name="filtering" value="on">
                                 <input type="hidden" name="id_pemeriksaan" value="1">
                                 <div class="form-group row">
