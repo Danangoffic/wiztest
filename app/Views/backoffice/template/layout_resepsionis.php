@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Swabber QuickTest - <?= $title; ?></title>
+    <title>Resepsionis QuickTest - <?= $title; ?></title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -87,7 +87,7 @@
     <div class="wrapper">
 
         <?= $this->renderSection('content'); ?>
-        <?= $this->include('backoffice/template/footer'); ?>
+        <!-- <?= $this->include('backoffice/template/footer'); ?> -->
     </div>
 </body>
 

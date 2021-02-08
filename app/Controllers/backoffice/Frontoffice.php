@@ -288,6 +288,11 @@ class Frontoffice extends ResourceController
         }
     }
 
+    public function antrian_menunggu()
+    {
+        # code...
+    }
+
     public function next_antrian()
     {
         $id_customer =  $this->request->getVar('id_customer');
