@@ -144,8 +144,9 @@
 </div>
 
 
-<!-- <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?= $midtrans_client_key; ?>"></script> -->
+
 <script>
+    var marketing = <?= $marketing; ?>;
     var jenis_test, nama_test, nama_layanan, biaya, array_peserta = [],
         array_table_peserta = [],
         jam_kunjungan;
@@ -156,17 +157,6 @@
         $("#collective").hide();
         // document.getElementById("add_peserta").addEventListener("click")
     });
-
-    // function getMenu() {
-    //     $.get('<?= base_url('menu'); ?>').then(e => {
-    //         var menus = '';
-    //         $.each(e, (i, v) => {
-    //             menus += `<button class="btn btn-default btn-sm" type="button" role="button" onclick="return selectMenu(${v.id_jenis_test})">${v.keterangan}</button>`;
-    //         });
-    //         $("#menus").html(menus);
-    //         $("#loading").hide();
-    //     });
-    // }
 
     function selectMenu(id_jenis_test) {
         $(".btn-test").removeClass("btn-primary active");
@@ -317,7 +307,6 @@
         array_table_peserta.splice(key, 1);
         array_peserta.splice(key, 1);
         $("#peserta" + key).hide();
-
     }
 
     function cancelData(result) {
@@ -387,11 +376,14 @@
             type: 'post',
             data: data,
             success: function(data, status, xhr) {
-                showToast('success', 'Berhasil simpan data peserta untuk home service, silahkan cek pada email untuk qr code yang nantinya dibutuhkan saat kehadiran');
+                showToast('success', 'Berhasil simpan data peserta untuk home service, ' +
+                    'silahkan cek pada email masing masing peserta untuk pengecekan qr code ' +
+                    'yang nantinya dibutuhkan saat kehadiran');
                 setInterval(window.location.reload, 5000);
             },
             error: function(err) {
-                showError("terjadi kesalahan dalam menyimpan data anda, silahkan menunggu beberapa saat. Terima kasih");
+                showError("terjadi kesalahan dalam menyimpan data anda, " +
+                    "silahkan menunggu beberapa saat. Terima kasih");
             }
         })
     }

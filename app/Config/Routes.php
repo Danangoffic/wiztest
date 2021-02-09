@@ -201,9 +201,18 @@ $routes->get("led/(:num)", "Antrian::bilik/$1");
 
 $routes->get("/api/wa", "backoffice\Whatsapp_service::coba_wa");
 $routes->post("/api/save-hs", "Customer::home_service_registration");
+// $routes->post("/save-rujukan", "Afiliasi::save_rujukan");
 $routes->get("swabber", "backoffice\Swabber::index");
 
 $routes->get("/backoffice/reporting/(:segment)", "backoffice\Reporting::$1");
+
+
+/**
+ * API untuk afiliasi home services dan corporate, rujukan akan menyusul dalam pertimbangan
+ */
+$routes->get("/afiliasi-hs/(:num)", "Afiliasi::home_service/$1");
+$routes->get("/corporate/(:num)", "Afiliasi::corporate/$1");
+// $routes->post("/afiliasi-corporate/save", "Afiliasi::save_corporate");
 /**
  * --------------------------------------------------------------------
  * Additional Routing

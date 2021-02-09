@@ -50,6 +50,7 @@ class Customer extends ResourceController
     protected $CustomerHomeServiceModel;
     protected $layanan_test_model;
     protected $midtrans_bo;
+    protected $afiliasi;
 
     public function __construct()
     {
@@ -72,6 +73,7 @@ class Customer extends ResourceController
         $this->CustomerHomeServiceModel = new CustomerHomeServiceModel();
         $this->layanan_test_model = new LayananTestModel();
         $this->midtrans_bo = new BackofficeMidtrans;
+        $this->afiliasi = new Afiliasi;
     }
 
     public function index()
@@ -721,7 +723,7 @@ class Customer extends ResourceController
             if ($check_jenis_test['id']) {
                 $check_data_layanan_test = $this->layananTestModel
                     ->where(['id_test' => $id_jenis_test, 'id_pemeriksaan' => $id_jenis_pemeriksaan, 'id_segmen' => $id_segmen])->get()->getResultArray();
-                if ($check_data_layanan_test) {
+                if ($check_data_layanan_test != null) {
                     $data = array();
                     foreach ($check_data_layanan_test as $key => $dlt) {
                         $detail_layanan = $this->layananModel->find($dlt['id_layanan']);
@@ -762,6 +764,8 @@ class Customer extends ResourceController
                 $this->session->setFlashdata('error', "Daftar peserta yang di daftarkan minimal adalah 5 orang");
                 return redirect()->to("/home-service");
             }
+            $tgl_kunjungan = $this->request->getVar("tgl_kunjungan");
+            $jam_kunjungan = $this->request->getVar("jam_kunjungan");
             $p = $peserta[0];
             $detail_jenis_test = $this->layananTestModel->find($p['jenis_test']);
             $detail_layanan = $this->layananModel->find($detail_jenis_test['id_layanan']);
@@ -769,17 +773,19 @@ class Customer extends ResourceController
             $jenis_pemeriksaan = $detail_jenis_test['id_pemeriksaan'];
             $jenis_layanan = $detail_jenis_test['id_layanan'];
             $jenis_test = $p['jenis_test'];
-            $tgl_kunjungan = $p['tgl_kunjungan'];
-            $jam_kunjungan = $p['jam_kunjungan'];
+            // $tgl_kunjungan = $p['tgl_kunjungan'];
+            // $id_jam_kunjungan = $p['jam_kunjungan'];
             $jenis_kelamin = $p['jenis_kelamin'];
             $tempat_lahir = $p['tempat_lahir'];
             $tgl_lahir = $p['tgl_lahir'];
             $alamat = $p['alamat'];
             $instansi = $p['instansi'];
             $marketing = $p['marketing'];
+            $dataJamKunjungan = $this->kuotaModel->find($jam_kunjungan);
+            $jam_kunjungan = $dataJamKunjungan['jam'];
 
             $customer_UNIQUE = $this->getOrderId($jenis_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
-            $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
+            $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan);
 
             $array_insert = array(
                 'jenis_test' => $p['jenis_test'],
@@ -806,7 +812,7 @@ class Customer extends ResourceController
             $this->CustomerHomeServiceModel->insert($array_insert);
             $id_hs = $this->CustomerHomeServiceModel->getInsertID();
 
-            $InvoiceCustomer = $this->generate_invoice_hs($id_hs);
+            $InvoiceCustomer = $this->afiliasi->afiliasi_invoice($id_hs, "home service");
             $this->CustomerHomeServiceModel->update($id_hs, ['invoice_number' => $InvoiceCustomer]);
 
             $array_insert = array();
@@ -820,17 +826,21 @@ class Customer extends ResourceController
                 $jenis_pemeriksaan = $detail_jenis_test['id_pemeriksaan'];
                 $jenis_layanan = $detail_jenis_test['id_layanan'];
                 $jenis_test = $p['jenis_test'];
-                $tgl_kunjungan = $p['tgl_kunjungan'];
-                $jam_kunjungan = $p['jam_kunjungan'];
+                // $tgl_kunjungan = $p['tgl_kunjungan'];
                 $jenis_kelamin = $p['jenis_kelamin'];
                 $tempat_lahir = $p['tempat_lahir'];
                 $tgl_lahir = $p['tgl_lahir'];
                 $alamat = $p['alamat'];
                 $instansi = $p['instansi'];
                 $marketing = $p['marketing'];
+                $dataJamKunjungan = $this->kuotaModel->find($jam_kunjungan);
+                $jam_kunjungan2 = $dataJamKunjungan['jam'];
+
+                $detail_layanan_test = $this->layanan_test_model->find($p['jenis_test']);
+                $biaya_test = $detail_layanan_test['biaya'];
 
                 $customer_UNIQUE = $this->getOrderId($jenis_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
-                $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
+                $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan2);
 
                 $array_insert = array(
                     'jenis_test' => $p['jenis_test'],
@@ -861,6 +871,15 @@ class Customer extends ResourceController
 
                 $InvoiceCustomer = $this->getInvoiceNumber($ids);
                 $this->customerModel->update($ids, ['invoice_number' => $InvoiceCustomer]);
+
+                $data_pembayaran = [
+                    'id_customer' => $ids,
+                    'tipe_pembayaran' => "langsung",
+                    'amount' => $biaya_test,
+                    'jenis_pembayaran' => "Invoice",
+                    'status_pembayaran' => "Invoice"
+                ];
+                $insert_pembayaran = $this->PembayaranModel->insert($data_pembayaran);
 
                 $harga_test += $detail_jenis_test['biaya'];
                 $product_name[] = $detail_test['nama_test'] . " " . $detail_layanan['nama_layanan'];

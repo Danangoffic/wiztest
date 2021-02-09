@@ -10,7 +10,8 @@ use App\Models\PemeriksaanModel;
 use App\Models\TestModel;
 use CodeIgniter\RESTful\ResourceController;
 // use Dompdf\Cpdf;
-use Dompdf\Dompdf;
+use TCPDF;
+// use Dompdf\Dompdf;
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
@@ -26,7 +27,7 @@ class Layanan extends ResourceController
     {
         $this->codeBarCode = "code128";
         $this->session = \Config\Services::session();
-        $this->dompdf = new Dompdf();
+        $this->dompdf = new TCPDF();
         $this->customer = new CustomerModel();
         $this->layanan_model = new LayananModel();
     }
@@ -69,7 +70,7 @@ class Layanan extends ResourceController
 
         $Whatsapp_service = new Whatsapp_service;
 
-        $Whatsapp_service->send_whatsapp_img_invoice($id_customer);
+        $Whatsapp_service->send_whatsapp_invoice($id_customer);
 
         $Email = \Config\Services::email();
 
@@ -131,11 +132,26 @@ class Layanan extends ResourceController
         );
         // $pdf = new PdfExtender;
         $html = view('backoffice/layanan/invoice_pdf_print', $data);
-        $this->dompdf->loadHtml($html);
+        $this->dompdf->setPageOrientation('L');
+        $this->dompdf->setCellMargins(0, 0, 0, 0);
+        $this->dompdf->SetCreator(PDF_CREATOR);
+        $this->dompdf->SetAuthor('QUICKTEST LABORATORIUM INDONESIA');
+        $this->dompdf->SetTitle('Invoice');
+        $this->dompdf->SetSubject('Invoice');
+
+        $this->dompdf->setPrintHeader(false);
+        $this->dompdf->setPrintFooter(false);
+
+        $this->dompdf->addPage();
+        $this->dompdf->writeHTML($html, true, false, true, false, '');
+
+        $this->response->setContentType('application/pdf');
+        //Close and output PDF document
+        $this->dompdf->Output('invoice.pdf', 'I');
         // Render the PDF
-        $this->dompdf->render();
+        // $this->dompdf->render();
         // Output the generated PDF to Browser
-        $this->dompdf->stream($this->filename, array("Attachment" => false));
+        // $this->dompdf->stream($this->filename, array("Attachment" => false));
         // $pdf->setPaper('A4');
         // $pdf->setFilename('Invoice.pdf');
         // $pdf->load_view('backoffice/layanan/invoice_pdf_print', $data);
@@ -236,11 +252,31 @@ class Layanan extends ResourceController
         // return $fileHTMLVIEW;
         // exit();
         // $htmlFile = base_url('backoffice/layanan/render_barcode/' . $encoded_id_customer, true);
-        $this->dompdf->loadHtml($fileHTMLVIEW);
-        $arraySize = array(0, 0, 170, 190);
-        $this->dompdf->setPaper($arraySize, 'landscape');
-        $this->dompdf->render();
-        $this->dompdf->stream('barcode.pdf', ['Attachment' => false]);
+        // $html = view('backoffice/layanan/invoice_pdf_print', $data);
+        $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
+        $PDF->setPageOrientation('L');
+        $PDF->setCellMargins(0, 0, 0, 0);
+        $PDF->SetCreator(PDF_CREATOR);
+        $PDF->SetAuthor('QUICKTEST LABORATORIUM INDONESIA');
+        $PDF->SetTitle('Barcode');
+        $PDF->SetSubject('Barcode');
+
+        $PDF->setPrintHeader(false);
+        $PDF->setPrintFooter(false);
+
+        $PDF->addPage();
+        $PDF->setBarcode($detailCustomer['customer_unique']);
+
+        $this->response->setContentType('application/pdf');
+        //Close and output PDF document
+        $PDF->Output('barcode.pdf', 'I');
+
+
+        // $this->dompdf->loadHtml($fileHTMLVIEW);
+        // $arraySize = array(0, 0, 170, 190);
+        // $this->dompdf->setPaper($arraySize, 'landscape');
+        // $this->dompdf->render();
+        // $this->dompdf->stream('barcode.pdf', ['Attachment' => false]);
         // readfile("fileinit.pdf");
 
         // return view('backoffice/Layanan/print_barcode', ['img_url' => $img_url]);
@@ -265,29 +301,29 @@ class Layanan extends ResourceController
         return view('backoffice/layanan/print_barcode', ['base64' => $base64, 'url' => $customer_unique, 'detailCustomer' => $detailCustomer, 'original_img' => $img_url, 'html_img' => $html]);
     }
 
-    public function coba_barcode($id_customer)
-    {
+    // public function coba_barcode($id_customer)
+    // {
 
-        $CustomerModel = new CustomerModel();
-        $detailCustomer = $CustomerModel->find($id_customer);
-        $url = $detailCustomer['customer_unique'];
-        $this->codeBarCode = "code128";
-        $img_url = $this->get_bar_code(urlencode($url));
-        $type = pathinfo($img_url, PATHINFO_EXTENSION);
-        $data = file_get_contents($img_url);
-        $base64 = 'data:image/png' . ';base64,' . base64_encode($data);
-        // It will be called downloaded.pdf
-        $html = '<center><img importance="" width=\'200\' height=\'100\' src="' . $img_url . '" id=""></center>';
-        // $fileHTMLVIEW = view('backoffice/layanan/print_barcode', ['base64' => $base64, 'url' => $url, 'detailCustomer' => $detailCustomer, 'original_img' => $img_url, 'html_img' => $html]);
-        // return $fileHTMLVIEW;
-        // exit();
-        // $htmlFile = base_url('backoffice/layanan/render_barcode/' . $encoded_id_customer, true);
-        $this->dompdf->loadHtml($html);
-        $arraySize = array(0, 0, 250, 150);
-        $this->dompdf->setPaper($arraySize);
-        $this->dompdf->render();
-        $this->dompdf->stream('barcode.pdf', ['Attachment' => false]);
-    }
+    //     $CustomerModel = new CustomerModel();
+    //     $detailCustomer = $CustomerModel->find($id_customer);
+    //     $url = $detailCustomer['customer_unique'];
+    //     $this->codeBarCode = "code128";
+    //     $img_url = $this->get_bar_code(urlencode($url));
+    //     $type = pathinfo($img_url, PATHINFO_EXTENSION);
+    //     $data = file_get_contents($img_url);
+    //     $base64 = 'data:image/png' . ';base64,' . base64_encode($data);
+    //     // It will be called downloaded.pdf
+    //     $html = '<center><img importance="" width=\'200\' height=\'100\' src="' . $img_url . '" id=""></center>';
+    //     // $fileHTMLVIEW = view('backoffice/layanan/print_barcode', ['base64' => $base64, 'url' => $url, 'detailCustomer' => $detailCustomer, 'original_img' => $img_url, 'html_img' => $html]);
+    //     // return $fileHTMLVIEW;
+    //     // exit();
+    //     // $htmlFile = base_url('backoffice/layanan/render_barcode/' . $encoded_id_customer, true);
+    //     $this->dompdf->loadHtml($html);
+    //     $arraySize = array(0, 0, 250, 150);
+    //     $this->dompdf->setPaper($arraySize);
+    //     $this->dompdf->render();
+    //     $this->dompdf->stream('barcode.pdf', ['Attachment' => false]);
+    // }
 
     public function get_encoded_peserta(int $id_customer)
     {
