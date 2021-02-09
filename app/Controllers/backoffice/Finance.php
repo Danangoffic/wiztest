@@ -7,6 +7,8 @@ use App\Models\InstansiModel;
 use App\Models\MarketingModel;
 use App\Models\PembayaranModel;
 use App\Controllers\BaseController;
+use TCPDF;
+
 // use App\Controllers;
 // use CodeIgniter\Controller;
 
@@ -164,13 +166,31 @@ class Finance extends BaseController
 
     protected function print_pdf($data)
     {
-        $dompdf = new \Dompdf\Dompdf();
-        $dompdf->loadHtml(view('backoffice/finance/invoice_print_pdf', $data));
-        $dompdf->setPaper('A4', 'landscape');
-        $dompdf->render();
-        // $dompdf->set
-        // $dompdf->
-        $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 0]);
+        // $dompdf = new \Dompdf\Dompdf();
+        // $dompdf->loadHtml(view('backoffice/finance/invoice_print_pdf', $data));
+        // $dompdf->setPaper('A4', 'landscape');
+        // $dompdf->render();
+        // // $dompdf->set
+        // // $dompdf->
+        // $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 0]);
+
+        $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
+        $PDF->setPageOrientation('L');
+        $PDF->setCellMargins(0, 0, 0, 0);
+        $PDF->SetCreator(PDF_CREATOR);
+        $PDF->SetAuthor('QUICKTEST LABORATORIUM INDONESIA');
+        $PDF->SetTitle("Invoicement");
+        $PDF->SetSubject("Invoicement");
+
+        $PDF->setPrintHeader(false);
+        $PDF->setPrintFooter(false);
+
+        $PDF->addPage();
+        $PDF->writeHTML(view('backoffice/finance/invoice_print_pdf', $data));
+
+        $this->response->setContentType('application/pdf');
+        //Close and output PDF document
+        $PDF->Output('Invoicement.pdf', 'I');
     }
 
     public function pdf_customer($invoice_number = null, $attachment = 1)
@@ -202,13 +222,24 @@ class Finance extends BaseController
             'data_pembayaran' => $data_pembayaran,
             'nama_paket' => $nama_paket
         ];
-        $dompdf = new \Dompdf\Dompdf();
-        $dompdf->loadHtml(view('backoffice/finance/print_invoice_customer', $data));
-        $dompdf->setPaper('A4', 'landscape');
-        $dompdf->render();
-        // $dompdf->set
-        // $dompdf->
-        $dompdf->stream($title . ".pdf", ['Attachment' => $attachment]);
+
+        $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
+        $PDF->setPageOrientation('L');
+        $PDF->setCellMargins(0, 0, 0, 0);
+        $PDF->SetCreator(PDF_CREATOR);
+        $PDF->SetAuthor('QUICKTEST LABORATORIUM INDONESIA');
+        $PDF->SetTitle($title);
+        $PDF->SetSubject($title);
+
+        $PDF->setPrintHeader(false);
+        $PDF->setPrintFooter(false);
+
+        $PDF->addPage();
+        $PDF->writeHTML(view('backoffice/finance/print_invoice_customer', $data));
+
+        $this->response->setContentType('application/pdf');
+        //Close and output PDF document
+        $PDF->Output($title . '.pdf', 'I');
     }
 
     public function pdf_customer_ttd($invoice_number = null, $attachment = 1)
@@ -229,20 +260,39 @@ class Finance extends BaseController
         $nama_layanan = $data_layanan['nama_layanan'];
 
         $nama_paket = $nama_test . " ({$nama_layanan})";
+        $title = "Invoice " . $customer['nama'] . " - " . $invoice_number;
         $data = [
-            'title' => "Invoice " . $customer['nama'] . " - " . $invoice_number,
+            'title' => $title,
             'page' => "invoice_customer",
             'customer' => $customer,
             'data_pembayaran' => $data_pembayaran,
             'nama_paket' => $nama_paket
         ];
-        $dompdf = new \Dompdf\Dompdf();
-        $dompdf->loadHtml(view('backoffice/finance/print_invoice_customer_ttd', $data));
-        $dompdf->setPaper('A4', 'landscape');
-        $dompdf->render();
-        // $dompdf->set
-        // $dompdf->
-        $dompdf->stream($data['title'] . ".pdf", ['Attachment' => $attachment]);
+        // $dompdf = new \Dompdf\Dompdf();
+        // $dompdf->loadHtml(view('backoffice/finance/print_invoice_customer_ttd', $data));
+        // $dompdf->setPaper('A4', 'landscape');
+        // $dompdf->render();
+        // // $dompdf->set
+        // // $dompdf->
+        // $dompdf->stream($data['title'] . ".pdf", ['Attachment' => $attachment]);
+
+        $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
+        $PDF->setPageOrientation('L');
+        $PDF->setCellMargins(0, 0, 0, 0);
+        $PDF->SetCreator(PDF_CREATOR);
+        $PDF->SetAuthor('QUICKTEST LABORATORIUM INDONESIA');
+        $PDF->SetTitle($title);
+        $PDF->SetSubject($title);
+
+        $PDF->setPrintHeader(false);
+        $PDF->setPrintFooter(false);
+
+        $PDF->addPage();
+        $PDF->writeHTML(view('backoffice/finance/print_invoice_customer_ttd', $data));
+
+        $this->response->setContentType('application/pdf');
+        //Close and output PDF document
+        $PDF->Output($title . '.pdf', 'I');
     }
 
     /**

@@ -34,7 +34,7 @@
                 </h4>
                 <div class="card-body">
                     <?php
-                    $action = "afiliasi-corporate/save";
+                    $action = "/afiliasi/save_corporate";
                     $attributes = ['id' => 'form_corporate', 'name' => 'form_corporate'];
                     echo form_open_multipart($action, $attributes);
 

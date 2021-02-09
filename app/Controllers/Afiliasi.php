@@ -5,8 +5,11 @@ namespace App\Controllers;
 use App\Controllers\backoffice\Layanan;
 use App\Controllers\backoffice\Midtrans;
 use App\Controllers\backoffice\SystemParameter;
+use App\Controllers\backoffice\Whatsapp_service;
 use App\Models\AfiliasiModel;
 use App\Models\AlatModel;
+use App\Models\CustomerCorporateModel;
+use App\Models\CustomerHomeServiceModel;
 use App\Models\CustomerModel;
 use App\Models\DokterModel;
 use App\Models\HasilLaboratoriumModel;
@@ -48,6 +51,9 @@ class Afiliasi extends ResourceController
     protected $instansi_model;
     protected $session;
     protected $midtrans_bo;
+    protected $customers_controller;
+    protected $customer_corporate;
+    protected $customer_home_service;
 
     public function __construct()
     {
@@ -72,6 +78,9 @@ class Afiliasi extends ResourceController
         $this->page = "afiliasi";
         $this->session = \Config\Services::session();
         $this->midtrans_bo = new Midtrans;
+        $this->customers_controller = new Customer;
+        $this->customer_corporate = new CustomerCorporateModel();
+        $this->customer_home_service = new CustomerHomeServiceModel();
         helper('form');
     }
 
@@ -133,11 +142,12 @@ class Afiliasi extends ResourceController
                 ->where(['id_pemeriksaan' => '1', 'id_segmen' => '2'])->groupBy('id_test')->get()->getResultArray();
             // $getData = $this->sysParamModel->getByVgroupAndParamter('MIDTRANS_KEY', 'CLIENT_KEY');
             $data = [
-                'title' => "Quicktest.id || Pendaftaran Afiliasi Home Service Melalui " . $data_marketing['nama'],
+                'title' => "Quicktest.id || Pendaftaran Afiliasi Home Service Melalui " . $data_marketing['nama_marketing'],
                 'subtitle1' => ucwords("form pendaftaran test"),
                 'marketings' => $data_marketing,
                 'jenis_test' => $this->testModel,
-                'layanan_test_data' => $layanan_test_data
+                'layanan_test_data' => $layanan_test_data,
+                'marketing' => $id_marketing
             ];
             return view('customer/home_service', $data);
         }
@@ -149,15 +159,24 @@ class Afiliasi extends ResourceController
         if ($fileexcel) {
             $id_instansi = $this->request->getPost('id_instansi');
             $id_marketing = $this->request->getPost("id_marketing");
-            $is_corporate = $this->request->getPost('is_corporate');
-            $id_test = $this->request->getPost("id_test");
-            $id_layanan = $this->request->getPost("id_layanan");
             $tgl_kunjungan = $this->request->getPost("tgl_kunjungan");
             $jam_kunjungan = $this->request->getPost("jam_kunjungan");
+            $id_layanan_test = $this->request->getPost("id_layanan");
+            $faskes_asal = 1;
+
+            $detail_layanan_test = $this->layananTestModel->find($id_layanan_test);
+
+            $jenis_test = $detail_layanan_test['id'];
+            $id_test = $detail_layanan_test['id_test'];
+            $jenis_layanan = $detail_layanan_test['id_layanan'];
+            $jenis_pemeriksaan = $detail_layanan_test['id_pemeriksaan'];
+            $biaya_test = $detail_layanan_test['biaya'];
 
             $detail_instansi = $this->instansi_model->detail_instansi($id_instansi);
 
             $nama_instansi = $detail_instansi['nama'];
+
+            $Layanan = new Layanan();
 
             $new_name_file = $nama_instansi . "-" . date('dmYHis') . "{$id_instansi}-" . $fileexcel->getRandomName();
             $excelReader  = new PHPExcel();
@@ -167,16 +186,332 @@ class Afiliasi extends ResourceController
             $objPHPExcel = PHPExcel_IOFactory::load($fileLocation);
             //ambil sheet active
             $sheet    = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
-
             foreach ($sheet as $idx => $data) {
+                if ($idx == 1) {
+                    continue;
+                }
                 $nama = $data['A'];
                 $nik = $data['B'];
                 $email = $data['C'];
                 $jenis_kelamin = $data['D'];
                 $phone = $data['E'];
                 $tempat_lahir = $data['F'];
-                $tanggal_lahir = $data['G'];
+                $tgl_lahir = $data['G'];
+                $alamat = $data['H'];
+
+                $customer_UNIQUE = $this->customers_controller->getOrderId($id_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
+                $no_urutan = $this->customers_controller->getUrutan($id_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan);
+
+                $dataMarketing = $this->marketing_model->find($id_marketing);
+                $dataLayanan = $this->layananModel->find($jenis_layanan);
+
+                if ($jenis_test == 2 || $jenis_test == "2") {
+                    $nomor_bilik = 1;
+                } else if ($jenis_test == 3 || $jenis_test == "3") {
+                    $nomor_bilik = 2;
+                } else {
+                    $hitung_bilik = 6 % $no_urutan;
+                    $nomor_bilik = $hitung_bilik + 2;
+                }
+
+                if ($idx == 2) {
+                    $data_insert_corporate = [
+                        'nama' => $nama,
+                        'email' => $email,
+                        'nik' => $nik,
+                        'phone' => $phone,
+                        'jenis_test' => $jenis_test,
+                        'jenis_pemeriksaan' => $jenis_pemeriksaan,
+                        'jenis_layanan' => $jenis_layanan,
+                        'faskes_asal' => $faskes_asal,
+                        'customer_unique' => $customer_UNIQUE,
+                        'jenis_kelamin' => $jenis_kelamin,
+                        'tempat_lahir' => $tempat_lahir,
+                        'tanggal_lahir' => $tgl_lahir,
+                        'alamat' => $alamat,
+                        'id_marketing' => $id_marketing,
+                        'instansi' => $id_instansi,
+                        'status_test' => 'menunggu',
+                        'tahap' => 1,
+                        'kehadiran' => '22',
+                        'no_antrian' => $no_urutan,
+                        'nomor_bilik' => $nomor_bilik,
+                        'jam_kunjungan' => $jam_kunjungan,
+                        'tgl_kunjungan' => $tgl_kunjungan,
+                        'status_pembayaran' => 'invoice',
+                        'status_peserta' => "20",
+                    ];
+                    $insert_corporate = $this->customer_corporate->insert($data_insert_corporate);
+                    if (!$insert_corporate) {
+                        $this->session->setFlashdata('error', "Gagal tambahkan data peserta corporate tahap 1");
+                        return redirect()->back();
+                        // return $this->failValidationError();
+                    }
+                    $id_inserted = $this->customer_corporate->getInsertID();
+
+                    $invoice_corporate = $this->afiliasi_invoice($id_inserted, "corporate");
+                    $arr_invoice_corporate = ['invoice_number' => $invoice_corporate];
+                    $this->customer_corporate->update($id_inserted, $arr_invoice_corporate);
+                }
+
+                $DataInsertCustomer = [
+                    'nama' => $nama,
+                    'email' => $email,
+                    'nik' => $nik,
+                    'phone' => $phone,
+                    'jenis_test' => $jenis_test,
+                    'jenis_pemeriksaan' => $jenis_pemeriksaan,
+                    'jenis_layanan' => $jenis_layanan,
+                    'faskes_asal' => $faskes_asal,
+                    'customer_unique' => $customer_UNIQUE,
+                    'jenis_kelamin' => $jenis_kelamin,
+                    'tempat_lahir' => $tempat_lahir,
+                    'tanggal_lahir' => $tgl_lahir,
+                    'alamat' => $alamat,
+                    'id_marketing' => $id_marketing,
+                    'instansi' => $id_instansi,
+                    'status_test' => 'menunggu',
+                    'tahap' => 1,
+                    'kehadiran' => '22',
+                    'no_antrian' => $no_urutan,
+                    'nomor_bilik' => $nomor_bilik,
+                    'jam_kunjungan' => $jam_kunjungan,
+                    'tgl_kunjungan' => $tgl_kunjungan,
+                    'status_pembayaran' => 'invoice',
+                    'status_peserta' => "20",
+                    'is_corporate' => "yes",
+                    'id_corporate' => $id_inserted
+                ];
+                $insert_customer = $this->customerModel->insert($DataInsertCustomer);
+
+                if ($insert_customer) {
+                    $insert_id = $this->customerModel->getInsertID();
+                } else {
+                    $this->session->setFlashdata('error', "Gagal tambahkan data peserta corporate tahap 2");
+                    return redirect()->back();
+                }
+                $InvoiceCustomer = $this->customers_controller->getInvoiceNumber($insert_id);
+                $arr_invoice = ['invoice_number' => $InvoiceCustomer];
+                $this->customerModel->update($insert_id, $arr_invoice);
+
+                $data_pembayaran = [
+                    'id_customer' => $insert_id,
+                    'tipe_pembayaran' => "langsung",
+                    'amount' => $biaya_test,
+                    'jenis_pembayaran' => "Invoice",
+                    'status_pembayaran' => "Invoice"
+                ];
+                $insert_pembayaran = $this->PembayaranModel->insert($data_pembayaran);
+                if (!$insert_pembayaran) {
+                    $this->session->setFlashdata('error', "Gagal tambahkan data peserta corporate tahap 2");
+                    return redirect()->back();
+                }
+                $this->send_email_customer_afiliasi($insert_id);
+                $this->send_whatsapp_customer_afiliasi($insert_id);
             }
+        }
+    }
+
+    public function save_rujukan()
+    {
+        $peserta_hs     =   $this->request->getVar("peserta");
+        $total_peserta  =   count($peserta_hs);
+        if ($total_peserta < 5) {
+            $this->session->setFlashdata('error', "Total peserta home service minimal adalah 5 orang, 
+                silahkan isi ulang hingga minimal 5 orang peserta.");
+            return redirect()->back();
+        }
+
+        $id_instansi    = 1;
+        $id_marketing   = $this->request->getVar("id_marketing");
+
+        $tgl_kunjungan  = $this->request->getVar("tgl_kunjungan");
+        $jam_kunjungan  = $this->request->getVar("jam_kunjungan");
+        $faskes_asal    = 1;
+
+        $nama           =   $this->request->getPost('nama');
+        $email          =   $this->request->getPost('email');
+        $phone          =   $this->request->getPost('phone');
+        $nik            =   $this->request->getPost('nik');
+        $jenis_kelamin  =   $this->request->getPost('jenis_kelamin');
+        $tempat_lahir   =   $this->request->getPost('tempat_lahir');
+        $tgl_lahir      =   $this->request->getPost('tgl_lahir');
+        $alamat         =   $this->request->getPost('alamat');
+
+        $id_layanan_test = $this->request->getPost("id_layanan");
+        $detail_layanan_test = $this->layananTestModel->find($id_layanan_test);
+
+        $jenis_test = $detail_layanan_test['id'];
+        $id_test = $detail_layanan_test['id_test'];
+        $jenis_layanan = $detail_layanan_test['id_layanan'];
+        $jenis_pemeriksaan = $detail_layanan_test['id_pemeriksaan'];
+        $biaya_test = $detail_layanan_test['biaya'];
+
+        $customer_UNIQUE = $this->customers_controller->getOrderId($id_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
+        $no_urutan = $this->customers_controller->getUrutan($id_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan);
+
+        $dataMarketing = $this->marketing_model->find($id_marketing);
+        $dataLayanan = $this->layananModel->find($jenis_layanan);
+
+        if ($jenis_test == 2 || $jenis_test == "2") {
+            $nomor_bilik = 1;
+        } else if ($jenis_test == 3 || $jenis_test == "3") {
+            $nomor_bilik = 2;
+        } else {
+            $hitung_bilik = 6 % $no_urutan;
+            $nomor_bilik = $hitung_bilik + 2;
+        }
+
+        $DataInsertCustomer = [
+            'nama' => $nama,
+            'email' => $email,
+            'nik' => $nik,
+            'phone' => $phone,
+            'jenis_test' => $jenis_test,
+            'jenis_pemeriksaan' => $jenis_pemeriksaan,
+            'jenis_layanan' => $jenis_layanan,
+            'faskes_asal' => $faskes_asal,
+            'customer_unique' => $customer_UNIQUE,
+            'jenis_kelamin' => $jenis_kelamin,
+            'tempat_lahir' => $tempat_lahir,
+            'tanggal_lahir' => $tgl_lahir,
+            'alamat' => $alamat,
+            'id_marketing' => $id_marketing,
+            'instansi' => $id_instansi,
+            'status_test' => 'menunggu',
+            'tahap' => 1,
+            'kehadiran' => '22',
+            'no_antrian' => $no_urutan,
+            'nomor_bilik' => $nomor_bilik,
+            'jam_kunjungan' => $jam_kunjungan,
+            'tgl_kunjungan' => $tgl_kunjungan,
+            'status_pembayaran' => 'invoice',
+            'status_peserta' => "20",
+        ];
+        $insert_customer = $this->customerModel->insert($DataInsertCustomer);
+
+        if ($insert_customer) {
+            $insert_id = $this->customerModel->getInsertID();
+        } else {
+            $this->session->setFlashdata('error', "Gagal tambahkan data peserta home service tahap 2");
+            return redirect()->back();
+        }
+        $InvoiceCustomer = $this->afiliasi_invoice($insert_id, "rujukan");
+        $arr_invoice = ['invoice_number' => $InvoiceCustomer];
+        $this->customerModel->update($insert_id, $arr_invoice);
+
+        $data_pembayaran = [
+            'id_customer' => $insert_id,
+            'tipe_pembayaran' => "langsung",
+            'amount' => $biaya_test,
+            'jenis_pembayaran' => "Invoice",
+            'status_pembayaran' => "Invoice"
+        ];
+        $insert_pembayaran = $this->PembayaranModel->insert($data_pembayaran);
+        if (!$insert_pembayaran) {
+            $this->session->setFlashdata('error', "Gagal tambahkan data peserta home service tahap 2");
+            return redirect()->back();
+        }
+        $this->send_email_customer_afiliasi($insert_id);
+        $this->send_whatsapp_customer_afiliasi($insert_id);
+    }
+
+    public function afiliasi_invoice($id, $tipe)
+    {
+        switch ($tipe) {
+            case 'corporate':
+                $word1 = "COR{$id}-";
+                $random = rand(1000, 9999);
+                $generateUrutan = str_pad($id, 4, '0', STR_PAD_LEFT);
+                $invoice = $word1 . date("ymd") . $random . $generateUrutan;
+                return $invoice;
+                break;
+            case 'home service':
+                $word1 = "HS{$id}-";
+                $random = rand(1000, 9999);
+                $generateUrutan = str_pad($id, 4, '0', STR_PAD_LEFT);
+                $invoice = $word1 . date("ymd") . $random . $generateUrutan;
+                return $invoice;
+                break;
+            case 'rujukan':
+                $word1 = "RJ{$id}-";
+                $random = rand(1000, 9999);
+                $generateUrutan = str_pad($id, 4, '0', STR_PAD_LEFT);
+                $invoice = $word1 . date("ymd") . $random . $generateUrutan;
+                return $invoice;
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
+
+    public function send_email_customer_afiliasi($id_customer = null)
+    {
+        $Layanan = new Layanan;
+
+        $Email = \Config\Services::email();
+
+        // $Email->initialize($config);
+
+        // $id_cust = $data_customer['id'];
+        $CustomerDetail = $this->customerModel->detail_customer($id_customer);
+        $emailCustomer = $CustomerDetail['email'];
+        $id_customer = $CustomerDetail['id'];
+        // $nama_customer = $CustomerDetail['nama'];
+        $invoice_number = $CustomerDetail['invoice_number'];
+
+        // $PaymentDetail = $this->PembayaranModel->pembayaran_by_customer($id_customer);
+        $qr_image = $Layanan->getUrlQRCode(base_url('api/hadir/' . $id_customer));
+
+        $tgl_kunjungan = $CustomerDetail['tgl_kunjungan'];
+        $jam_kunjungan = $CustomerDetail['jam_kunjungan'];
+        $nama = $CustomerDetail['nama'];
+        $no_reg = $CustomerDetail['customer_unique'];
+        $title = "Informasi Pembayaran dan Pendaftaran Pada Quictest.id";
+        $pdf_file = base_url('api/print_invoice/no-ttd/' . $invoice_number . "?attachment=1");
+
+        $data_email = array(
+            'no_reg' => $no_reg,
+            'nama' => $nama,
+            'title' => $title,
+            'qr_image' => $qr_image,
+            'pdf_file' => $pdf_file,
+            'informasi' => "Terima kasih telah melakukan pembayaran pada kami, berikut kami berikan gambar QR Code untuk anda 
+                                    hadir pada tempat kami saat melakukan konfirmasi kedatangan 
+                                    pada tanggal {$tgl_kunjungan} 
+                                    pukul {$jam_kunjungan}."
+        );
+
+        $emailMessage = view('send_email_afiliasi', $data_email);
+
+        $Email->setTo($emailCustomer);
+        $Email->setFrom('pendaftaran@quicktest.id', 'Pendaftaran QuickTest.id');
+        $Email->setSubject($title);
+        $Email->setMessage($emailMessage);
+        $Email->attach($qr_image, 'inline', "qr_code_quictest.png", "image/png");
+        $Email->attach(
+            $pdf_file,
+            'inline',
+            "Invoice " . $CustomerDetail['nama'] . " - {$invoice_number}.pdf",
+            "application/pdf"
+        );
+        if ($Email->send()) {
+            return true;
+        } else {
+            $data = $Email->printDebugger(['headers']);
+            print_r($data);
+        }
+    }
+
+    protected function send_whatsapp_customer_afiliasi($id_customer = null)
+    {
+        if ($id_customer != null) {
+            $whatsapp_service = new Whatsapp_service;
+            $whatsapp_service->send_whatsapp_QR($id_customer);
+            $whatsapp_service->send_whatsapp_invoice($id_customer);
+        } else {
+            return false;
         }
     }
 }

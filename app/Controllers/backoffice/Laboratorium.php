@@ -88,6 +88,7 @@ class Laboratorium extends ResourceController
         $this->lokasi_input = new KotaModel();
         $this->instansi = new InstansiModel();
         $this->faskes_asal = new FaskesModel();
+        helper('form');
         // $this->sampleModel;
     }
     public function index()
@@ -154,27 +155,69 @@ class Laboratorium extends ResourceController
         return view("backoffice/laboratorium/import_excel", $data);
     }
 
-    public function insert_antigen()
+    public function data_peserta_antigen()
     {
         if (!$this->session->has('logged_in')) {
             return redirect()->to('/backoffice/login');
         }
-        $user_level = $this->session->get("user_level");
-        $level = array(1, 6, 7, 8, 99);
-        // in_array($level);
-        if (!in_array($user_level, $level)) {
-            $this->session->setFlashdata("error", "Anda tidak mempunyai akses");;
-            return redirect()->to("/backoffice/login");
-        }
-        $list_status_cov = $this->statusHasilModel->by_jenis_status('status_cov')->get()->getResultArray();
-        $list_status_gene = $this->statusHasilModel->by_jenis_status('status_gene')->get()->getResultArray();
-        $list_status_orf = $this->statusHasilModel->by_jenis_status('status_orf')->get()->getResultArray();
+        // $user_level = $this->session->get("user_level");
+        // $level = array(1, 6, 7, 8, 99);
+        // // in_array($level);
+        // if (!in_array($user_level, $level)) {
+        //     $this->session->setFlashdata("error", "Anda tidak mempunyai akses");;
+        //     return redirect()->to("/backoffice/login");
+        // }
+        $data_list_peserta_antigen = $this->customer->get_peserta_test(3)->getResultArray();
+
         $data = array(
-            'title' => "Import data",
+            'title' => "Peserta Antigen",
             'page' => "lab",
-            'session' => $this->session
+            'session' => $this->session,
+            'data_peserta_antigen' => $data_list_peserta_antigen,
+            'layanan_test_model' => $this->layananTestModel,
+            'layanan_model' => $this->layananModel,
+            'test_model' => $this->testModel,
         );
-        return view("backoffice/laboratorium/import_excel", $data);
+        return view("backoffice/laboratorium/peserta_antigen", $data);
+    }
+
+    public function verifikasi_peserta($id_customer = null)
+    {
+        if (!$this->session->has('logged_in')) {
+            return redirect()->to('/backoffice/login');
+        }
+
+        $detail_customer = $this->customer->detail_customer($id_customer);
+        $id_layanan_test = $detail_customer['jenis_test'];
+        $detail_layanan_test = $this->layananTestModel->find($id_layanan_test);
+        $id_test = $detail_layanan_test['id_test'];
+        $nama = $detail_customer['nama'];
+        $data = array(
+            'title' => "Validasi Peserta Antigen - " . $nama,
+            'page' => "lab",
+            'session' => $this->session,
+            'detail_customer' => $detail_customer,
+            'layanan_test_model' => $this->layananTestModel,
+            'layanan_model' => $this->layananModel,
+            'test_model' => $this->testModel,
+            'id_test' => $id_test
+        );
+        return view("backoffice/laboratorium/verifikasi_peserta", $data);
+    }
+
+    public function save_verifikasi()
+    {
+        $status_result = $this->request->getPost("status_result");
+        $status_n_gene = $this->request->getPost("status_n_gene");
+
+        $status_orf = $this->request->getPost("status_orf");
+        $nilai_ic = $this->request->getPost("nilai_ic");
+
+        $gene_orf = $this->request->getPost("gene_orf");
+        $nilai_ct_orf = $this->request->getPost("nilai_ct_orf");
+
+        $gene_hex_n = $this->request->getPost("gene_hex_n");
+        $nilai_ct_hex_n = $this->request->getPost("nilai_ct_hex_n");
     }
 
 

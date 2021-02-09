@@ -26,6 +26,7 @@ use CodeIgniter\Validation\Validation;
 use Dompdf\Cpdf;
 use Dompdf\Css\Stylesheet;
 use Dompdf\Options;
+use TCPDF;
 
 // use App\Controllers;
 // use CodeIgniter\Controller;
@@ -354,39 +355,30 @@ class Peserta extends BaseController
         $nama = $Customer['nama'];
         $order_id = $Customer->customer_unique;
 
-        /**
-         * GET STATUS PEMBAYARAN MELALUI MIDTRANS
-         */
-        $midtrans_status = \Midtrans::status($order_id);
+        $tipe_pembayaran = $Customer->tipe_pembayaran;
 
-        $midtrans_payment_type = ucwords(str_replace("_", " ", $midtrans_status['payment_type']));
-        $midtrans_transaction_status = $midtrans_status['transaction_status'];
-        $midtrans_gross_amount = (int) $midtrans_status['gross_amount'];
-        $has_va = ($midtrans_status['va_numbers']) ? $midtrans_status['va_numbers'] : null;
-        // dd($Customer);
-        // echo $orderId;
-        // exit();
-        $va = ($has_va != null) ? $has_va['va_number'] : null;
+        if ($tipe_pembayaran == "midtrans") {
+            /**
+             * GET STATUS PEMBAYARAN MELALUI MIDTRANS
+             */
+            $midtrans_status = \Midtrans::status($order_id);
 
-        $bank = ($has_va != null) ? $has_va['bank'] : null;
-        $amt = 'Rp ' . number_format($midtrans_gross_amount, 0, ",", ".");
+            $jenis_pembayaran = ucwords(str_replace("_", " ", $midtrans_status['payment_type']));
+            $status_pembayaran = $midtrans_status['transaction_status'];
+            $midtrans_gross_amount = (int) $midtrans_status['gross_amount'];
+            $has_va = ($midtrans_status['va_numbers']) ? $midtrans_status['va_numbers'] : null;
 
-        // $detail_pembayaran = $this->pembayaran_model->pembayaran_by_customer($id);
-        // dd($detail_pembayaran);
-        // $tipe_pembayaran = $detail_pembayaran['tipe_pembayaran'];
-
-        // $amount = $midtrans_gross_amount;
-        // $jenis_pembayaran = $detail_pembayaran['jenis_pembayaran'];
-        // $status_pembayaran = $detail_pembayaran['status_pembayaran'];
-        // $va_numbers = "";
-        // $bank = "";
-        // $va = "";
-
-        // $payment_type = ucwords($jenis_pembayaran);
-        // $transactionStatus = ucwords($status_pembayaran);
-        // }
-
-        // dd($DetailPayment);
+            $va = ($has_va != null) ? $has_va['va_number'] : null;
+            $bank = ($has_va != null) ? $has_va['bank'] : null;
+            $amt = 'Rp ' . number_format($midtrans_gross_amount, 0, ",", ".");
+        } elseif ($tipe_pembayaran == "langsung") {
+            $amount = $Customer->amount;
+            $jenis_pembayaran = $Customer->jenis_pembayaran;
+            $status_pembayaran = $Customer->status_pembayaran;
+            $va = null;
+            $amt = 'Rp ' . number_format($amount, 0, ",", ".");
+            $bank = null;
+        }
 
         $data = array(
             'title' => "Detail Peserta {$nama} - {$order_id}",
@@ -396,9 +388,9 @@ class Peserta extends BaseController
             'id' => $id,
             'amt' => $amt,
             'va' => $va,
-            'paymentType' => $midtrans_payment_type,
+            'paymentType' => $jenis_pembayaran,
             'bank' => $bank,
-            'transactionStatus' => $midtrans_transaction_status,
+            'transactionStatus' => $status_pembayaran,
             'status_hadir' => $this->statusHadir
         );
         return view('backoffice/peserta/detail_peserta', $data);
@@ -451,15 +443,34 @@ class Peserta extends BaseController
         $html .= '<link rel="stylesheet" href="/assets/dist/css/adminlte.min.css">';
         // $html .= '';
         // $this->dompdf->setIsHtml5ParserEnabled(true);
-        $this->dompdf->loadHtml($html);
+        $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
+
+        $PDF->SetCreator(PDF_CREATOR);
+        $PDF->SetAuthor('Dea Venditama');
+        $PDF->SetTitle('Invoice');
+        $PDF->SetSubject('Invoice');
+
+        $PDF->setPrintHeader(false);
+        $PDF->setPrintFooter(false);
+
+        $PDF->addPage();
+
+        //PDFutput the HTML content
+        $PDF->writeHTML($html, true, false, true, false, '');
+        //line ini penting
+        $this->response->setContentType('application/pdf');
+        //Close and output PDF document
+        $PDF->Output('Invoice-' . $name_attn . '.pdf', 'I');
+
+        // $this->dompdf->loadHtml($html);
         // Render the PDF
 
-        $this->dompdf->render();
+        // $this->dompdf->render();
         // Output the generated PDF to Browser
         // $stylsheet = new Stylesheet($this->dompdf);
         // $stylsheet->set_base_path('/assets/dist/css/adminlte.min.css');
-        $this->dompdf->setBasePath('/assets/dist/css/adminlte.min.css');
-        $this->dompdf->stream("Invoice - " . $name_attn, array("Attachment" => false));
+        // $this->dompdf->setBasePath('/assets/dist/css/adminlte.min.css');
+        // $this->dompdf->stream("Invoice - " . $name_attn, array("Attachment" => false));
     }
 
     public function print_pdf_peserta($id_customer)

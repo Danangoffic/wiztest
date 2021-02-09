@@ -108,13 +108,18 @@ class CustomerModel extends Model
     public function detailRegistrasi($id = false, $jenis_pemeriksaan = false)
     {
         $db = db_connect();
-        $builder = $db->table('customers a')->select('a.*, b.nama as nama_instansi, c.nama_marketing, d.biaya, e.nama_layanan, f.nama_test, g.nama_pemeriksaan')
+        $builder = $db->table('customers a')->select('a.*, 
+        b.nama as nama_instansi, 
+        c.nama_marketing, 
+        d.biaya, e.nama_layanan, f.nama_test, g.nama_pemeriksaan, 
+        h.tipe_pembayaran, h.va_number, h.amount, h.jenis_pembayaran, h.status_pembayaran')
             ->join('instansi b', 'b.id = a.instansi')
             ->join('marketing c', 'c.id = a.id_marketing')
             ->join('data_layanan_test d', 'd.id = a.jenis_test')
             ->join('jenis_layanan e', 'e.id = d.id_layanan')
             ->join('jenis_test f', 'f.id = d.id_test')
             ->join('jenis_pemeriksaan g', 'g.id = d.id_pemeriksaan')
+            ->join('data_pembayaran h', 'h.id_customer = a.id')
             ->orderBy('id', 'DESC');
         if ($id) {
             $builder->where('a.id', $id);
@@ -232,6 +237,21 @@ class CustomerModel extends Model
             ->where(['kehadiran' => "23", "tgl_kunjungan" => date('Y-m-d'), 'jam_kunjungan' => date("H") . ":00:00"])
             ->orderBy('no_antrian', 'ASC')->get();
         return $builder;
+    }
+
+    public function get_peserta_test($id_test = null)
+    {
+        if ($id_test == null) {
+            $cond = "in(2,3)";
+        } else {
+            $cond = "= {$id_test}";
+        }
+        $builder = db_connect()
+            ->table($this->table)
+            ->whereNotIn('id', 'select id_customer from hasil_laboratorium')
+            ->where('jenis_test', 'select id from data_layanan_test where id_test ' . $cond)
+            ->orderBy("id", 'DESC');
+        return $builder->get();
     }
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
