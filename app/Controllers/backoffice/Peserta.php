@@ -223,7 +223,7 @@ class Peserta extends BaseController
         $id_layanan = $explode_layanan[1];
         $faskes_asal = $this->request->getPost('faskes_asal');
         $instansi = $this->request->getPost('instansi');
-        $status_peserta = $this->request->getPost('status_peserta');
+
         $kehadiran = 22;
         $tgl_kunjungan = $this->request->getPost('tgl_kunjungan');
         $id_jam_kunjungan = $this->request->getPost('jam_kunjungan');
@@ -248,7 +248,11 @@ class Peserta extends BaseController
             $id_jenis_test_customer = $data_layanan_test['id'];
             $amount_test = intval($data_layanan_test['biaya']);
 
-            // echo "Urutan : " . $no_urutan;
+            /**
+             * VALIDASI STATUS PESERTA, JIKA NO URUT > MAX KUOTA, OTOMATIS MENJADI PESERTA OVERKUOTA
+             */
+            $status_peserta = ($no_urutan <= 51) ? (int) $this->request->getPost('status_peserta') : 21;
+
 
             // var_dump($data);
             $DataInsertCustomer = [
@@ -284,7 +288,6 @@ class Peserta extends BaseController
                 $InvoiceCustomer = $this->customerPublic->getInvoiceNumber($insert_id);
 
                 $this->customerModel->update($insert_id, ['invoice_number' => $InvoiceCustomer]);
-
 
                 /**
                  * jika status peserta adalah overload, insert data ke customer overload juga
@@ -346,45 +349,56 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
 
-        $Midtrans = new Midtrans();
+        // $Midtrans = new Midtrans();
         $Customer = $this->customerModel->detailRegistrasi($id)->getFirstRow();
-        $orderId = $Customer->customer_unique;
+        $nama = $Customer['nama'];
+        $order_id = $Customer->customer_unique;
+
+        /**
+         * GET STATUS PEMBAYARAN MELALUI MIDTRANS
+         */
+        $midtrans_status = \Midtrans::status($order_id);
+
+        $midtrans_payment_type = ucwords(str_replace("_", " ", $midtrans_status['payment_type']));
+        $midtrans_transaction_status = $midtrans_status['transaction_status'];
+        $midtrans_gross_amount = (int) $midtrans_status['gross_amount'];
+        $has_va = ($midtrans_status['va_numbers']) ? $midtrans_status['va_numbers'] : null;
         // dd($Customer);
         // echo $orderId;
         // exit();
-        $amt = null;
-        $va = null;
-        $paymentType = null;
-        $bank = null;
+        $va = ($has_va != null) ? $has_va['va_number'] : null;
 
-        $detail_pembayaran = $this->pembayaran_model->pembayaran_by_customer($id);
+        $bank = ($has_va != null) ? $has_va['bank'] : null;
+        $amt = 'Rp ' . number_format($midtrans_gross_amount, 0, ",", ".");
+
+        // $detail_pembayaran = $this->pembayaran_model->pembayaran_by_customer($id);
         // dd($detail_pembayaran);
-        $tipe_pembayaran = $detail_pembayaran['tipe_pembayaran'];
+        // $tipe_pembayaran = $detail_pembayaran['tipe_pembayaran'];
 
-        $amount = $detail_pembayaran['amount'];
-        $jenis_pembayaran = $detail_pembayaran['jenis_pembayaran'];
-        $status_pembayaran = $detail_pembayaran['status_pembayaran'];
-        $va_numbers = "";
-        $bank = "";
-        $va = "";
-        $amt = 'Rp ' . number_format($amount, 0, ",", ".");
-        $payment_type = ucwords($jenis_pembayaran);
-        $transactionStatus = ucwords($status_pembayaran);
+        // $amount = $midtrans_gross_amount;
+        // $jenis_pembayaran = $detail_pembayaran['jenis_pembayaran'];
+        // $status_pembayaran = $detail_pembayaran['status_pembayaran'];
+        // $va_numbers = "";
+        // $bank = "";
+        // $va = "";
+
+        // $payment_type = ucwords($jenis_pembayaran);
+        // $transactionStatus = ucwords($status_pembayaran);
         // }
 
         // dd($DetailPayment);
 
         $data = array(
-            'title' => "Registrasi",
+            'title' => "Detail Peserta {$nama} - {$order_id}",
             'page' => "registrasi",
             'data_customer' => $Customer,
             'session' => $this->session,
             'id' => $id,
             'amt' => $amt,
             'va' => $va,
-            'paymentType' => $paymentType,
+            'paymentType' => $midtrans_payment_type,
             'bank' => $bank,
-            'transactionStatus' => $transactionStatus,
+            'transactionStatus' => $midtrans_transaction_status,
             'status_hadir' => $this->statusHadir
         );
         return view('backoffice/peserta/detail_peserta', $data);
@@ -617,11 +631,12 @@ class Peserta extends BaseController
         // var_dump($user_level);
         // exit();
 
-        $data_customer = $this->customerModel->find($id_customer);
+        $data_customer = $this->customerModel->detail_customer($id_customer);
         if ($data_customer == null) {
             $this->session->setFlashdata("error", "Data customer tidak ditemukan");
             return redirect()->to("/backoffice/registrasi");
         }
+
         $data = array(
             'title' => "Hapus Customer",
             'page' => "registrasi",
@@ -647,7 +662,7 @@ class Peserta extends BaseController
 
         $id_customer = base64_decode($this->request->getPost("id_customer"));
 
-        $data_customer = $this->customerModel->find($id_customer);
+        $data_customer = $this->customerModel->detail_customer($id_customer);
         $data_pembayaran = $this->pembayaran_model->where(['id_customer' => $id_customer])->first();
         $data_lab = $this->hasil_lab->where(['id_customer' => $id_customer])->get()->getRowArray();
         $csrf = $this->request->getPost("csrf_test_name");
@@ -656,10 +671,12 @@ class Peserta extends BaseController
             $this->session->setFlashdata("error", "Maaf token penghapusan tidak ditemukan");
             return redirect()->to("/backoffice/registrasi");
         }
-        if ($data_customer === null) {
+        if ($data_customer == null) {
             $this->session->setFlashdata("error", "Data customer tidak ditemukan");
             return redirect()->to("/backoffice/registrasi");
         }
+        $order_id = $data_customer['customer_unique'];
+        $cancel_payment = \Midtrans::cancel($order_id);
         $status_peserta = $data_customer['status_peserta'];
         if ($status_peserta == 21) {
             $customer_overload = $this->customer_overload->where(['id_customer' => $id_customer])->get()->getRowArray();
@@ -772,7 +789,22 @@ class Peserta extends BaseController
         $today = date("Y-m-d");
         $customerDetail = $this->customerModel->detail_customer($id_peserta);
         $pembayaran_detail = $this->pembayaran_model->pembayaran_by_customer($id_peserta);
+
         if ($customerDetail != null && $pembayaran_detail != null) {
+            /**
+             * cek pembayaran di midtrans juga untuk menghindari data yg tidak benar
+             */
+            $order_id = $customerDetail['customer_unique'];
+            $midtrans_detail = \Midtrans::status($order_id);
+            $midtrans_status_payment = $midtrans_detail['transaction_status'];
+            if ($midtrans_status_payment != "settlement" || $midtrans_status_payment != "capture") {
+                $array_return = array(
+                    'statusMessage' => "failed",
+                    'message' => "<h4 class='badge badge-danger'>Gagal absen untuk hadir karena belum melakukan pembayaran</h4>",
+                    'responseCode' => "01"
+                );
+                return $array_return;
+            }
             $tgl_kunjungan = $customerDetail['tgl_kunjungan'];
 
             if ($today != $tgl_kunjungan) {

@@ -721,7 +721,7 @@ class Customer extends ResourceController
             if ($check_jenis_test['id']) {
                 $check_data_layanan_test = $this->layananTestModel
                     ->where(['id_test' => $id_jenis_test, 'id_pemeriksaan' => $id_jenis_pemeriksaan, 'id_segmen' => $id_segmen])->get()->getResultArray();
-                if ($check_data_layanan_test) {
+                if ($check_data_layanan_test != null) {
                     $data = array();
                     foreach ($check_data_layanan_test as $key => $dlt) {
                         $detail_layanan = $this->layananModel->find($dlt['id_layanan']);
@@ -770,16 +770,18 @@ class Customer extends ResourceController
             $jenis_layanan = $detail_jenis_test['id_layanan'];
             $jenis_test = $p['jenis_test'];
             $tgl_kunjungan = $p['tgl_kunjungan'];
-            $jam_kunjungan = $p['jam_kunjungan'];
+            $id_jam_kunjungan = $p['jam_kunjungan'];
             $jenis_kelamin = $p['jenis_kelamin'];
             $tempat_lahir = $p['tempat_lahir'];
             $tgl_lahir = $p['tgl_lahir'];
             $alamat = $p['alamat'];
             $instansi = $p['instansi'];
             $marketing = $p['marketing'];
+            $dataJamKunjungan = $this->kuotaModel->find($id_jam_kunjungan);
+            $jam_kunjungan = $dataJamKunjungan['jam'];
 
             $customer_UNIQUE = $this->getOrderId($jenis_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
-            $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
+            $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan);
 
             $array_insert = array(
                 'jenis_test' => $p['jenis_test'],
@@ -821,16 +823,18 @@ class Customer extends ResourceController
                 $jenis_layanan = $detail_jenis_test['id_layanan'];
                 $jenis_test = $p['jenis_test'];
                 $tgl_kunjungan = $p['tgl_kunjungan'];
-                $jam_kunjungan = $p['jam_kunjungan'];
+                $id_jam_kunjungan_ = $p['jam_kunjungan'];
                 $jenis_kelamin = $p['jenis_kelamin'];
                 $tempat_lahir = $p['tempat_lahir'];
                 $tgl_lahir = $p['tgl_lahir'];
                 $alamat = $p['alamat'];
                 $instansi = $p['instansi'];
                 $marketing = $p['marketing'];
+                $dataJamKunjungan = $this->kuotaModel->find($id_jam_kunjungan_);
+                $jam_kunjungan2 = $dataJamKunjungan['jam'];
 
                 $customer_UNIQUE = $this->getOrderId($jenis_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
-                $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
+                $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan2);
 
                 $array_insert = array(
                     'jenis_test' => $p['jenis_test'],

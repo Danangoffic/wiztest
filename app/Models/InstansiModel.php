@@ -23,4 +23,12 @@ class InstansiModel extends Model
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at';
+
+    public function detail_instansi($id_instansi = null)
+    {
+        if ($id_instansi == null) {
+            return null;
+        }
+        return db_connect()->table($this->table)->select()->where('id', $id_instansi)->limit(1)->get()->getRowArray();
+    }
 }

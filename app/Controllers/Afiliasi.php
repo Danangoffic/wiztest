@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\backoffice\Layanan;
+use App\Controllers\backoffice\Midtrans;
 use App\Controllers\backoffice\SystemParameter;
 use App\Models\AfiliasiModel;
 use App\Models\AlatModel;
@@ -21,6 +22,8 @@ use App\Models\SampleModel;
 use App\Models\StatusHasilModel;
 use App\Models\TestModel;
 use CodeIgniter\RESTful\ResourceController;
+use PHPExcel;
+use PHPExcel_IOFactory;
 
 class Afiliasi extends ResourceController
 {
@@ -44,6 +47,7 @@ class Afiliasi extends ResourceController
     protected $page;
     protected $instansi_model;
     protected $session;
+    protected $midtrans_bo;
 
     public function __construct()
     {
@@ -67,6 +71,8 @@ class Afiliasi extends ResourceController
         $this->instansi_model = new InstansiModel();
         $this->page = "afiliasi";
         $this->session = \Config\Services::session();
+        $this->midtrans_bo = new Midtrans;
+        helper('form');
     }
 
 
@@ -75,7 +81,7 @@ class Afiliasi extends ResourceController
         if ($id_instansi == null) {
             return redirect()->to("/");
         }
-        $data_instansi = $this->instansi_model->find($id_instansi);
+        $data_instansi = $this->instansi_model->detail_instansi($id_instansi);
         if ($data_instansi == null) {
             $this->session->setFlashdata('error', "Corporate tidak ditemukan");
             return redirect()->to("/");
@@ -89,14 +95,21 @@ class Afiliasi extends ResourceController
         $data_marketing = $data_marketing = $this->marketing_model->find($id_marketing);
 
         $layanan_test_data = $this->layananTestModel
-            ->where(['id_pemeriksaan' => '1', 'id_segmen' => '2'])->groupBy('id_test')->get()->getResultArray();
+            ->by_keys(['id_pemeriksaan' => '1', 'id_segmen' => '2'])
+            ->groupBy('id_test')
+            ->get()
+            ->getResultArray();
         // $getData = $this->sysParamModel->getByVgroupAndParamter('MIDTRANS_KEY', 'CLIENT_KEY');
         $data = [
             'title' => "Quicktest.id || Pendaftaran Test Afiliasi Corporate " . $data_instansi['nama'],
             'subtitle1' => ucwords("form pendaftaran test"),
             'marketings' => $data_marketing,
             'jenis_test' => $this->testModel,
-            'layanan_test_data' => $layanan_test_data
+            'layanan_test_data' => $layanan_test_data,
+            'data_instansi' => $data_instansi,
+            'data_marketing' => $data_marketing,
+            'id_instansi' => $id_instansi,
+            'id_marketing' => $data_marketing['id']
         ];
         return view('customer/corporate', $data);
     }
@@ -127,6 +140,43 @@ class Afiliasi extends ResourceController
                 'layanan_test_data' => $layanan_test_data
             ];
             return view('customer/home_service', $data);
+        }
+    }
+
+    public function save_corporate()
+    {
+        $fileexcel = $this->request->getFile("excel");
+        if ($fileexcel) {
+            $id_instansi = $this->request->getPost('id_instansi');
+            $id_marketing = $this->request->getPost("id_marketing");
+            $is_corporate = $this->request->getPost('is_corporate');
+            $id_test = $this->request->getPost("id_test");
+            $id_layanan = $this->request->getPost("id_layanan");
+            $tgl_kunjungan = $this->request->getPost("tgl_kunjungan");
+            $jam_kunjungan = $this->request->getPost("jam_kunjungan");
+
+            $detail_instansi = $this->instansi_model->detail_instansi($id_instansi);
+
+            $nama_instansi = $detail_instansi['nama'];
+
+            $new_name_file = $nama_instansi . "-" . date('dmYHis') . "{$id_instansi}-" . $fileexcel->getRandomName();
+            $excelReader  = new PHPExcel();
+            //mengambil lokasi temp file
+            $fileLocation = $fileexcel->getTempName();
+            //baca file
+            $objPHPExcel = PHPExcel_IOFactory::load($fileLocation);
+            //ambil sheet active
+            $sheet    = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+
+            foreach ($sheet as $idx => $data) {
+                $nama = $data['A'];
+                $nik = $data['B'];
+                $email = $data['C'];
+                $jenis_kelamin = $data['D'];
+                $phone = $data['E'];
+                $tempat_lahir = $data['F'];
+                $tanggal_lahir = $data['G'];
+            }
         }
     }
 }
