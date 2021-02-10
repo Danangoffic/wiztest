@@ -209,7 +209,7 @@ class Customer extends ResourceController
 
             $dataInsertPembayaran = [
                 'id_customer' => $insert_id,
-                'status_pembayaran' => 'unpaid'
+                'status_pembayaran' => 'pending'
             ];
             $insertPembayaran = $this->PembayaranModel->insert($dataInsertPembayaran);
             $id_pembayaran = $this->PembayaranModel->getInsertID();
