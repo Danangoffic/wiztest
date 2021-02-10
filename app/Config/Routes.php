@@ -79,6 +79,8 @@ $routes->get('/backoffice/print/barcodev2/(:any)', 'backoffice\Layanan::printbar
 $routes->get('/backoffice/print/qrcode/(:num)', 'backoffice\Layanan::print_qrcode/$1');
 $routes->get('/backoffice/print/pdf/(:num)', 'backoffice\Layanan::print_pdf/$1');
 
+$routes->post("/api/verifikasi-selesa-cetak", "backoffice/Swabber::do_update_customer_been_printed");
+
 $routes->get('/backoffice/instansi', 'backoffice\Instansi::index');
 $routes->add('/backoffice/instansi/(:num)', 'backoffice\Instansi::detail_instansi/$1');
 $routes->get('/backoffice/instansi/create', 'backoffice\Instansi::create_instansi');

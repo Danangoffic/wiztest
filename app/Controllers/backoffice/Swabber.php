@@ -206,11 +206,15 @@ class Swabber extends ResourceController
         // $printbarcoder = 
     }
 
-    protected function do_update_customer_been_printed($id_customer = null)
+    public function do_update_customer_been_printed()
     {
+        $id_customer = $this->request->getVar("id_customer");
         $is_printed = "3";
         $arr_update = ['is_printed' => $is_printed];
-        $this->customer_model->update($id_customer, $arr_update);
+        $update = $this->customer_model->update($id_customer, $arr_update);
+        if ($update) {
+            return $this->respond(['statusMessage' => "success"], 200, 'success');
+        }
     }
 
     // public function print_it()
