@@ -259,7 +259,7 @@ class Customer extends ResourceController
     public function getUrutan($type_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan)
     {
 
-        $data = $this->customerModel->getCustomerAvailableByDate($type_test, $jenis_pemeriksaan, $jenis_layanan, '1', $tgl_kunjungan, $jam_kunjungan)->getRowArray();
+        $data = $this->customerModel->getCustomerAvailableByDate($type_test, '1', $tgl_kunjungan, $jam_kunjungan)->getRowArray();
 
         if ($data != null) {
             $totalData = (intval($data['no_antrian'])) ? intval($data['no_antrian']) : 0;

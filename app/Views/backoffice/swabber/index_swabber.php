@@ -190,7 +190,7 @@
                             <td>${v.nama}</td>
                             <td>${v.customer_unique}</td>
                             <td>
-                            <a href="/backoffice/print/barcodev2/${v.id}" class="btn btn-primary btn-sm">Barcode</a>
+                            <a href="/backoffice/print/barcodev2/${v.id}" target="_blank" class="btn btn-primary btn-sm">Barcode</a>
                             <button class="btn btn-success btn-sm float-right" onclick="return verifikasi_selesai('${v.id}')">selesai</button>
                             </td>
                             </tr>`;
