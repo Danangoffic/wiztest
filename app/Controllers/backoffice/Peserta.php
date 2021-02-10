@@ -936,7 +936,7 @@ class Peserta extends BaseController
             }
             $statusKehadiran = intval($customerDetail['kehadiran']);
             $statusPembayaran = lcfirst($pembayaran_detail['status_pembayaran']);
-            if ($statusKehadiran == 22 && ($statusPembayaran == 'settlement' || $statusPembayaran == 'invoice' || $statusPembayaran == "lunas")) {
+            if ($statusKehadiran == 22 && ($statusPembayaran == 'settlement' || $statusPembayaran == 'Invoice' || $statusPembayaran == "lunas")) {
                 $created_by = ($this->session->has('id_user')) ? $this->session->get('id_user') : '0';
                 $dataCustomer = array(
                     'kehadiran' => 23
