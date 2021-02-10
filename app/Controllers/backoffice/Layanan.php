@@ -9,6 +9,8 @@ use App\Models\LayananTestModel;
 use App\Models\PemeriksaanModel;
 use App\Models\TestModel;
 use CodeIgniter\RESTful\ResourceController;
+use Dompdf\Dompdf;
+
 // use Dompdf\Cpdf;
 // use PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf;
 // use Dompdf\Dompdf;
@@ -253,30 +255,22 @@ class Layanan extends ResourceController
         // exit();
         // $htmlFile = base_url('backoffice/layanan/render_barcode/' . $encoded_id_customer, true);
         // $html = view('backoffice/layanan/invoice_pdf_print', $data);
-        $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
-        $PDF->setPageOrientation('L');
-        $PDF->setCellMargins(0, 0, 0, 0);
-        $PDF->SetCreator(PDF_CREATOR);
-        $PDF->SetAuthor('QUICKTEST LABORATORIUM INDONESIA');
-        $PDF->SetTitle('Barcode');
-        $PDF->SetSubject('Barcode');
-
-        $PDF->setPrintHeader(false);
-        $PDF->setPrintFooter(false);
-
-        $PDF->addPage();
-        $PDF->setBarcode($detailCustomer['customer_unique']);
+        $PDF = new Dompdf();
+        // $PDF->loadHtml($fileHTMLVIEW);
+        // $PDF->($detailCustomer['customer_unique']);
 
         $this->response->setContentType('application/pdf');
+        // $PDF->render();
+        // $PDF->stream("barcode.pdf", ['attachment' => 1]);
         //Close and output PDF document
-        $PDF->Output('barcode.pdf', 'I');
+        // $PDF->Output('barcode.pdf', 'I');
 
 
-        // $this->dompdf->loadHtml($fileHTMLVIEW);
-        // $arraySize = array(0, 0, 170, 190);
-        // $this->dompdf->setPaper($arraySize, 'landscape');
-        // $this->dompdf->render();
-        // $this->dompdf->stream('barcode.pdf', ['Attachment' => false]);
+        $PDF->loadHtml($fileHTMLVIEW);
+        $arraySize = array(0, 0, 170, 190);
+        $PDF->setPaper($arraySize, 'landscape');
+        $PDF->render();
+        $PDF->stream('barcode.pdf', ['Attachment' => false]);
         // readfile("fileinit.pdf");
 
         // return view('backoffice/Layanan/print_barcode', ['img_url' => $img_url]);

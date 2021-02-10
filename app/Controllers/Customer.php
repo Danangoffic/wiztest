@@ -82,10 +82,12 @@ class Customer extends ResourceController
 
     public function registrasi()
     {
-        $layanan_test_model = new LayananTestModel();
-        $kuotaModel = new KuotaModel();
-        $marketing_model = new MarketingModel();
-        $layananModel = new LayananModel();
+        $this->layanan_test_model = new LayananTestModel();
+        $this->kuotaModel = new KuotaModel();
+        $this->marketing_model = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->pemeriksaanModel = new PemeriksaanModel();
+        $this->PembayaranModel = new PembayaranModel();
 
         $nama = $this->request->getPost('nama');
         $nik = $this->request->getPost('nik');
@@ -99,7 +101,7 @@ class Customer extends ResourceController
         $alamat = $this->request->getPost('alamat');
         $marketing = $this->request->getPost('marketing');
         $jenis_test = $this->request->getPost('jenis_test');
-        $detail_layanan_test = $layanan_test_model->find($jenis_test);
+        $detail_layanan_test = $this->layanan_test_model->find($jenis_test);
         $jenis_pemeriksaan = $detail_layanan_test['id_pemeriksaan'];
         $jenis_layanan = $detail_layanan_test['id_layanan'];
         $faskes_asal = $this->request->getPost('faskes_asal');
@@ -107,7 +109,7 @@ class Customer extends ResourceController
         $kehadiran = 0;
         $tgl_kunjungan = $this->request->getPost('tgl_kunjungan');
         $id_jam_kunjungan = $this->request->getPost('jam_kunjungan');
-        $dataJamKunjungan = $kuotaModel->find($id_jam_kunjungan);
+        $dataJamKunjungan = $this->kuotaModel->find($id_jam_kunjungan);
         $jam_kunjungan = $dataJamKunjungan['jam'];
         // var_dump($this->request->getPost());
         // exit();
@@ -118,7 +120,7 @@ class Customer extends ResourceController
             // exit();
             // dd($customer_UNIQUE);
 
-            $dataMarketing = $marketing_model->find($marketing);
+            $dataMarketing = $this->marketing_model->find($marketing);
             $dataLayanan = $this->layananModel->find($jenis_layanan);
 
             if ($jenis_test == 2 || $jenis_test == "2") {
@@ -169,13 +171,13 @@ class Customer extends ResourceController
             $InvoiceCustomer = $this->getInvoiceNumber($insert_id);
             $arr_invoice = ['invoice_number' => $InvoiceCustomer];
             $this->customerModel->update($insert_id, $arr_invoice);
-            $DetailLayananTest = $layananModel->find($jenis_pemeriksaan);
-            $productName = $DetailLayananTest['nama_test'] . ' ' . $DetailLayananTest['nama_layanan'];
+            // $DetailLayananTest = $this->layananTestModel->find($jenis_pemeriksaan);
+            // $productName = $DetailLayananTest['nama_test'] . ' ' . $DetailLayananTest['nama_layanan'];
             $params = array(
                 'transaction_details' => array(
                     'order_id' => $DataInsertCustomer['customer_unique'],
                     'gross_amount' => $detail_layanan_test['biaya'],
-                    'product_name' => $productName,
+                    // 'product_name' => $productName,
                     'quantity' => 1
                 ),
                 'customer_details' => array(
