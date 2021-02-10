@@ -913,16 +913,33 @@ class Peserta extends BaseController
              * cek pembayaran di midtrans juga untuk menghindari data yg tidak benar
              */
             $order_id = $customerDetail['customer_unique'];
-            $midtrans_detail = \Midtrans::status($order_id);
-            $midtrans_status_payment = $midtrans_detail['transaction_status'];
-            if ($midtrans_status_payment != "settlement" || $midtrans_status_payment != "capture") {
-                $array_return = array(
-                    'statusMessage' => "failed",
-                    'message' => "<h4 class='badge badge-danger'>Gagal absen untuk hadir karena belum melakukan pembayaran</h4>",
-                    'responseCode' => "01"
-                );
-                return $array_return;
+            $tipe_pembayaran = $pembayaran_detail['tipe_pembayaran'];
+            if ($tipe_pembayaran == "midtrans") {
+                $midtrans_bo = new Midtrans;
+                \Midtrans::$isProduction = $midtrans_bo->production_mode;
+                \Midtrans::$serverKey = $midtrans_bo->server_key;
+                $midtrans_detail = \Midtrans::status($order_id);
+                $midtrans_status_payment = $midtrans_detail['transaction_status'];
+                if ($midtrans_status_payment != "settlement" || $midtrans_status_payment != "capture") {
+                    $array_return = array(
+                        'statusMessage' => "failed",
+                        'message' => "<h4 class='badge badge-danger'>Gagal absen untuk hadir karena belum melakukan pembayaran</h4>",
+                        'responseCode' => "01"
+                    );
+                    return $array_return;
+                }
+            } else {
+                $status_pembayaran = $pembayaran_detail['status_pembayaran'];
+                if ($status_pembayaran == "Belum Lunas" || $status_pembayaran == "belum lunas") {
+                    $array_return = array(
+                        'statusMessage' => "failed",
+                        'message' => "<h4 class='badge badge-danger'>Gagal absen untuk hadir karena belum melakukan pembayaran</h4>",
+                        'responseCode' => "01"
+                    );
+                    return $array_return;
+                }
             }
+
             $tgl_kunjungan = $customerDetail['tgl_kunjungan'];
 
             if ($today != $tgl_kunjungan) {
