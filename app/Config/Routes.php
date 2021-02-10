@@ -75,7 +75,7 @@ $routes->get("/api/get_hasil_lab/(:num)", "\backoffice\Laboratorium::print_hasil
 // $routes->get('/backoffice/peserta/edit/(:num)', 'backoffice\Registrasi::edit_peserta/$1');
 
 $routes->get('/backoffice/print/barcode/(:any)', 'backoffice\Layanan::printbarcode/$1');
-$routes->get('/backoffice/print/barcodev2/(:any)', 'backoffice\Layanan::printbarcode/$1');
+$routes->get('/backoffice/print/barcodev2/(:any)', 'backoffice\Layanan::printbarcodev2/$1');
 $routes->get('/backoffice/print/qrcode/(:num)', 'backoffice\Layanan::print_qrcode/$1');
 $routes->get('/backoffice/print/pdf/(:num)', 'backoffice\Layanan::print_pdf/$1');
 
