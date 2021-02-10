@@ -100,6 +100,7 @@
                         </div>
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">Filter</button>
+                            <a href="cek_bilik_antrian" class="btn btn-primary">Bilik Antrian</a>
                             </form>
                         </div>
                     </div>

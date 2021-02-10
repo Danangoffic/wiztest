@@ -68,6 +68,11 @@ class Frontoffice extends ResourceController
             return redirect()->to('/backoffice/login');
         }
         $filter = ($this->request->getVar('filtering')) ? $this->request->getVar('filtering') : '';
+        $data_layanan_test = $this->layananTestModel->get_by_key('id_pemeriksaan', "1")->getResultArray();
+        $ids_test = array();
+        foreach ($data_layanan_test as $key => $lt) {
+            $ids_test[] = $lt['id'];
+        }
         $Customer = array();
         if ($filter == "on") {
             $date1 = ($this->request->getVar('date1')) ? $this->request->getVar('date1') : '';
@@ -75,34 +80,17 @@ class Frontoffice extends ResourceController
             $instansi = ($this->request->getVar('instansi')) ? $this->request->getVar('instansi') : '';
             $marketing = ($this->request->getVar('marketing')) ? $this->request->getVar('marketing') : '';
             $layanan_test = ($this->request->getVar('layanan_test')) ? $this->request->getVar('layanan_test') : '';
-            $queryFilter = 'SELECT * FROM customers';
-            $queryFilter .= " WHERE jenis_test IN (SELECT id FROM data_layanan WHERE id_segmen = '1' AND id_layanan = '1')";
-
-            if ($date1 !== '' && $date2 !== '') {
-                $queryFilter .= " AND tgl_kunjungan BETWEEN '" . $date1 . "' AND '" . $date2 . "'";
-            } elseif ($date1 !== '') {
-                $queryFilter .= " AND tgl_kunjungan = '" . $date1 . "'";
-            } elseif ($date2 !== '') {
-                $queryFilter .= " AND tgl_kunjungan BETWEEN '" . date('Y-m-d') . "' AND '" . $date2 . "'";
-            }
-            if ($instansi !== '') {
-                $queryFilter .= " AND instansi = '$instansi'";
-            }
-            if ($marketing !== '') {
-                $queryFilter .= " AND id_marketing = '$marketing'";
-            }
-            if ($layanan_test !== '') {
-                $queryFilter .= " AND jenis_test = '$layanan_test'";
-            }
-            $queryFilter .= " ORDER BY id DESC";
-            $Customer = db_connect()->query($queryFilter)->getResultArray();
+            $Customer = $this->customerModel->filter_walkin($ids_test, $date1, $date2, $instansi, $marketing, $layanan_test)->getResultArray();
         } else {
-            $data_layanan_test = $this->layananTestModel->select("id")->where(['id_layanan' => "1"])->get()->getResultArray();
-            $ids_test = array();
-            foreach ($data_layanan_test as $key => $lt) {
-                $ids_test[] = $lt['id'];
-            }
-            $Customer = db_connect()->table('customers')->select()->whereIn('jenis_test', $ids_test)->orderBy('id', 'DESC')->get()->getResultArray();
+            // $data_layanan_test = $this->layananTestModel->select("id")->where(['id_layanan' => "1"])->get()->getResultArray();
+            // $ids_test = array();
+            // foreach ($data_layanan_test as $key => $lt) {
+            //     $ids_test[] = $lt['id'];
+            // }
+            $extra = [
+                'jenis_test' => $ids_test
+            ];
+            $Customer = $this->customerModel->deep_detail_by_id(null, $extra)->getResultArray();
         }
         // $Customer = $this->customerModel->detailRegistrasi(false, $id_jenis_pemeriksaan)->getResultArray();
         $data = array(
@@ -136,7 +124,8 @@ class Frontoffice extends ResourceController
             $filterDate = date('Y-m-d');
         }
         // $filterDate = ($this->request->getVar('filterDate')) ? $this->request->getPost('filterDate') : date('Y-m-d');
-        $data_layanan_test_show = $this->layananTestModel->where(['id_segmen' => '1', 'id_test' => '1', 'id_pemeriksaan' => '1'])->get()->getResultArray();
+        $filter = ['id_segmen' => '1', 'id_test' => '1', 'id_pemeriksaan' => '1'];
+        $data_layanan_test_show = $this->layananTestModel->where($filter)->get()->getResultArray();
         $data = array(
             'title' => "Antrian Swab Walk-In",
             'page' => "antrian_swab_walk_in",
@@ -231,12 +220,28 @@ class Frontoffice extends ResourceController
         // $detail_layanan_test = $this->layananTestModel->where(['id_layanan' => $id_layanan])->first();
 
         // $id_jenis_test = $detail_layanan_test['id'];
-        $antrian_swabber = $this->customerModel->where(['tgl_kunjungan' => $tanggal, 'jam_kunjungan' => $jam, 'jenis_test' => $id_test, 'kehadiran' => '23'])->orderBy('no_antrian', 'ASC')->get()->getResultArray();
+        $filter_antrian = ['tgl_kunjungan' => $tanggal, 'jam_kunjungan' => $jam, 'jenis_test' => $id_test, 'kehadiran' => '23'];
+        $antrian_swabber = $this->customerModel->where($filter_antrian)->orderBy('no_antrian', 'ASC')->get()->getResultArray();
         // echo db_connect()->showLastQuery() . "<br>";
-        $booking_antrian = $this->customerModel->where(['tgl_kunjungan' => $tanggal, 'jam_kunjungan' => $jam, 'jenis_test' => $id_test])->orderBy('no_antrian', 'ASC')->get()->getResultArray();
+        $filter_booking = ['tgl_kunjungan' => $tanggal, 'jam_kunjungan' => $jam, 'jenis_test' => $id_test];
+        $booking_antrian = $this->customerModel->where($filter_booking)->orderBy('no_antrian', 'ASC')->get()->getResultArray();
         // echo db_connect()->showLastQuery() . "<br>";
         $data = array('antrian_swabber' => $antrian_swabber, 'booking_antrian' => $booking_antrian);
         return $this->respond($data, 200, 'success');
+    }
+
+    public function cek_bilik_antrian()
+    {
+        helper('form');
+        $bilikModel = new BilikSwabberModel();
+        $data_bilik = $bilikModel->orderBy("nomor_bilik", "asc")->get()->getResultArray();
+        $data = [
+            'data_bilik' => $data_bilik,
+            'title' => 'Data Bilik Antrian',
+            'page' => 'fontoffice',
+            'session' => $this->session
+        ];
+        return view("backoffice/frontoffice/cek_bilik_antrian", $data);
     }
 
     public function manajemen_antrian($nomor_bilik = 1)
@@ -301,7 +306,8 @@ class Frontoffice extends ResourceController
         $id_customer =  $this->request->getVar('id_customer');
         try {
             $cek = $this->customerModel->detail_customer($id_customer);
-            if ($cek == null) return $this->respond(['status' => "failed", 'message' => "peserta tidak ditemukan"], 400, "failed");
+            $response_failed = ['status' => "failed", 'message' => "peserta tidak ditemukan"];
+            if ($cek == null) return $this->respond($response_failed, 400, "failed");
 
             $data_pemanggilan = array('status_pemanggilan' => "12");
             $get_pemanggilan = $this->pemanggilan_model->get_by_customer($id_customer);

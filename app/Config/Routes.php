@@ -79,7 +79,7 @@ $routes->get('/backoffice/print/qrcode/(:num)', 'backoffice\Layanan::print_qrcod
 $routes->get('/backoffice/print/pdf/(:num)', 'backoffice\Layanan::print_pdf/$1');
 
 $routes->get('/backoffice/instansi', 'backoffice\Instansi::index');
-$routes->get('/backoffice/instansi/(:num)', 'backoffice\Instansi::detail_instansi/$1');
+$routes->add('/backoffice/instansi/(:num)', 'backoffice\Instansi::detail_instansi/$1');
 $routes->get('/backoffice/instansi/create', 'backoffice\Instansi::create_instansi');
 $routes->post('/backoffice/instansi/save', 'backoffice\Instansi::save_instansi');
 $routes->get('/backoffice/instansi/edit/(:num)', 'backoffice\Instansi::edit_instansi/$1');
@@ -195,6 +195,7 @@ $routes->get('/marketing/(:num)', 'backoffice\Marketing::detail/$1');
 $routes->add('/marketing/(:segment)', 'backoffice\Marketing::$1');
 $routes->add('/marketing/(:segment)/(:num)', 'backoffice\Marketing::$1/$2');
 $routes->get("/backoffice/laporan/hasil", "backoffice\Laboratorium::hasil");
+$routes->get("/backoffice/logout", "backoffice\User::logout");
 
 $routes->get("led/", "Antrian::bilik");
 $routes->get("led/(:num)", "Antrian::bilik/$1");
@@ -203,6 +204,7 @@ $routes->get("/api/wa", "backoffice\Whatsapp_service::coba_wa");
 $routes->post("/api/save-hs", "Customer::home_service_registration");
 // $routes->post("/save-rujukan", "Afiliasi::save_rujukan");
 $routes->get("swabber", "backoffice\Swabber::index");
+$routes->post("/api/print-barcode-swabber", "backoffice\Swabber::print_barcode");
 
 $routes->get("/backoffice/reporting/(:segment)", "backoffice\Reporting::$1");
 
