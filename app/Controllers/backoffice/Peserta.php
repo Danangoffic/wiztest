@@ -244,7 +244,7 @@ class Peserta extends BaseController
         $faskes_asal = $this->request->getPost('faskes_asal');
         $instansi = $this->request->getPost('instansi');
 
-        $kehadiran = 22;
+        $kehadiran = 23;
         $tgl_kunjungan = $this->request->getPost('tgl_kunjungan');
         $id_jam_kunjungan = $this->request->getPost('jam_kunjungan');
         $dataJamKunjungan = $kuotaModel->find($id_jam_kunjungan);
@@ -303,7 +303,7 @@ class Peserta extends BaseController
                 'jam_kunjungan' => $jam_kunjungan,
                 'tgl_kunjungan' => $tgl_kunjungan,
                 'status_pembayaran' => $status_pembayaran,
-                'status_peserta' => $status_peserta
+                'status_peserta' => $status_peserta,
             ];
             $insert = $this->customerModel->insert($DataInsertCustomer);
             // $insert_id = null;
