@@ -59,6 +59,7 @@ class Peserta extends BaseController
     {
         $this->session = \Config\Services::session();
         $this->customerModel = new CustomerModel();
+        $this->faskesModel = new FaskesModel();
     }
 
     protected function check_user_level()
@@ -160,6 +161,7 @@ class Peserta extends BaseController
         $this->layananTestModel = new LayananTestModel();
         $this->pemeriksaModel = new PemeriksaModel();
         $this->jenisPemeriksaanModel = new PemeriksaanModel();
+
 
         $dataPemeriksa = $this->pemeriksaModel->findAll();
         // dd($dataPemeriksa);
