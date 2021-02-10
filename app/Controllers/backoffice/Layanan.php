@@ -242,14 +242,19 @@ class Layanan extends ResourceController
     {
         $decoded = base64_decode($encoded_id_customer);
         $CustomerModel = new CustomerModel();
-        $detailCustomer = $CustomerModel->find(base64_decode($encoded_id_customer));
+        $id_customer = base64_decode($encoded_id_customer);
+        $detailCustomer = $CustomerModel->deep_detail_by_id($id_customer)->getRowArray();
         $url = (string) $detailCustomer['customer_unique'];
+        $nama = $detailCustomer['nama'];
+        $tgl_lahir = $detailCustomer['tanggal_lahir'];
+        $nama_test = $detailCustomer['nama_test'];
+        $nama_layanan = $detailCustomer['nama_layanan'];
         $img_url = $this->get_bar_code($url);
         $type = pathinfo($img_url, PATHINFO_EXTENSION);
         $data = file_get_contents($img_url);
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
         // It will be called downloaded.pdf
-        $html = '<center>' . $detailCustomer['nama'] . '<br><img importance="" width=\'150\' height=\'75\' src="' . $base64 . '" id=""></center>';
+        $html = '<center>' . $nama . '<br>' . $tgl_lahir . '<br> ' . $nama_test . ' ' . $nama_layanan . '<br><img importance="" width=\'150\' height=\'75\' src="' . $base64 . '" id=""></center>';
         $fileHTMLVIEW = view('backoffice/layanan/print_barcode', ['base64' => $base64, 'url' => $url, 'detailCustomer' => $detailCustomer, 'original_img' => $img_url, 'html_img' => $html]);
         // return $fileHTMLVIEW;
         // exit();
@@ -267,7 +272,8 @@ class Layanan extends ResourceController
 
 
         $PDF->loadHtml($fileHTMLVIEW);
-        $arraySize = array(0, 0, 170, 190);
+        $arraySize = array(0, 0, 120, 220);
+
         $PDF->setPaper($arraySize, 'landscape');
         $PDF->render();
         $PDF->stream('barcode.pdf', ['Attachment' => false]);
@@ -279,14 +285,18 @@ class Layanan extends ResourceController
     public function printbarcodev2(string $id_customer)
     {
         $CustomerModel = new CustomerModel();
-        $detailCustomer = $CustomerModel->find($id_customer);
+        $detailCustomer = $CustomerModel->deep_detail_by_id($id_customer)->getRowArray();
         $url = (string) $detailCustomer['customer_unique'];
+        $nama = $detailCustomer['nama'];
+        $tgl_lahir = $detailCustomer['tanggal_lahir'];
+        $nama_test = $detailCustomer['nama_test'];
+        $nama_layanan = $detailCustomer['nama_layanan'];
         $img_url = $this->get_bar_code($url);
         $type = pathinfo($img_url, PATHINFO_EXTENSION);
         $data = file_get_contents($img_url);
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
         // It will be called downloaded.pdf
-        $html = '<center>' . $detailCustomer['nama'] . '<br><img importance="" width=\'150\' height=\'75\' src="' . $base64 . '" id=""></center>';
+        $html = '<center>' . $nama . '<br>' . $tgl_lahir . '<br> ' . $nama_test . ' ' . $nama_layanan . '<img importance="" width=\'150\' height=\'75\' src="' . $base64 . '" id=""></center>';
         $fileHTMLVIEW = view('backoffice/layanan/print_barcode', ['base64' => $base64, 'url' => $url, 'detailCustomer' => $detailCustomer, 'original_img' => $img_url, 'html_img' => $html]);
         // return $fileHTMLVIEW;
         // exit();
@@ -304,7 +314,7 @@ class Layanan extends ResourceController
 
 
         $PDF->loadHtml($fileHTMLVIEW);
-        $arraySize = array(0, 0, 170, 190);
+        $arraySize = array(0, 0, 120, 220);
         $PDF->setPaper($arraySize, 'landscape');
         $PDF->render();
         $PDF->stream('barcode.pdf', ['Attachment' => false]);
