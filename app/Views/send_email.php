@@ -37,7 +37,7 @@
         <div class="card-body p-0">
             <!-- /.mailbox-controls -->
             <div class="mailbox-read-message">
-                <h3>Quick Test Covid</h3>
+                <h3>PT. QuickTest Laboratorium Indonesia</h3>
                 <p>Hello <?= $detail_customer['nama']; ?>,</p>
 
                 <?php

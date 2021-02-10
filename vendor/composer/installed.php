@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '1da2c55854462b8fdc41ce96d1c9d176541a0169',
+    'reference' => 'ef28a47503e7aabded6ccc8ab7d70812d44d64dd',
     'name' => 'codeigniter4/framework',
   ),
   'versions' => 
@@ -27,7 +27,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '1da2c55854462b8fdc41ce96d1c9d176541a0169',
+      'reference' => 'ef28a47503e7aabded6ccc8ab7d70812d44d64dd',
     ),
     'doctrine/instantiator' => 
     array (
@@ -156,6 +156,15 @@
       ),
       'reference' => '231c73783ebb7dd9ec77916c10037eff5a2b6efe',
     ),
+    'mpdf/mpdf' => 
+    array (
+      'pretty_version' => 'v8.0.10',
+      'version' => '8.0.10.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '1333a962cd2f7ae1a127b7534b7734b58179186f',
+    ),
     'myclabs/deep-copy' => 
     array (
       'pretty_version' => '1.10.2',
@@ -177,6 +186,15 @@
       array (
       ),
       'reference' => 'd178027d1e679832db9f38248fcc7200647dc2b7',
+    ),
+    'paragonie/random_compat' => 
+    array (
+      'pretty_version' => 'v9.99.100',
+      'version' => '9.99.100.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '996434e5492cb4c3edcb9168db6fbb1359ef965a',
     ),
     'phar-io/manifest' => 
     array (
@@ -502,6 +520,15 @@
       ),
       'reference' => '99732be0ddb3361e16ad77b68ba41efc8e979019',
     ),
+    'setasign/fpdi' => 
+    array (
+      'pretty_version' => 'v2.3.5',
+      'version' => '2.3.5.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'f2246c8669bd25834f5c264425eb0e250d7a9312',
+    ),
     'squizlabs/php_codesniffer' => 
     array (
       'pretty_version' => '3.5.8',
@@ -528,15 +555,6 @@
       array (
       ),
       'reference' => 'f377a3dd1fde44d37b9831d68dc8dea3ffd28e13',
-    ),
-    'tecnickcom/tcpdf' => 
-    array (
-      'pretty_version' => '6.3.5',
-      'version' => '6.3.5.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '19a535eaa7fb1c1cac499109deeb1a7a201b4549',
     ),
     'theseer/tokenizer' => 
     array (

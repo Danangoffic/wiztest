@@ -184,7 +184,7 @@ class User extends ResourceController
         $this->session->destroy();
         $this->session->start();
         $this->session->setFlashdata('success', 'Berhasil keluar');
-        return redirect()->to('backoffice/login');
+        return redirect()->to('/backoffice/login');
     }
 
     public function create_user()

@@ -145,7 +145,7 @@ class Swabber extends ResourceController
         return $this->respond($data, 200, 'success');
     }
 
-    public function print_barcode1()
+    public function print_barcode()
     {
         $id_customer = $this->request->getPost("id_customer");
         $customer = $this->customer_model->detail_customer($id_customer);

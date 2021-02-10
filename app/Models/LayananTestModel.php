@@ -74,6 +74,23 @@ class LayananTestModel extends Model
         return $builder->get();
     }
 
+    public function by_keys(array $keys = null, $value = null)
+    {
+        if ($keys == null) {
+            return null;
+        }
+        $builder = db_connect()->table('data_layanan_test');
+        if (is_array($keys)) {
+            $builder->where($keys);
+        } else {
+            if ($value == null) {
+                return null;
+            }
+            $builder->where($keys, $value);
+        }
+        return $builder;
+    }
+
     public function get_by_id_layanan($id_layanan = null)
     {
         if ($id_layanan == null) {

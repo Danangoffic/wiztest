@@ -4,7 +4,6 @@ namespace App\Controllers\backoffice;
 
 use App\Controllers\Customer;
 use App\Models\CustomerModel;
-use App\Models\DokterModel;
 use App\Models\FaskesModel;
 use App\Models\InstansiModel;
 use App\Models\LayananModel;
@@ -22,10 +21,13 @@ use App\Models\KehadiranModel;
 use App\Models\PembayaranModel;
 use App\Models\UserDetailModel;
 use App\Models\UserModel;
-use CodeIgniter\Validation\Validation;
-use Dompdf\Cpdf;
-use Dompdf\Css\Stylesheet;
-use Dompdf\Options;
+use TCPDF;
+
+// use CodeIgniter\Validation\Validation;
+// use Dompdf\Cpdf;
+// use Dompdf\Css\Stylesheet;
+// use Dompdf\Options;
+// use TCPDF;
 
 // use App\Controllers;
 // use CodeIgniter\Controller;
@@ -57,25 +59,6 @@ class Peserta extends BaseController
     {
         $this->session = \Config\Services::session();
         $this->customerModel = new CustomerModel();
-        $this->pemeriksaModel = new PemeriksaModel();
-        $this->jenisPemeriksaanModel = new PemeriksaanModel();
-        $this->faskesModel = new FaskesModel();
-        $this->instansiModel = new InstansiModel();
-        $this->marketingModel = new MarketingModel();
-        $this->layananTestModel = new LayananTestModel();
-        $this->testModel = new TestModel();
-        $this->layananModel = new LayananModel();
-        $this->customerPublic = new Customer;
-        $this->statusHadir = new StatusHasilModel();
-        $this->pembayaran_model = new PembayaranModel();
-        $this->hasil_lab = new HasilLaboratoriumModel();
-        $this->customer_overload = new CustomerOverloadModel();
-        $this->home_service_model = new CustomerHomeServiceModel();
-        $this->user_model = new UserModel();
-        $this->detail_user_model = new UserDetailModel();
-        $layanan = new Layanan;
-        $this->dompdf = $layanan->dompdf;
-        $this->kehadiran_model = new KehadiranModel();
     }
 
     protected function check_user_level()
@@ -104,7 +87,12 @@ class Peserta extends BaseController
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
         }
-
+        $this->layananTestModel = new LayananTestModel();
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
         $data_walkin = $this->layananTestModel->get_by_key('id_pemeriksaan', "1")->getResultArray();
 
         $ids_test = array();
@@ -124,14 +112,20 @@ class Peserta extends BaseController
             } elseif ($date1 !== '') {
                 $queryFilter .= " AND tgl_kunjungan = '" . $date1 . "'";
             } elseif ($date2 !== '') {
-                $queryFilter .= " AND tgl_kunjungan BETWEEN '" . date('Y-m-d') . "' AND '" . $date2 . "'";
+                $now_date = date("Y-m-d");
+                $queryFilter .= " AND tgl_kunjungan BETWEEN '{$now_date}' AND '{$date2}'";
             }
             $queryFilter .= " AND jenis_test IN (SELECT id FROM data_layanan_test WHERE id_segmen = '1' AND id_pemeriksaan = '1')";
             $queryFilter .= " ORDER BY id DESC";
             $Customer = db_connect()->query($queryFilter)->getResultArray();
         } else {
-            $Customer = db_connect()->table('customers')->whereIn('jenis_test', $ids_test)->select()->orderBy('id', 'DESC')->get()->getResultArray();
+            $extra = [
+                'jenis_test' => $ids_test
+            ];
+            $Customer = $this->customerModel->deep_detail_by_id(null, $extra)->getResultArray();
+            // $Customer = db_connect()->table('customers')->whereIn('jenis_test', $ids_test)->select()->orderBy('id', 'DESC')->get()->getResultArray();
         }
+
         $data = array(
             'title' => "Data Registrasi Peserta",
             'page' => "registrasi",
@@ -158,6 +152,14 @@ class Peserta extends BaseController
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
         }
+
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
+        $this->pemeriksaModel = new PemeriksaModel();
+        $this->jenisPemeriksaanModel = new PemeriksaanModel();
 
         $dataPemeriksa = $this->pemeriksaModel->findAll();
         // dd($dataPemeriksa);
@@ -201,6 +203,16 @@ class Peserta extends BaseController
         // $validation =  \Config\Services::validation();
         $this->validasi_peserta();
 
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
+        $this->pemeriksaModel = new PemeriksaModel();
+        $this->jenisPemeriksaanModel = new PemeriksaanModel();
+        $this->customerPublic = new Customer;
+        $this->customer_overload = new CustomerOverloadModel();
+
         $nama = $this->request->getPost('nama');
         $nik = $this->request->getPost('nik');
         $phone = $this->request->getPost('phone');
@@ -223,7 +235,7 @@ class Peserta extends BaseController
         $id_layanan = $explode_layanan[1];
         $faskes_asal = $this->request->getPost('faskes_asal');
         $instansi = $this->request->getPost('instansi');
-        $status_peserta = $this->request->getPost('status_peserta');
+
         $kehadiran = 22;
         $tgl_kunjungan = $this->request->getPost('tgl_kunjungan');
         $id_jam_kunjungan = $this->request->getPost('jam_kunjungan');
@@ -248,7 +260,11 @@ class Peserta extends BaseController
             $id_jenis_test_customer = $data_layanan_test['id'];
             $amount_test = intval($data_layanan_test['biaya']);
 
-            // echo "Urutan : " . $no_urutan;
+            /**
+             * VALIDASI STATUS PESERTA, JIKA NO URUT > MAX KUOTA, OTOMATIS MENJADI PESERTA OVERKUOTA
+             */
+            $status_peserta = ($no_urutan <= 51) ? (int) $this->request->getPost('status_peserta') : 21;
+
 
             // var_dump($data);
             $DataInsertCustomer = [
@@ -284,7 +300,6 @@ class Peserta extends BaseController
                 $InvoiceCustomer = $this->customerPublic->getInvoiceNumber($insert_id);
 
                 $this->customerModel->update($insert_id, ['invoice_number' => $InvoiceCustomer]);
-
 
                 /**
                  * jika status peserta adalah overload, insert data ke customer overload juga
@@ -346,45 +361,50 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
 
-        $Midtrans = new Midtrans();
+        $this->statusHadir = new StatusHasilModel();
+        $this->customer_overload = new CustomerOverloadModel();
+
+        // $Midtrans = new Midtrans();
         $Customer = $this->customerModel->detailRegistrasi($id)->getFirstRow();
-        $orderId = $Customer->customer_unique;
-        // dd($Customer);
-        // echo $orderId;
-        // exit();
-        $amt = null;
-        $va = null;
-        $paymentType = null;
-        $bank = null;
+        $nama = $Customer['nama'];
+        $order_id = $Customer->customer_unique;
 
-        $detail_pembayaran = $this->pembayaran_model->pembayaran_by_customer($id);
-        // dd($detail_pembayaran);
-        $tipe_pembayaran = $detail_pembayaran['tipe_pembayaran'];
+        $tipe_pembayaran = $Customer->tipe_pembayaran;
 
-        $amount = $detail_pembayaran['amount'];
-        $jenis_pembayaran = $detail_pembayaran['jenis_pembayaran'];
-        $status_pembayaran = $detail_pembayaran['status_pembayaran'];
-        $va_numbers = "";
-        $bank = "";
-        $va = "";
-        $amt = 'Rp ' . number_format($amount, 0, ",", ".");
-        $payment_type = ucwords($jenis_pembayaran);
-        $transactionStatus = ucwords($status_pembayaran);
-        // }
+        if ($tipe_pembayaran == "midtrans") {
+            /**
+             * GET STATUS PEMBAYARAN MELALUI MIDTRANS
+             */
+            $midtrans_status = \Midtrans::status($order_id);
 
-        // dd($DetailPayment);
+            $jenis_pembayaran = ucwords(str_replace("_", " ", $midtrans_status['payment_type']));
+            $status_pembayaran = $midtrans_status['transaction_status'];
+            $midtrans_gross_amount = (int) $midtrans_status['gross_amount'];
+            $has_va = ($midtrans_status['va_numbers']) ? $midtrans_status['va_numbers'] : null;
+
+            $va = ($has_va != null) ? $has_va['va_number'] : null;
+            $bank = ($has_va != null) ? $has_va['bank'] : null;
+            $amt = 'Rp ' . number_format($midtrans_gross_amount, 0, ",", ".");
+        } elseif ($tipe_pembayaran == "langsung") {
+            $amount = $Customer->amount;
+            $jenis_pembayaran = $Customer->jenis_pembayaran;
+            $status_pembayaran = $Customer->status_pembayaran;
+            $va = null;
+            $amt = 'Rp ' . number_format($amount, 0, ",", ".");
+            $bank = null;
+        }
 
         $data = array(
-            'title' => "Registrasi",
+            'title' => "Detail Peserta {$nama} - {$order_id}",
             'page' => "registrasi",
             'data_customer' => $Customer,
             'session' => $this->session,
             'id' => $id,
             'amt' => $amt,
             'va' => $va,
-            'paymentType' => $paymentType,
+            'paymentType' => $jenis_pembayaran,
             'bank' => $bank,
-            'transactionStatus' => $transactionStatus,
+            'transactionStatus' => $status_pembayaran,
             'status_hadir' => $this->statusHadir
         );
         return view('backoffice/peserta/detail_peserta', $data);
@@ -402,6 +422,18 @@ class Peserta extends BaseController
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
         }
+
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
+
+        $this->customer_overload = new CustomerOverloadModel();
+        $this->home_service_model = new CustomerHomeServiceModel();
+        $this->user_model = new UserModel();
+        $this->detail_user_model = new UserDetailModel();
+        $this->pembayaran_model = new PembayaranModel();
 
         $data_customer = $this->customerModel->find($id_customer);
         if ($data_customer == null) {
@@ -437,15 +469,35 @@ class Peserta extends BaseController
         $html .= '<link rel="stylesheet" href="/assets/dist/css/adminlte.min.css">';
         // $html .= '';
         // $this->dompdf->setIsHtml5ParserEnabled(true);
-        $this->dompdf->loadHtml($html);
+        require_once('tcpdf_include.php');
+        $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
+
+        $PDF->SetCreator(PDF_CREATOR);
+        $PDF->SetAuthor('Dea Venditama');
+        $PDF->SetTitle('Invoice');
+        $PDF->SetSubject('Invoice');
+
+        $PDF->setPrintHeader(false);
+        $PDF->setPrintFooter(false);
+
+        $PDF->addPage();
+
+        //PDFutput the HTML content
+        $PDF->writeHTML($html, true, false, true, false, '');
+        //line ini penting
+        $this->response->setContentType('application/pdf');
+        //Close and output PDF document
+        $PDF->Output('Invoice-' . $name_attn . '.pdf', 'I');
+
+        // $this->dompdf->loadHtml($html);
         // Render the PDF
 
-        $this->dompdf->render();
+        // $this->dompdf->render();
         // Output the generated PDF to Browser
         // $stylsheet = new Stylesheet($this->dompdf);
         // $stylsheet->set_base_path('/assets/dist/css/adminlte.min.css');
-        $this->dompdf->setBasePath('/assets/dist/css/adminlte.min.css');
-        $this->dompdf->stream("Invoice - " . $name_attn, array("Attachment" => false));
+        // $this->dompdf->setBasePath('/assets/dist/css/adminlte.min.css');
+        // $this->dompdf->stream("Invoice - " . $name_attn, array("Attachment" => false));
     }
 
     public function print_pdf_peserta($id_customer)
@@ -465,6 +517,23 @@ class Peserta extends BaseController
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
         }
+
+
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
+        $this->pemeriksaModel = new PemeriksaModel();
+        $this->faskesModel = new FaskesModel();
+        $this->jenisPemeriksaanModel = new PemeriksaanModel();
+        // $this->customerPublic = new Customer;
+        $this->customer_overload = new CustomerOverloadModel();
+        $this->home_service_model = new CustomerHomeServiceModel();
+        $this->user_model = new UserModel();
+        $this->detail_user_model = new UserDetailModel();
+        $this->pembayaran_model = new PembayaranModel();
+
 
         $dataPemeriksa = $this->pemeriksaModel->findAll();
         // dd($dataPemeriksa);
@@ -506,6 +575,21 @@ class Peserta extends BaseController
         }
 
         $this->validasi_peserta();
+
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
+        $this->pemeriksaModel = new PemeriksaModel();
+        $this->faskesModel = new FaskesModel();
+        $this->jenisPemeriksaanModel = new PemeriksaanModel();
+        $this->customerPublic = new Customer;
+        $this->customer_overload = new CustomerOverloadModel();
+        $this->home_service_model = new CustomerHomeServiceModel();
+        $this->user_model = new UserModel();
+        $this->detail_user_model = new UserDetailModel();
+        $this->pembayaran_model = new PembayaranModel();
 
         $nama = $this->request->getPost('nama');
         $nik = $this->request->getPost('nik');
@@ -582,7 +666,10 @@ class Peserta extends BaseController
                 $dataInsertPembayaran = [
                     'status_pembayaran' => $status_pembayaran
                 ];
-                $update_payment = db_connect()->table('data_pembayaran')->update($dataInsertPembayaran, ['id_customer' => $id_customer]);
+                $data_pembayaran = $this->pembayaran_model->find(['id_customer' => $id_customer]);
+                $id_pembayaran = $data_pembayaran['id'];
+                $update_payment = $this->pembayaran_model->update($id_pembayaran, $dataInsertPembayaran);
+                // $update_payment = db_connect()->table('data_pembayaran')->update($dataInsertPembayaran, ['id_customer' => $id_customer]);
                 if ($update_payment) {
                     $this->session->setFlashdata('success', 'Berhasil ubah data peserta tes');
                     return redirect()->to('/backoffice/peserta');
@@ -617,11 +704,12 @@ class Peserta extends BaseController
         // var_dump($user_level);
         // exit();
 
-        $data_customer = $this->customerModel->find($id_customer);
+        $data_customer = $this->customerModel->detail_customer($id_customer);
         if ($data_customer == null) {
             $this->session->setFlashdata("error", "Data customer tidak ditemukan");
             return redirect()->to("/backoffice/registrasi");
         }
+
         $data = array(
             'title' => "Hapus Customer",
             'page' => "registrasi",
@@ -647,7 +735,15 @@ class Peserta extends BaseController
 
         $id_customer = base64_decode($this->request->getPost("id_customer"));
 
-        $data_customer = $this->customerModel->find($id_customer);
+
+        $this->pembayaran_model = new PembayaranModel();
+        $this->hasil_lab = new HasilLaboratoriumModel();
+
+        $this->user_model = new UserModel();
+        $this->detail_user_model = new UserDetailModel();
+        // $this->hasil_lab = new Lab
+
+        $data_customer = $this->customerModel->detail_customer($id_customer);
         $data_pembayaran = $this->pembayaran_model->where(['id_customer' => $id_customer])->first();
         $data_lab = $this->hasil_lab->where(['id_customer' => $id_customer])->get()->getRowArray();
         $csrf = $this->request->getPost("csrf_test_name");
@@ -656,10 +752,12 @@ class Peserta extends BaseController
             $this->session->setFlashdata("error", "Maaf token penghapusan tidak ditemukan");
             return redirect()->to("/backoffice/registrasi");
         }
-        if ($data_customer === null) {
+        if ($data_customer == null) {
             $this->session->setFlashdata("error", "Data customer tidak ditemukan");
             return redirect()->to("/backoffice/registrasi");
         }
+        $order_id = $data_customer['customer_unique'];
+        $cancel_payment = \Midtrans::cancel($order_id);
         $status_peserta = $data_customer['status_peserta'];
         if ($status_peserta == 21) {
             $customer_overload = $this->customer_overload->where(['id_customer' => $id_customer])->get()->getRowArray();
@@ -769,10 +867,29 @@ class Peserta extends BaseController
 
     protected function updated_by_qr($id_peserta): array
     {
+
+        $this->pembayaran_model = new PembayaranModel();
+
+
         $today = date("Y-m-d");
         $customerDetail = $this->customerModel->detail_customer($id_peserta);
         $pembayaran_detail = $this->pembayaran_model->pembayaran_by_customer($id_peserta);
+
         if ($customerDetail != null && $pembayaran_detail != null) {
+            /**
+             * cek pembayaran di midtrans juga untuk menghindari data yg tidak benar
+             */
+            $order_id = $customerDetail['customer_unique'];
+            $midtrans_detail = \Midtrans::status($order_id);
+            $midtrans_status_payment = $midtrans_detail['transaction_status'];
+            if ($midtrans_status_payment != "settlement" || $midtrans_status_payment != "capture") {
+                $array_return = array(
+                    'statusMessage' => "failed",
+                    'message' => "<h4 class='badge badge-danger'>Gagal absen untuk hadir karena belum melakukan pembayaran</h4>",
+                    'responseCode' => "01"
+                );
+                return $array_return;
+            }
             $tgl_kunjungan = $customerDetail['tgl_kunjungan'];
 
             if ($today != $tgl_kunjungan) {
@@ -841,6 +958,7 @@ class Peserta extends BaseController
 
     protected function updateHadirkanPeserta($id_peserta)
     {
+
         $customerDetail = $this->customerModel->find($id_peserta);
         if ($customerDetail) {
             $statusKehadiran = intval($customerDetail['kehadiran']);

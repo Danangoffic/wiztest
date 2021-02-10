@@ -2,10 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Controllers\backoffice\Home_service;
-use App\Controllers\backoffice\Layanan;
 use App\Controllers\backoffice\Midtrans as BackofficeMidtrans;
-use App\Controllers\backoffice\SystemParameter;
 use App\Models\AlatModel;
 use App\Models\CustomerHomeServiceModel;
 use App\Models\CustomerModel;
@@ -25,9 +22,6 @@ use App\Models\SampleModel;
 use App\Models\StatusHasilModel;
 use App\Models\TestModel;
 use CodeIgniter\RESTful\ResourceController;
-use CodeIgniter\API\ResponseTrait;
-use App\Models\SystemParameterModel;
-use App\Controllers\Midtrans;
 
 class Customer extends ResourceController
 {
@@ -48,42 +42,25 @@ class Customer extends ResourceController
     protected $petugas_model;
     protected $layanan_controller;
     protected $CustomerHomeServiceModel;
-    protected $layanan_test_model;
+    // protected $layanan_test_model;
     protected $midtrans_bo;
+    protected $afiliasi;
 
     public function __construct()
     {
-        $this->systemparam = new SystemParameter;
-        $this->layananModel = new LayananModel();
-        $this->pemeriksaanModel = new PemeriksaanModel();
-        $this->testModel = new TestModel();
-        $this->layananTestModel = new LayananTestModel();
         $this->customerModel = new CustomerModel();
-        $this->kuotaModel = new KuotaModel();
-        $this->PembayaranModel = new PembayaranModel();
-        $this->status_model = new StatusHasilModel();
-        $this->marketing_model = new MarketingModel();
-        $this->hasil_test = new HasilLaboratoriumModel();
-        $this->dokter_model = new DokterModel();
-        $this->alat_model = new AlatModel();
-        $this->sample_model = new SampleModel();
-        $this->petugas_model = new PemeriksaModel();
-        $this->layanan_controller = new Layanan;
-        $this->CustomerHomeServiceModel = new CustomerHomeServiceModel();
-        $this->layanan_test_model = new LayananTestModel();
-        $this->midtrans_bo = new BackofficeMidtrans;
     }
 
     public function index()
     {
-
+        $this->marketing_model = new MarketingModel();
         $data_marketing = $this->marketing_model->findAll();
-
+        $midtrans_bo = new BackofficeMidtrans;
         $data = [
             'title' => "Home",
             'marketings' => $data_marketing,
-            'midtrans_client_key' => $this->midtrans_bo->client_key,
-            'snap_url_js' => $this->midtrans_bo->snap_url_js
+            'midtrans_client_key' => $midtrans_bo->client_key,
+            'snap_url_js' => $midtrans_bo->snap_url_js
         ];
         return view('customer/index', $data);
     }
@@ -105,6 +82,10 @@ class Customer extends ResourceController
 
     public function registrasi()
     {
+        $layanan_test_model = new LayananTestModel();
+        $kuotaModel = new KuotaModel();
+        $marketing_model = new MarketingModel();
+        $layananModel = new LayananModel();
 
         $nama = $this->request->getPost('nama');
         $nik = $this->request->getPost('nik');
@@ -118,7 +99,7 @@ class Customer extends ResourceController
         $alamat = $this->request->getPost('alamat');
         $marketing = $this->request->getPost('marketing');
         $jenis_test = $this->request->getPost('jenis_test');
-        $detail_layanan_test = $this->layanan_test_model->find($jenis_test);
+        $detail_layanan_test = $layanan_test_model->find($jenis_test);
         $jenis_pemeriksaan = $detail_layanan_test['id_pemeriksaan'];
         $jenis_layanan = $detail_layanan_test['id_layanan'];
         $faskes_asal = $this->request->getPost('faskes_asal');
@@ -126,7 +107,7 @@ class Customer extends ResourceController
         $kehadiran = 0;
         $tgl_kunjungan = $this->request->getPost('tgl_kunjungan');
         $id_jam_kunjungan = $this->request->getPost('jam_kunjungan');
-        $dataJamKunjungan = $this->kuotaModel->find($id_jam_kunjungan);
+        $dataJamKunjungan = $kuotaModel->find($id_jam_kunjungan);
         $jam_kunjungan = $dataJamKunjungan['jam'];
         // var_dump($this->request->getPost());
         // exit();
@@ -137,8 +118,7 @@ class Customer extends ResourceController
             // exit();
             // dd($customer_UNIQUE);
 
-            $Layanan = new Layanan();
-            $dataMarketing = $this->marketing_model->find($marketing);
+            $dataMarketing = $marketing_model->find($marketing);
             $dataLayanan = $this->layananModel->find($jenis_layanan);
 
             if ($jenis_test == 2 || $jenis_test == "2") {
@@ -189,7 +169,7 @@ class Customer extends ResourceController
             $InvoiceCustomer = $this->getInvoiceNumber($insert_id);
             $arr_invoice = ['invoice_number' => $InvoiceCustomer];
             $this->customerModel->update($insert_id, $arr_invoice);
-            $DetailLayananTest = $Layanan->detail_layanan($jenis_pemeriksaan);
+            $DetailLayananTest = $layananModel->find($jenis_pemeriksaan);
             $productName = $DetailLayananTest['nama_test'] . ' ' . $DetailLayananTest['nama_layanan'];
             $params = array(
                 'transaction_details' => array(
@@ -278,9 +258,7 @@ class Customer extends ResourceController
     {
 
         $data = $this->customerModel->getCustomerAvailableByDate($type_test, $jenis_pemeriksaan, $jenis_layanan, '1', $tgl_kunjungan, $jam_kunjungan)->getRowArray();
-        // db_connect()->table()->select()->get()->getRowArray()
-        // echo db_connect()->showLastQuery();
-        // var_dump($data);
+
         if ($data) {
             $totalData = (intval($data['id'])) ? intval($data['id']) : 0;
         } else {
@@ -292,8 +270,7 @@ class Customer extends ResourceController
     public function getInvoiceNumber($id_customer): string
     {
         $data = $this->customerModel->detail_customer($id_customer);
-        // echo $data['no_antrian'];
-        // exit();
+
         $word1 = 'INV-';
         $random = rand(1000, 9999);
         if (!is_array($id_customer)) {
@@ -303,17 +280,15 @@ class Customer extends ResourceController
         }
 
         $generateUrutan = str_pad($urutan, 4, '0', STR_PAD_LEFT);
-        // echo $date;
-        // exit();
+
         $invoice = $word1 . date("ymd") . $random . $generateUrutan;
-        // echo $invoice;
-        // exit();
+
         return $invoice;
     }
 
     public function detail_form2()
     {
-
+        $this->layananTestModel = new LayananTestModel();
         $id_jenis_test = $this->request->getVar('id_jenis_test');
         $id_pemeriksaan = $this->request->getVar('id_pemeriksaan');
         $segmen = $this->request->getVar('segmen');
@@ -333,7 +308,7 @@ class Customer extends ResourceController
 
     public function jadwal_available()
     {
-
+        $this->layananTestModel = new LayananTestModel();
         $id_jenis_test = $this->request->getVar('jenis_test');
         $tgl_kunjungan = $this->request->getVar('tgl_kunjungan');
         // $jenis_pemeriksaan = $this->request->getPost('jenis_pemeriksaan');
@@ -361,6 +336,7 @@ class Customer extends ResourceController
 
     public function update_data_customer_registration()
     {
+        $this->PembayaranModel = new PembayaranModel();
         $payment_type = $this->request->getPost('payment_type');
         $order_id = $this->request->getPost('order_id');
         $pdf_url = $this->request->getPost('pdf_url');
@@ -394,9 +370,9 @@ class Customer extends ResourceController
 
                     if ($updateCustomer && $updatePayment) {
                         $get_qr = array();
-                        if ($transaction_status == "settlement" || $transaction_status == "capture") {
-                            $get_qr = $this->get_qr_by_order_id($order_id);
-                        }
+                        // if ($transaction_status == "settlement" || $transaction_status == "capture") {
+                        //     $get_qr = $this->get_qr_by_order_id($order_id);
+                        // }
                         $responseStatus = "success";
                         $midtransStatus = $MidtransHandler->getStatusByOrderId($order_id);
                         $statusCode = 200;
@@ -491,49 +467,50 @@ class Customer extends ResourceController
         }
     }
 
-    public function get_qr_by_order_id($order_id)
-    {
-        // $order_id = $this->request->getVar('order_id');
-        try {
-            $db_init = db_connect()->table('customers')->select()->where('customer_unique', $order_id)->get();
-            $data_customer = $db_init->getResultArray();
-            $total_data = count($data_customer);
-            if ($total_data > 0) {
-                $id_customer = $data_customer['id'];
-                $url = base_url('api/hadir/' . base64_encode($id_customer));
-                $qr_url = $this->layanan_controller->getUrlQRCode($url);
-                $respondData = array(
-                    'responseMessage' => 'success',
-                    'url_img' => $qr_url
-                );
-                return $this->respond($respondData, 200, 'success');
-            } else {
-                $respondData = array(
-                    'responseMessage' => 'not found',
-                    'url_img' => null
-                );
-                return $this->respond($respondData, 404, 'failed');
-            }
-        } catch (\Throwable $th) {
-            //throw $th;
-            return $this->failServerError();
-        }
-    }
+    // public function get_qr_by_order_id($order_id)
+    // {
+    //     // $order_id = $this->request->getVar('order_id');
+    //     try {
+    //         $db_init = db_connect()->table('customers')->select()->where('customer_unique', $order_id)->get();
+    //         $data_customer = $db_init->getResultArray();
+    //         $total_data = count($data_customer);
+    //         if ($total_data > 0) {
+    //             $id_customer = $data_customer['id'];
+    //             $url = base_url('api/hadir/' . base64_encode($id_customer));
+    //             $qr_url = $this->layanan_controller->getUrlQRCode($url);
+    //             $respondData = array(
+    //                 'responseMessage' => 'success',
+    //                 'url_img' => $qr_url
+    //             );
+    //             return $this->respond($respondData, 200, 'success');
+    //         } else {
+    //             $respondData = array(
+    //                 'responseMessage' => 'not found',
+    //                 'url_img' => null
+    //             );
+    //             return $this->respond($respondData, 404, 'failed');
+    //         }
+    //     } catch (\Throwable $th) {
+    //         //throw $th;
+    //         return $this->failServerError();
+    //     }
+    // }
 
     public function findOrderId()
     {
         $order_id = $this->request->getVar('order_id');
         try {
-            $db_init = db_connect()->table('customers')->select()->where('customer_unique', $order_id)->get();
-            $data_customer = $db_init->getResultArray();
-            $total_data = count($data_customer);
-            if ($total_data > 0) {
-                $id_customer = $data_customer['id'];
-                $url = base_url('api/hadir/' . base64_encode($id_customer));
-                $qr_url = $this->layanan_controller->getUrlQRCode($url);
+            $data_customer = $this->customerModel->get_by_customer_unique($order_id);
+            // $data_customer = $db_init->getResultArray();
+            // $total_data = count($data_customer);
+            if ($data_customer != null) {
+                // $id_customer = $data_customer['id'];
+                // $url = base_url('api/hadir/' . base64_encode($id_customer));
+                // $qr_url = $this->layanan_controller->getUrlQRCode($url);
                 $respondData = array(
                     'statusMessage' => 'success',
-                    'url_img' => $qr_url
+                    'data' => $data_customer
+                    // 'url_img' => $qr_url
                 );
                 return $this->respond($respondData, 200, 'success');
             } else {
@@ -578,7 +555,7 @@ class Customer extends ResourceController
 
     public function cari_hasil($order_id)
     {
-
+        $this->status_model = new StatusHasilModel();
         try {
             $detailCustomer = $this->customerModel->where(['customer_unique' => $order_id])->first();
             if (count($detailCustomer) == 0) {
@@ -664,7 +641,7 @@ class Customer extends ResourceController
 
     public function cari_registrasi_detail($order_id)
     {
-        $PemanggilanModel = new PemanggilanModel();
+        $this->PembayaranModel = new PembayaranModel();
         try {
             $detailCustomer = $this->customerModel->where(['customer_unique' => $order_id])->first();
 
@@ -689,6 +666,8 @@ class Customer extends ResourceController
 
     public function home_service()
     {
+        $this->marketing_model = new MarketingModel();
+        $this->layananTestModel = new LayananTestModel();
         $data_marketing = $this->marketing_model->findAll();
         $vgroup = 'MIDTRANS_KEY';
         $paramter = 'CLIENT_KEY';
@@ -711,6 +690,8 @@ class Customer extends ResourceController
 
     public function getSelectedTest()
     {
+        $this->testModel = new TestModel();
+        $this->layananModel = new LayananModel();
         $id_jenis_test = $this->request->getVar('id_test');
         $id_jenis_pemeriksaan = $this->request->getVar('type');
         $id_segmen = $this->request->getVar('segmen');
@@ -721,7 +702,7 @@ class Customer extends ResourceController
             if ($check_jenis_test['id']) {
                 $check_data_layanan_test = $this->layananTestModel
                     ->where(['id_test' => $id_jenis_test, 'id_pemeriksaan' => $id_jenis_pemeriksaan, 'id_segmen' => $id_segmen])->get()->getResultArray();
-                if ($check_data_layanan_test) {
+                if ($check_data_layanan_test != null) {
                     $data = array();
                     foreach ($check_data_layanan_test as $key => $dlt) {
                         $detail_layanan = $this->layananModel->find($dlt['id_layanan']);
@@ -751,6 +732,12 @@ class Customer extends ResourceController
 
     public function home_service_registration()
     {
+        $this->testModel = new TestModel();
+        $this->layananModel = new LayananModel();
+        $this->layananTestModel = new LayananTestModel();
+        $this->PembayaranModel = new PembayaranModel();
+        $this->afiliasi = new Afiliasi;
+        $this->CustomerHomeServiceModel = new CustomerHomeServiceModel();
         try {
             $token = $this->request->getVar('token');
             if (!$token) {
@@ -762,6 +749,8 @@ class Customer extends ResourceController
                 $this->session->setFlashdata('error', "Daftar peserta yang di daftarkan minimal adalah 5 orang");
                 return redirect()->to("/home-service");
             }
+            $tgl_kunjungan = $this->request->getVar("tgl_kunjungan");
+            $jam_kunjungan = $this->request->getVar("jam_kunjungan");
             $p = $peserta[0];
             $detail_jenis_test = $this->layananTestModel->find($p['jenis_test']);
             $detail_layanan = $this->layananModel->find($detail_jenis_test['id_layanan']);
@@ -769,17 +758,19 @@ class Customer extends ResourceController
             $jenis_pemeriksaan = $detail_jenis_test['id_pemeriksaan'];
             $jenis_layanan = $detail_jenis_test['id_layanan'];
             $jenis_test = $p['jenis_test'];
-            $tgl_kunjungan = $p['tgl_kunjungan'];
-            $jam_kunjungan = $p['jam_kunjungan'];
+            // $tgl_kunjungan = $p['tgl_kunjungan'];
+            // $id_jam_kunjungan = $p['jam_kunjungan'];
             $jenis_kelamin = $p['jenis_kelamin'];
             $tempat_lahir = $p['tempat_lahir'];
             $tgl_lahir = $p['tgl_lahir'];
             $alamat = $p['alamat'];
             $instansi = $p['instansi'];
             $marketing = $p['marketing'];
+            $dataJamKunjungan = $this->kuotaModel->find($jam_kunjungan);
+            $jam_kunjungan = $dataJamKunjungan['jam'];
 
             $customer_UNIQUE = $this->getOrderId($jenis_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
-            $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
+            $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan);
 
             $array_insert = array(
                 'jenis_test' => $p['jenis_test'],
@@ -806,7 +797,7 @@ class Customer extends ResourceController
             $this->CustomerHomeServiceModel->insert($array_insert);
             $id_hs = $this->CustomerHomeServiceModel->getInsertID();
 
-            $InvoiceCustomer = $this->generate_invoice_hs($id_hs);
+            $InvoiceCustomer = $this->afiliasi->afiliasi_invoice($id_hs, "home service");
             $this->CustomerHomeServiceModel->update($id_hs, ['invoice_number' => $InvoiceCustomer]);
 
             $array_insert = array();
@@ -820,17 +811,21 @@ class Customer extends ResourceController
                 $jenis_pemeriksaan = $detail_jenis_test['id_pemeriksaan'];
                 $jenis_layanan = $detail_jenis_test['id_layanan'];
                 $jenis_test = $p['jenis_test'];
-                $tgl_kunjungan = $p['tgl_kunjungan'];
-                $jam_kunjungan = $p['jam_kunjungan'];
+                // $tgl_kunjungan = $p['tgl_kunjungan'];
                 $jenis_kelamin = $p['jenis_kelamin'];
                 $tempat_lahir = $p['tempat_lahir'];
                 $tgl_lahir = $p['tgl_lahir'];
                 $alamat = $p['alamat'];
                 $instansi = $p['instansi'];
                 $marketing = $p['marketing'];
+                $dataJamKunjungan = $this->kuotaModel->find($jam_kunjungan);
+                $jam_kunjungan2 = $dataJamKunjungan['jam'];
+
+                $detail_layanan_test = $this->layanan_test_model->find($p['jenis_test']);
+                $biaya_test = $detail_layanan_test['biaya'];
 
                 $customer_UNIQUE = $this->getOrderId($jenis_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
-                $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan);
+                $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan2);
 
                 $array_insert = array(
                     'jenis_test' => $p['jenis_test'],
@@ -862,6 +857,15 @@ class Customer extends ResourceController
                 $InvoiceCustomer = $this->getInvoiceNumber($ids);
                 $this->customerModel->update($ids, ['invoice_number' => $InvoiceCustomer]);
 
+                $data_pembayaran = [
+                    'id_customer' => $ids,
+                    'tipe_pembayaran' => "langsung",
+                    'amount' => $biaya_test,
+                    'jenis_pembayaran' => "Invoice",
+                    'status_pembayaran' => "Invoice"
+                ];
+                $insert_pembayaran = $this->PembayaranModel->insert($data_pembayaran);
+
                 $harga_test += $detail_jenis_test['biaya'];
                 $product_name[] = $detail_test['nama_test'] . " " . $detail_layanan['nama_layanan'];
             }
@@ -880,6 +884,7 @@ class Customer extends ResourceController
 
     protected function generate_invoice_hs($id_customer)
     {
+        $this->customer_home_service_model = new CustomerHomeServiceModel();
         $data = $this->customer_home_service_model->find($id_customer);
 
         $word1 = 'INV-';
@@ -950,31 +955,34 @@ class Customer extends ResourceController
 
     public function validasi_no_registrasi()
     {
+        $this->status_model = new StatusHasilModel();
         $customer_unique = $this->request->getVar('no_registrasi');
         try {
             $finding = $this->customerModel->where(['customer_unique' => $customer_unique])->first();
             if ($finding) {
-                $detail_layanan_test = $this->layananTestModel->find($finding['jenis_test']);
-                $detail_layanan = $this->layananModel->find($detail_layanan_test['id_layanan']);
-                $detail_pemeriksaan = $this->pemeriksaanModel->find($detail_layanan_test['id_pemeriksaan']);
-                $detail_test = $this->testModel->find($detail_layanan_test['id_test']);
-                $detail_pembayaran = $this->PembayaranModel->where(['id_customer' => $finding['id']])->get()->getRowArray();
-                $detail_kehadiran = $this->status_model->find($finding['kehadiran']);
-                $detail_marketing = $this->marketing_model->find($finding['id_marketing']);
+                $id_customer = $finding['id'];
+                $detail_customer = $this->customerModel->deep_detail_by_id($id_customer);
+                // $detail_layanan_test = $this->layananTestModel->find($finding['jenis_test']);
+                // $detail_layanan = $this->layananModel->find($detail_layanan_test['id_layanan']);
+                // $detail_pemeriksaan = $this->pemeriksaanModel->find($detail_layanan_test['id_pemeriksaan']);
+                // $detail_test = $this->testModel->find($detail_layanan_test['id_test']);
+                // $detail_pembayaran = $this->PembayaranModel->where(['id_customer' => $finding['id']])->get()->getRowArray();
+                $detail_kehadiran = $this->status_model->find($detail_customer['kehadiran']);
+                // $detail_marketing = $this->marketing_model->find($finding['id_marketing']);
                 $result_data = array(
                     'no_registrasi' => $customer_unique,
                     'nama' => $finding['nama'],
                     'kehadiran' => $detail_kehadiran['nama_status'],
-                    'jenis_test' => $detail_test['nama_test'],
-                    'jenis_layanan' => $detail_layanan['nama_layanan'],
+                    'jenis_test' => $detail_customer['nama_test'],
+                    'jenis_layanan' => $detail_customer['nama_layanan'],
                     'tgl_kunjungan' => $finding['tgl_kunjungan'],
                     'jam_kunjungan' => $finding['jam_kunjungan'],
-                    'marketing' => $detail_marketing['nama_marketing'],
-                    'cara_pemeriksaan' => $detail_pemeriksaan['nama_pemeriksaan'],
+                    'marketing' => $detail_customer['nama_marketing'],
+                    'cara_pemeriksaan' => $detail_customer['nama_pemeriksaan'],
                     'detail_pembayaran' => array(
-                        'gross_amount' => $detail_pembayaran['amount'],
-                        'jenis_pembayaran' => $detail_pembayaran['jenis_pembayaran'],
-                        'status_pembayaran' => $detail_pembayaran['status_pembayaran']
+                        'gross_amount' => $detail_customer['amount'],
+                        'jenis_pembayaran' => $detail_customer['jenis_pembayaran'],
+                        'status_pembayaran' => $detail_customer['status_pembayaran']
                     ),
 
                 );
@@ -990,10 +998,13 @@ class Customer extends ResourceController
 
     public function check_hasil()
     {
+        $this->hasil_test = new HasilLaboratoriumModel();
+        $this->alat_model = new AlatModel();
         $customer_unique = $this->request->getVar('no_registrasi');
         try {
             $finding = $this->customerModel->where(['customer_unique' => $customer_unique])->first();
             if ($finding) {
+                $customer_detail = $this->customerModel->deep_detail_by_id($finding['id'])->getRowArray();
 
                 $detail_hasil = $this->hasil_test->where(['id_customer' => $finding['id']])->get()->getRowArray();
                 $id_dokter = $detail_hasil['id_dokter'];

@@ -65,7 +65,7 @@ class CustomerModel extends Model
         $builder = $this->customer()->select($select)
             ->where('jenis_test', $id_jenis_test)
             ->where('jenis_layanan', $id_jenis_layanan)
-            ->where("tgl_kunjungan BETWEEN '{$date1}' AND '{$date2}'");
+            ->where("tgl_kunjungan between '{$date1}' AND '{$date2}'");
         return $builder->get()->getFirstRow();
         // $query = $this->db_this()->query("select {$select} from {$this->table} where jenis_test = '{$id_jenis_test}' AND jenis_layanan = '{$id_jenis_layanan}' AND tgl_kunjungan BETWEEN '{$date1}' AND '{$date2}'");
         // return $query->getFirstRow();
@@ -108,13 +108,18 @@ class CustomerModel extends Model
     public function detailRegistrasi($id = false, $jenis_pemeriksaan = false)
     {
         $db = db_connect();
-        $builder = $db->table('customers a')->select('a.*, b.nama as nama_instansi, c.nama_marketing, d.biaya, e.nama_layanan, f.nama_test, g.nama_pemeriksaan')
+        $builder = $db->table('customers a')->select('a.*, 
+        b.nama as nama_instansi, 
+        c.nama_marketing, 
+        d.biaya, e.nama_layanan, f.nama_test, g.nama_pemeriksaan, 
+        h.tipe_pembayaran, h.va_number, h.amount, h.jenis_pembayaran, h.status_pembayaran')
             ->join('instansi b', 'b.id = a.instansi')
             ->join('marketing c', 'c.id = a.id_marketing')
             ->join('data_layanan_test d', 'd.id = a.jenis_test')
             ->join('jenis_layanan e', 'e.id = d.id_layanan')
             ->join('jenis_test f', 'f.id = d.id_test')
             ->join('jenis_pemeriksaan g', 'g.id = d.id_pemeriksaan')
+            ->join('data_pembayaran h', 'h.id_customer = a.id')
             ->orderBy('id', 'DESC');
         if ($id) {
             $builder->where('a.id', $id);
@@ -232,6 +237,124 @@ class CustomerModel extends Model
             ->where(['kehadiran' => "23", "tgl_kunjungan" => date('Y-m-d'), 'jam_kunjungan' => date("H") . ":00:00"])
             ->orderBy('no_antrian', 'ASC')->get();
         return $builder;
+    }
+
+    public function get_peserta_test($id_test = null)
+    {
+        if ($id_test == null) {
+            $cond = "in(2,3)";
+        } else {
+            $cond = "= {$id_test}";
+        }
+        $builder = db_connect()
+            ->table($this->table)
+            ->whereNotIn('id', 'select id_customer from hasil_laboratorium')
+            ->where('jenis_test', 'select id from data_layanan_test where id_test ' . $cond)
+            ->orderBy("id", 'DESC');
+        return $builder->get();
+    }
+
+    public function deep_detail_by_id($id = null, array $extra = null)
+    {
+        $db = db_connect();
+        $builder = $db->table('customers a')->select('a.*, 
+        b.nama as nama_instansi, 
+        c.nama_marketing, 
+        d.biaya, e.nama_layanan, f.nama_test, g.nama_pemeriksaan, 
+        h.tipe_pembayaran, h.va_number, h.amount, h.jenis_pembayaran, h.status_pembayaran')
+            ->join('instansi b', 'b.id = a.instansi')
+            ->join('marketing c', 'c.id = a.id_marketing')
+            ->join('data_layanan_test d', 'd.id = a.jenis_test')
+            ->join('jenis_layanan e', 'e.id = d.id_layanan')
+            ->join('jenis_test f', 'f.id = d.id_test')
+            ->join('jenis_pemeriksaan g', 'g.id = d.id_pemeriksaan')
+            ->join('data_pembayaran h', 'h.id_customer = a.id');
+        if ($extra != null) {
+            if (array_key_exists('is_corporate', $extra)) {
+                $is_corporate = $extra['is_corporate'];
+                if ($is_corporate == "yes") {
+                    $id_corporate = $extra['id_corporate'];
+                    $builder->select("corporate.id as id_corporate, corporate.invoice_number")
+                        ->join('customer_corporate corporate', 'corporate.id = a.id_corporate')
+                        ->where('a.id_corporate', $id_corporate);
+                }
+            }
+            if (array_key_exists('is_hs', $extra)) {
+                $is_hs = $extra['is_hs'];
+                if ($is_hs == "yes") {
+                    $id_hs = $extra['id_hs'];
+                    $builder->select("hs.invoice_number")
+                        ->join('customer_home_service hs', 'hs.id = a.id_hs')
+                        ->where('a.id_corporate', $id_hs);
+                }
+            }
+            if (array_key_exists('jenis_test', $extra)) {
+                if (is_array($extra['jenis_test'])) {
+                    $builder->whereIn('a.jenis_test', $extra['jenis_test']);
+                } elseif (!is_array($extra['jenis_test']) && $extra['jenis_test'] != "") {
+                    $builder->where('a.jenis_test', $extra['jenis_test']);
+                }
+            }
+            if (array_key_exists('tgl_kunjungan', $extra)) {
+                if (strpos($extra['tgl_kunjungan'], "between")) {
+                    $builder->where($extra['tgl_kunjungan']);
+                } else {
+                    $builder->where('a.tgl_kunjungan', $extra['tgl_kunjungan']);
+                }
+            }
+            if (array_key_exists('jam_kunjungan', $extra)) {
+                $builder->where('a.jam_kunjungan', $extra['jam_kunjungan']);
+            }
+            if (array_key_exists('orderBy', $extra)) {
+                $builder->orderBy($extra['orderBy']);
+            } else {
+                $builder->orderBy('a.id', 'DESC');
+            }
+            if (array_key_exists('instansi', $extra)) {
+                $builder->where('a.instansi', $extra['instansi']);
+            }
+            if (array_key_exists("kehadiran", $extra)) {
+                if (is_array($extra['kehadiran'])) {
+                    $builder->whereIn('a.kehadiran', $extra['kehadiran']);
+                } else {
+                    $builder->where("a.kehadiran", $extra['kehadiran']);
+                }
+            }
+        } else {
+            $builder->orderBy('a.id', 'DESC');
+        }
+
+        if ($id != null) {
+            $builder->where('a.id', $id);
+        }
+        return $builder->get();
+    }
+
+    public function filter_walkin(array $ids_test = null, $date1 = "", $date2 = "", $instansi = "", $marketing = "", $layanan_test = "")
+    {
+        $builder = db_connect()->table($this->table);
+        if ($ids_test != null || is_array($ids_test)) {
+            $builder->whereIn('jenis_test', $ids_test);
+        }
+        if ($date1 != "" && $date2 != "") {
+            $builder->where("tgl_kunjungan BETWEEN {$date1} AND {$date2}");
+        } elseif ($date1 !== '') {
+            $builder->where('tgl_kunjungan', $date1);
+        } elseif ($date2 !== '') {
+            $date_now = date("Y-m-d");
+            $builder->where("tgl_kunjungan BETWEEN {$date_now} AND {$date2}");
+        }
+        if ($instansi != "") {
+            $builder->where('instansi', $instansi);
+        }
+        if ($marketing != "") {
+            $builder->where('id_marketing', $marketing);
+        }
+        if ($layanan_test != "") {
+            $builder->where('jenis_layanan', $layanan_test);
+        }
+        $builder->orderBy('id', 'DESC');
+        return $builder->get();
     }
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
