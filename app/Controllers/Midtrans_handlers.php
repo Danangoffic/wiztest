@@ -198,7 +198,7 @@ class Midtrans_handlers extends ResourceController
      * Send email to customer user 
      * 
      */
-    protected function sendEmailCustomer(string $order_id, $notif_modtrans)
+    public function sendEmailCustomer(string $order_id, $notif_modtrans)
     {
         # code...
 
@@ -255,7 +255,7 @@ class Midtrans_handlers extends ResourceController
         }
     }
 
-    protected function send_whatsapp($id_customer = null)
+    public function send_whatsapp($id_customer = null)
     {
         if ($id_customer != null) {
             $whatsapp_service = new Whatsapp_service;

@@ -7,6 +7,7 @@ use App\Models\InstansiModel;
 use App\Models\MarketingModel;
 use App\Models\PembayaranModel;
 use App\Controllers\BaseController;
+use Dompdf\Dompdf;
 use TCPDF;
 
 // use App\Controllers;
@@ -174,23 +175,15 @@ class Finance extends BaseController
         // // $dompdf->
         // $dompdf->stream($data['title'] . ".pdf", ['Attachment' => 0]);
 
-        $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
-        $PDF->setPageOrientation('L');
-        $PDF->setCellMargins(0, 0, 0, 0);
-        $PDF->SetCreator(PDF_CREATOR);
-        $PDF->SetAuthor('QUICKTEST LABORATORIUM INDONESIA');
-        $PDF->SetTitle("Invoicement");
-        $PDF->SetSubject("Invoicement");
-
-        $PDF->setPrintHeader(false);
-        $PDF->setPrintFooter(false);
-
-        $PDF->addPage();
-        $PDF->writeHTML(view('backoffice/finance/invoice_print_pdf', $data));
+        $PDF = new Dompdf();
+        // $PDF->paperOrientation = 'landscape';
+        $PDF->loadHtml(view('backoffice/finance/invoice_print_pdf', $data));
 
         $this->response->setContentType('application/pdf');
+        $PDF->render();
+        $PDF->stream($data['title'] . ".pdf", ['attachment' => 0]);
         //Close and output PDF document
-        $PDF->Output('Invoicement.pdf', 'I');
+        // $PDF->Output('Invoicement.pdf', 'I');
     }
 
     public function pdf_customer($invoice_number = null, $attachment = 1)
@@ -223,21 +216,12 @@ class Finance extends BaseController
             'nama_paket' => $nama_paket
         ];
 
-        $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
-        $PDF->setPageOrientation('L');
-        $PDF->setCellMargins(0, 0, 0, 0);
-        $PDF->SetCreator(PDF_CREATOR);
-        $PDF->SetAuthor('QUICKTEST LABORATORIUM INDONESIA');
-        $PDF->SetTitle($title);
-        $PDF->SetSubject($title);
-
-        $PDF->setPrintHeader(false);
-        $PDF->setPrintFooter(false);
-
-        $PDF->addPage();
-        $PDF->writeHTML(view('backoffice/finance/print_invoice_customer', $data));
-
+        $PDF = new Dompdf();
+        $PDF->loadHtml(view('backoffice/finance/print_invoice_customer', $data));
+        // $PDF->paperOrientation = 'landscape';
         $this->response->setContentType('application/pdf');
+        $PDF->render();
+        $PDF->stream("{$title}.pdf", ['attachment' => 1]);
         //Close and output PDF document
         $PDF->Output($title . '.pdf', 'I');
     }
@@ -276,23 +260,16 @@ class Finance extends BaseController
         // // $dompdf->
         // $dompdf->stream($data['title'] . ".pdf", ['Attachment' => $attachment]);
 
-        $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
-        $PDF->setPageOrientation('L');
-        $PDF->setCellMargins(0, 0, 0, 0);
-        $PDF->SetCreator(PDF_CREATOR);
-        $PDF->SetAuthor('QUICKTEST LABORATORIUM INDONESIA');
-        $PDF->SetTitle($title);
-        $PDF->SetSubject($title);
+        $PDF = new Dompdf();
+        // $PDF->paperOrientation = 'landscape';
 
-        $PDF->setPrintHeader(false);
-        $PDF->setPrintFooter(false);
-
-        $PDF->addPage();
-        $PDF->writeHTML(view('backoffice/finance/print_invoice_customer_ttd', $data));
-
+        $PDF->loadHtml(view('backoffice/finance/print_invoice_customer_ttd', $data));
+        $PDF->paperOrientation = 'landscape';
         $this->response->setContentType('application/pdf');
+        $PDF->render();
+        $PDF->stream($title . ".pdf", ['attachment' => 0]);
         //Close and output PDF document
-        $PDF->Output($title . '.pdf', 'I');
+        // $PDF->Output($title . '.pdf', 'I');
     }
 
     /**
