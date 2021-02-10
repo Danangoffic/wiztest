@@ -152,8 +152,9 @@ class Swabber extends ResourceController
         if ($customer == null) return false;
         $customer_unique = $customer['customer_unique'];
         $nama = $customer['nama'];
+        $connector = "USB0001";
         // $connector = new FilePrintConnector("php://stdout");
-        $connector = new WindowsPrintConnector("UBS0001");
+        $connector = new WindowsPrintConnector($connector);
         $printer = new Printer($connector);
 
         $printer->setBarcodeTextPosition(Printer::BARCODE_TEXT_BELOW);
@@ -165,7 +166,7 @@ class Swabber extends ResourceController
             $printer->setEmphasis(true);
             $printer->text($nama . "\n");
             $printer->setEmphasis(true);
-            $printer->barcode($customer_unique, Printer::BARCODE_CODE128);
+            $printer->barcode($customer_unique);
             $printer->feed();
             $printer->cut();
         }
