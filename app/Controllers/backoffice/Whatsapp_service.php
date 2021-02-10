@@ -90,8 +90,16 @@ class Whatsapp_service extends ResourceController
             'message' => $message,
             'urlDownloadImage' => $url_img,
         );
-
-        $result = $this->send_curl($url, $data);
+        $this->curl = curl_init();
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        curl_setopt($this->curl, CURLOPT_HEADER, 0);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($this->curl, CURLOPT_TIMEOUT, 600);
+        curl_setopt($this->curl, CURLOPT_POST, 1);
+        curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
+        $result = curl_exec($this->curl);
         if (!$result) {
             // return $this->fail('failed', 400, 'failed');
             return false;
@@ -165,8 +173,16 @@ class Whatsapp_service extends ResourceController
             'phoneNumber'  => $new_phone,
             'message' => $message
         );
-
-        $result = $this->send_curl($url, $data);
+        $this->curl = curl_init();
+        curl_setopt($this->curl, CURLOPT_URL, $url);
+        curl_setopt($this->curl, CURLOPT_HEADER, 0);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($this->curl, CURLOPT_TIMEOUT, 600);
+        curl_setopt($this->curl, CURLOPT_POST, 1);
+        curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
+        $result = curl_exec($this->curl);
         if (!$result) {
             // return $this->fail('failed', 400, 'failed');
             return false;

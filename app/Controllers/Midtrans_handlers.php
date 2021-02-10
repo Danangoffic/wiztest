@@ -31,7 +31,7 @@ class Midtrans_handlers extends ResourceController
         $this->CustomerModel = new CustomerModel();
         $this->PembayaranModel = new PembayaranModel();
         $this->Midtrans_bo = new MidtransBO;
-        $this->production_mode = $this->Midtrans_bo->production_mode;
+        // $this->production_mode = $this->Midtrans_bo->production_mode;
     }
 
     public function index()
