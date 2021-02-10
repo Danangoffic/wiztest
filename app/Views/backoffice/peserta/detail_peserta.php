@@ -116,7 +116,7 @@
                                             <?php
                                             if ($kehadiran == 23) :
                                             ?>
-                                                <a href="<?= base_url('backoffice/layanan/printbarcode/' . base64_encode($data_customer->id)); ?>" class="btn btn-primary btn-sm m-2" id="print_barcode">Barcode</a>
+                                                <a href="/backoffice/print/barcode/<?= base64_encode($data_customer->id); ?>" class="btn btn-primary btn-sm m-2" id="print_barcode">Barcode</a>
                                             <?php
                                             endif;
                                             ?>

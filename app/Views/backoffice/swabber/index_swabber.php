@@ -194,7 +194,7 @@
                             html_antrian += `<tr><td>${v.no_antrian}</td>
                             <td>${v.nama}</td>
                             <td>${v.customer_unique}</td>
-                            <td><button type="button" onclick="return print_barcode_customer('${v.id}')" class="btn btn-primary">Barcode</button></td></tr>`;
+                            <td><a href="/backoffice/print/barcodev2/${v.id}" class="btn btn-primary">Barcode</a></td></tr>`;
                         });
                         var html_booking = "";
                         $.each(booking_antrian, (k, v) => {

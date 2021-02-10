@@ -251,25 +251,12 @@ class Peserta extends BaseController
         $jam_kunjungan = $dataJamKunjungan['jam'];
         $status_pembayaran = $this->request->getPost('status_pembayaran');
         $pemeriksa =  $this->request->getPost('nama_pemeriksa');
-        // var_dump($this->request->getPost());
-        // exit();
 
-        // echo db_connect()->showLastQuery();
-        // exit();
-        // dd($customer_UNIQUE);
-        // $Layanan = new Layanan();
-        // $dataLayanan = $this->layananModel->find($jenis_layanan);
-        // $dataTest = $this->testModel->find($id_test);
         try {
             $customer_UNIQUE = $this->customerPublic->getOrderId($id_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
 
             $no_urutan = $this->customerPublic->getUrutan($id_test, $tgl_kunjungan, $id_pemeriksaan, $jenis_layanan, $jam_kunjungan);
-            // echo db_connect()->showLastQuery();
-            // exit();
-            // dd($customer_UNIQUE);
 
-            // $dataMarketing = $marketing_model->find($marketing);
-            // $dataLayanan = $this->layananModel->find($jenis_layanan);
 
             if ($id_test == 2 || $id_test == "2") {
                 $nomor_bilik = 1;
