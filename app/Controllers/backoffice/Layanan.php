@@ -243,7 +243,44 @@ class Layanan extends ResourceController
         $decoded = base64_decode($encoded_id_customer);
         $CustomerModel = new CustomerModel();
         $detailCustomer = $CustomerModel->find(base64_decode($encoded_id_customer));
-        $url = $detailCustomer['customer_unique'];
+        $url = (string) $detailCustomer['customer_unique'];
+        $img_url = $this->get_bar_code($url);
+        $type = pathinfo($img_url, PATHINFO_EXTENSION);
+        $data = file_get_contents($img_url);
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        // It will be called downloaded.pdf
+        $html = '<center>' . $detailCustomer['nama'] . '<br><img importance="" width=\'150\' height=\'75\' src="' . $base64 . '" id=""></center>';
+        $fileHTMLVIEW = view('backoffice/layanan/print_barcode', ['base64' => $base64, 'url' => $url, 'detailCustomer' => $detailCustomer, 'original_img' => $img_url, 'html_img' => $html]);
+        // return $fileHTMLVIEW;
+        // exit();
+        // $htmlFile = base_url('backoffice/layanan/render_barcode/' . $encoded_id_customer, true);
+        // $html = view('backoffice/layanan/invoice_pdf_print', $data);
+        $PDF = new Dompdf();
+        // $PDF->loadHtml($fileHTMLVIEW);
+        // $PDF->($detailCustomer['customer_unique']);
+
+        $this->response->setContentType('application/pdf');
+        // $PDF->render();
+        // $PDF->stream("barcode.pdf", ['attachment' => 1]);
+        //Close and output PDF document
+        // $PDF->Output('barcode.pdf', 'I');
+
+
+        $PDF->loadHtml($fileHTMLVIEW);
+        $arraySize = array(0, 0, 170, 190);
+        $PDF->setPaper($arraySize, 'landscape');
+        $PDF->render();
+        $PDF->stream('barcode.pdf', ['Attachment' => false]);
+        // readfile("fileinit.pdf");
+
+        // return view('backoffice/Layanan/print_barcode', ['img_url' => $img_url]);
+    }
+
+    public function printbarcodev2(string $id_customer)
+    {
+        $CustomerModel = new CustomerModel();
+        $detailCustomer = $CustomerModel->find($id_customer);
+        $url = (string) $detailCustomer['customer_unique'];
         $img_url = $this->get_bar_code($url);
         $type = pathinfo($img_url, PATHINFO_EXTENSION);
         $data = file_get_contents($img_url);

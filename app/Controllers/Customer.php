@@ -261,8 +261,8 @@ class Customer extends ResourceController
 
         $data = $this->customerModel->getCustomerAvailableByDate($type_test, $jenis_pemeriksaan, $jenis_layanan, '1', $tgl_kunjungan, $jam_kunjungan)->getRowArray();
 
-        if ($data) {
-            $totalData = (intval($data['id'])) ? intval($data['id']) : 0;
+        if ($data != null) {
+            $totalData = (intval($data['no_antrian'])) ? intval($data['no_antrian']) : 0;
         } else {
             $totalData = 0;
         }

@@ -90,8 +90,8 @@ class CustomerModel extends Model
                 'faskes_asal' => $faskes_asal,
                 'tgl_kunjungan' => $tgl_kunjungan,
                 'jam_kunjungan' => $jam_kunjungan,
-                'kehadiran' => '22'
-            ])->orderBy('id', 'DESC')->limit(1);
+                'kehadiran' => 22
+            ])->orderBy('id', 'DESC');
         return $query->get();
     }
 
