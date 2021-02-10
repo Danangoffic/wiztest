@@ -7,7 +7,11 @@
     <title>Document</title>
     <style>
         @page {
-            /* margin: 0px; */
+            margin: 0px;
+        }
+
+        body {
+            margin: 0px;
         }
 
 
