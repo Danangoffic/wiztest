@@ -107,7 +107,7 @@
                                     <table class="table table-bordered table-hover table-sm">
                                         <thead>
                                             <tr>
-                                                <th>No Antrian</th>
+                                                <th width="3%">No Antrian</th>
                                                 <th>Nama</th>
                                                 <th>No Reg</th>
                                                 <th>Aksi</th>
@@ -189,7 +189,11 @@
                             html_antrian += `<tr><td>${v.no_antrian}</td>
                             <td>${v.nama}</td>
                             <td>${v.customer_unique}</td>
-                            <td><a href="/backoffice/print/barcodev2/${v.id}" class="btn btn-primary">Barcode</a></td></tr>`;
+                            <td>
+                            <a href="/backoffice/print/barcodev2/${v.id}" class="btn btn-primary btn-sm">Barcode</a>
+                            <button class="btn btn-success btn-sm float-right" onclick="return verifikasi_selesai('${v.id}')">selesai</button>
+                            </td>
+                            </tr>`;
                         });
                         var html_booking = "";
                         $.each(booking_antrian, (k, v) => {
@@ -213,8 +217,8 @@
         ?>
     }
 
-    function print_barcode_customer(id_customer) {
-        $.post('/api/print-barcode-swabber', {
+    function verifikasi_selesai(id_customer) {
+        $.post('/api/verifikasi-selesa-cetak', {
             id_customer
         }, function(data) {
 
