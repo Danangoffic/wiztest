@@ -4,7 +4,6 @@ namespace App\Controllers\backoffice;
 
 use App\Controllers\Customer;
 use App\Models\CustomerModel;
-use App\Models\DokterModel;
 use App\Models\FaskesModel;
 use App\Models\InstansiModel;
 use App\Models\LayananModel;
@@ -22,11 +21,13 @@ use App\Models\KehadiranModel;
 use App\Models\PembayaranModel;
 use App\Models\UserDetailModel;
 use App\Models\UserModel;
-use CodeIgniter\Validation\Validation;
-use Dompdf\Cpdf;
-use Dompdf\Css\Stylesheet;
-use Dompdf\Options;
 use TCPDF;
+
+// use CodeIgniter\Validation\Validation;
+// use Dompdf\Cpdf;
+// use Dompdf\Css\Stylesheet;
+// use Dompdf\Options;
+// use TCPDF;
 
 // use App\Controllers;
 // use CodeIgniter\Controller;
@@ -58,25 +59,6 @@ class Peserta extends BaseController
     {
         $this->session = \Config\Services::session();
         $this->customerModel = new CustomerModel();
-        $this->pemeriksaModel = new PemeriksaModel();
-        $this->jenisPemeriksaanModel = new PemeriksaanModel();
-        $this->faskesModel = new FaskesModel();
-        $this->instansiModel = new InstansiModel();
-        $this->marketingModel = new MarketingModel();
-        $this->layananTestModel = new LayananTestModel();
-        $this->testModel = new TestModel();
-        $this->layananModel = new LayananModel();
-        $this->customerPublic = new Customer;
-        $this->statusHadir = new StatusHasilModel();
-        $this->pembayaran_model = new PembayaranModel();
-        $this->hasil_lab = new HasilLaboratoriumModel();
-        $this->customer_overload = new CustomerOverloadModel();
-        $this->home_service_model = new CustomerHomeServiceModel();
-        $this->user_model = new UserModel();
-        $this->detail_user_model = new UserDetailModel();
-        $layanan = new Layanan;
-        $this->dompdf = $layanan->dompdf;
-        $this->kehadiran_model = new KehadiranModel();
     }
 
     protected function check_user_level()
@@ -105,7 +87,12 @@ class Peserta extends BaseController
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
         }
-
+        $this->layananTestModel = new LayananTestModel();
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
         $data_walkin = $this->layananTestModel->get_by_key('id_pemeriksaan', "1")->getResultArray();
 
         $ids_test = array();
@@ -125,14 +112,20 @@ class Peserta extends BaseController
             } elseif ($date1 !== '') {
                 $queryFilter .= " AND tgl_kunjungan = '" . $date1 . "'";
             } elseif ($date2 !== '') {
-                $queryFilter .= " AND tgl_kunjungan BETWEEN '" . date('Y-m-d') . "' AND '" . $date2 . "'";
+                $now_date = date("Y-m-d");
+                $queryFilter .= " AND tgl_kunjungan BETWEEN '{$now_date}' AND '{$date2}'";
             }
             $queryFilter .= " AND jenis_test IN (SELECT id FROM data_layanan_test WHERE id_segmen = '1' AND id_pemeriksaan = '1')";
             $queryFilter .= " ORDER BY id DESC";
             $Customer = db_connect()->query($queryFilter)->getResultArray();
         } else {
-            $Customer = db_connect()->table('customers')->whereIn('jenis_test', $ids_test)->select()->orderBy('id', 'DESC')->get()->getResultArray();
+            $extra = [
+                'jenis_test' => $ids_test
+            ];
+            $Customer = $this->customerModel->deep_detail_by_id(null, $extra)->getResultArray();
+            // $Customer = db_connect()->table('customers')->whereIn('jenis_test', $ids_test)->select()->orderBy('id', 'DESC')->get()->getResultArray();
         }
+
         $data = array(
             'title' => "Data Registrasi Peserta",
             'page' => "registrasi",
@@ -159,6 +152,14 @@ class Peserta extends BaseController
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
         }
+
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
+        $this->pemeriksaModel = new PemeriksaModel();
+        $this->jenisPemeriksaanModel = new PemeriksaanModel();
 
         $dataPemeriksa = $this->pemeriksaModel->findAll();
         // dd($dataPemeriksa);
@@ -201,6 +202,16 @@ class Peserta extends BaseController
         }
         // $validation =  \Config\Services::validation();
         $this->validasi_peserta();
+
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
+        $this->pemeriksaModel = new PemeriksaModel();
+        $this->jenisPemeriksaanModel = new PemeriksaanModel();
+        $this->customerPublic = new Customer;
+        $this->customer_overload = new CustomerOverloadModel();
 
         $nama = $this->request->getPost('nama');
         $nik = $this->request->getPost('nik');
@@ -350,6 +361,9 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
 
+        $this->statusHadir = new StatusHasilModel();
+        $this->customer_overload = new CustomerOverloadModel();
+
         // $Midtrans = new Midtrans();
         $Customer = $this->customerModel->detailRegistrasi($id)->getFirstRow();
         $nama = $Customer['nama'];
@@ -409,6 +423,18 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
 
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
+
+        $this->customer_overload = new CustomerOverloadModel();
+        $this->home_service_model = new CustomerHomeServiceModel();
+        $this->user_model = new UserModel();
+        $this->detail_user_model = new UserDetailModel();
+        $this->pembayaran_model = new PembayaranModel();
+
         $data_customer = $this->customerModel->find($id_customer);
         if ($data_customer == null) {
             $this->session->setFlashdata('error', "peserta tidak ditemukan");
@@ -443,6 +469,7 @@ class Peserta extends BaseController
         $html .= '<link rel="stylesheet" href="/assets/dist/css/adminlte.min.css">';
         // $html .= '';
         // $this->dompdf->setIsHtml5ParserEnabled(true);
+        require_once('tcpdf_include.php');
         $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
 
         $PDF->SetCreator(PDF_CREATOR);
@@ -491,6 +518,23 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
 
+
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
+        $this->pemeriksaModel = new PemeriksaModel();
+        $this->faskesModel = new FaskesModel();
+        $this->jenisPemeriksaanModel = new PemeriksaanModel();
+        // $this->customerPublic = new Customer;
+        $this->customer_overload = new CustomerOverloadModel();
+        $this->home_service_model = new CustomerHomeServiceModel();
+        $this->user_model = new UserModel();
+        $this->detail_user_model = new UserDetailModel();
+        $this->pembayaran_model = new PembayaranModel();
+
+
         $dataPemeriksa = $this->pemeriksaModel->findAll();
         // dd($dataPemeriksa);
         $dataJenisPemeriksaan = $this->jenisPemeriksaanModel->findAll();
@@ -531,6 +575,21 @@ class Peserta extends BaseController
         }
 
         $this->validasi_peserta();
+
+        $this->instansiModel = new InstansiModel();
+        $this->marketingModel = new MarketingModel();
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
+        $this->pemeriksaModel = new PemeriksaModel();
+        $this->faskesModel = new FaskesModel();
+        $this->jenisPemeriksaanModel = new PemeriksaanModel();
+        $this->customerPublic = new Customer;
+        $this->customer_overload = new CustomerOverloadModel();
+        $this->home_service_model = new CustomerHomeServiceModel();
+        $this->user_model = new UserModel();
+        $this->detail_user_model = new UserDetailModel();
+        $this->pembayaran_model = new PembayaranModel();
 
         $nama = $this->request->getPost('nama');
         $nik = $this->request->getPost('nik');
@@ -607,7 +666,10 @@ class Peserta extends BaseController
                 $dataInsertPembayaran = [
                     'status_pembayaran' => $status_pembayaran
                 ];
-                $update_payment = db_connect()->table('data_pembayaran')->update($dataInsertPembayaran, ['id_customer' => $id_customer]);
+                $data_pembayaran = $this->pembayaran_model->find(['id_customer' => $id_customer]);
+                $id_pembayaran = $data_pembayaran['id'];
+                $update_payment = $this->pembayaran_model->update($id_pembayaran, $dataInsertPembayaran);
+                // $update_payment = db_connect()->table('data_pembayaran')->update($dataInsertPembayaran, ['id_customer' => $id_customer]);
                 if ($update_payment) {
                     $this->session->setFlashdata('success', 'Berhasil ubah data peserta tes');
                     return redirect()->to('/backoffice/peserta');
@@ -672,6 +734,14 @@ class Peserta extends BaseController
         }
 
         $id_customer = base64_decode($this->request->getPost("id_customer"));
+
+
+        $this->pembayaran_model = new PembayaranModel();
+        $this->hasil_lab = new HasilLaboratoriumModel();
+
+        $this->user_model = new UserModel();
+        $this->detail_user_model = new UserDetailModel();
+        // $this->hasil_lab = new Lab
 
         $data_customer = $this->customerModel->detail_customer($id_customer);
         $data_pembayaran = $this->pembayaran_model->where(['id_customer' => $id_customer])->first();
@@ -797,6 +867,10 @@ class Peserta extends BaseController
 
     protected function updated_by_qr($id_peserta): array
     {
+
+        $this->pembayaran_model = new PembayaranModel();
+
+
         $today = date("Y-m-d");
         $customerDetail = $this->customerModel->detail_customer($id_peserta);
         $pembayaran_detail = $this->pembayaran_model->pembayaran_by_customer($id_peserta);
@@ -884,6 +958,7 @@ class Peserta extends BaseController
 
     protected function updateHadirkanPeserta($id_peserta)
     {
+
         $customerDetail = $this->customerModel->find($id_peserta);
         if ($customerDetail) {
             $statusKehadiran = intval($customerDetail['kehadiran']);

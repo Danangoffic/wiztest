@@ -14,11 +14,12 @@
         "laminas/laminas-escaper": "^2.6",
         "psr/log": "^1.1",
         "midtrans/midtrans-php": "^2.3",
-        "tecnickcom/tcpdf": "^6.3",
         "phpmailer/phpmailer": "^6.2",
         "phpoffice/phpspreadsheet": "^1.16",
         "mike42/escpos-php": "^3.0",
-        "picqer/php-barcode-generator": "^2.1"
+        "picqer/php-barcode-generator": "^2.1",
+        "mpdf/mpdf": "^8.0",
+        "dompdf/dompdf": "^1.0"
     },
     "require-dev": {
         "codeigniter4/codeigniter4-standard": "^1.0",

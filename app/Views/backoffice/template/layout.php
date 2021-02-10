@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="/assets/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="/assets/plugins/datatables-buttons/css/buttons.bootstrap44.min.css">
+    <link rel="stylesheet" href="/assets/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 
     <link rel="stylesheet" href="/assets/plugins/select2/css/select2.min.css">
     <link rel="stylesheet" href="/assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
@@ -65,22 +65,10 @@
         }
     </style>
 
-
-</head>
-
-<body class="hold-transition sidebar-mini layout-fixed"">
-    <div class=" wrapper">
-    <?= $this->include('backoffice/template/navbar'); ?>
-    <?= $this->include('backoffice/template/sidebar'); ?>
-    <?= $this->renderSection('content'); ?>
-    <?= $this->include('backoffice/template/footer'); ?>
-    </div>
-
-
     <!-- jQuery -->
     <script src="/assets/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
-    <script src="/assets/plugins/bootstrap/js/bootstrap.bundle.min.js>"></script>
+    <script src="/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="/assets/dist/js/adminlte.min.js"></script>
 
@@ -94,14 +82,25 @@
     <script src="/assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed"">
+    <div class=" wrapper">
+    <?= $this->include('backoffice/template/navbar'); ?>
+    <?= $this->include('backoffice/template/sidebar'); ?>
+    <?= $this->renderSection('content'); ?>
+    <?= $this->include('backoffice/template/footer'); ?>
+    </div>
+
+
+
     <script>
         $(document).ready(function() {
             $("#filter-card").collapse();
 
 
         });
-
-
 
         function filterDashboard() {
             var date1 = $("#date1").val();

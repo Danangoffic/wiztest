@@ -18,10 +18,9 @@
                     <span class="float-right text-muted text-sm">Logout</span>
                 </a>
                 <a href="/backoffice/change-password" class="nav-link">
-                    <!-- <i class="fas fa-sign-out-alt mr-2"></i>  -->
-                    <span class="float-right text-muted text-sm">Logout</span>
+                    <i class="fas fa-lock mr-2"></i>
+                    <span class="float-right text-muted text-sm">Change Password</span>
                 </a>
-
             </div>
         </li>
     </ul>

@@ -219,7 +219,7 @@
     }
 
     function print_barcode_customer(id_customer) {
-        $.post('<?= base_url('backoffice/swabber/print_it'); ?>', {
+        $.post('/api/print-barcode-swabber', {
             id_customer
         }, function(data) {
 

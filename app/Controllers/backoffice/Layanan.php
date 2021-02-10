@@ -10,7 +10,7 @@ use App\Models\PemeriksaanModel;
 use App\Models\TestModel;
 use CodeIgniter\RESTful\ResourceController;
 // use Dompdf\Cpdf;
-use TCPDF;
+// use PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf;
 // use Dompdf\Dompdf;
 // use App\Controllers;
 // use CodeIgniter\Controller;
@@ -27,7 +27,7 @@ class Layanan extends ResourceController
     {
         $this->codeBarCode = "code128";
         $this->session = \Config\Services::session();
-        $this->dompdf = new TCPDF();
+        // $this->dompdf = new TCPDF();
         $this->customer = new CustomerModel();
         $this->layanan_model = new LayananModel();
     }

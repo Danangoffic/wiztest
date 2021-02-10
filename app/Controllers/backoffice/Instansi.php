@@ -10,6 +10,7 @@ use App\Models\MarketingModel;
 use App\Models\TestModel;
 use App\Controllers\BaseController;
 use App\Models\CustomerCorporateModel;
+use App\Models\CustomerModel;
 use Dompdf\Cpdf;
 // use App\Controllers;
 // use CodeIgniter\Controller;
@@ -95,10 +96,85 @@ class Instansi extends BaseController
 
     public function detail_instansi($id_instansi)
     {
+        helper('form');
+        $customerModel = new CustomerModel();
+        $layanan_test_model = new LayananTestModel();
+        $layanan_model = new LayananModel();
+        $test_model = new TestModel();
+        $filtering = ($this->request->getPost('filtering')) ? $this->request->getPost('filtering') : "";
+        $filter_instansi = [
+            'instansi' => $id_instansi,
+        ];
+        if ($filtering == "on") {
+            $date1 = ($this->request->getPost("date1")) ? $this->request->getPost("date1") : "";
+            $date2 = ($this->request->getPost("date2")) ? $this->request->getPost("date2") : "";
+            $jenis_test  = ($this->request->getPost("jenis_test")) ? $this->request->getPost("jenis_test") : "";
+
+            if ($jenis_test != "") {
+                $filter_instansi['jenis_test'] = $jenis_test;
+            }
+            if ($date1 != "" && $date2 != "") {
+                $filter_instansi['tgl_kunjungan'] = "a.tgl_kunjungan between {$date1} AND {$date2}";
+            } elseif ($date1 == "" && $date2 != "") {
+                $filter_instansi['tgl_kunjungan'] = $date2;
+            } elseif ($date1 != "" && $date2 != "") {
+                $date_now = date("Y-m-d");
+                $filter_instansi['tgl_kunjungan'] = "a.tgl_kunjungan between {$date1} AND {$date_now}";
+            }
+        }
+        $customers = $customerModel->deep_detail_by_id(null, $filter_instansi)->getResultArray();
+        $filter_instansi['kehadiran'] = 23;
+        $kehadiran_customers = $customerModel->deep_detail_by_id(null, $filter_instansi)->getResultArray();
+        $filter_instansi['kehadiran'] = 22;
+        $ketidak_hadiran_customers = $customerModel->deep_detail_by_id(null, $filter_instansi)->getResultArray();
+        $total_kehadiran = count($kehadiran_customers);
+        $total_customer = count($customers);
+        $total_tidak_hadir = count($ketidak_hadiran_customers);
+        $detail_instansi = $this->instansiModel->find($id_instansi);
+        $nama_instansi = $detail_instansi['nama'];
+        $alamat = $detail_instansi['alamat'];
+        $id_marketing = $detail_instansi['pic_marketing'];
+        if ($id_marketing != null) {
+            $detail_marketing = $this->marketingModel->find($id_marketing);
+            $pic_marketing = $detail_marketing['nama_marketing'];
+        } else {
+            $pic_marketing = "";
+        }
+        $filter_test_instansi = ['id_pemeriksaan' => 1];
+        if ($id_instansi == 1) {
+            $filter_test_instansi['id_segmen'] = 1;
+        } else {
+            $filter_test_instansi['id_segmen'] = 2;
+        }
+
+        $layanan_test = $layanan_test_model->by_keys($filter_test_instansi)->get()->getResultArray();
+        $pemeriksaan = array();
+        foreach ($layanan_test as $key => $LT) {
+            $detail_layanan = $layanan_model->find($LT['id_layanan']);
+            $detail_test = $test_model->find($LT['id_test']);
+
+            $nama_layanan = $detail_layanan['nama_layanan'];
+            $nama_test = $detail_test['nama_test'];
+
+            $pemeriksaan[] = array(
+                'id' => $LT['id'],
+                'text' => $nama_test . " " . $nama_layanan
+            );
+        }
         $data = array(
-            'title' => "Detail Instansi",
+            'title' => "Data Detail Instansi",
             'page' => "instansi",
             'session' => session(),
+            'customers_instansi' => $customers,
+            'jumlah_customer' => $total_customer,
+            'total_kehadiran' => $total_kehadiran,
+            'total_invoice_terbit' => null,
+            'PIC' => $pic_marketing,
+            'pemeriksaan' => $pemeriksaan,
+            'nama_instansi' => $nama_instansi,
+            'total_tidak_hadir' => $total_tidak_hadir,
+            'alamat' => $alamat
+
         );
         return view('backoffice/instansi/detail_instansi', $data);
     }
