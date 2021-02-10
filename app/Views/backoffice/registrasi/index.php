@@ -2,7 +2,7 @@
 <?= $this->section('content'); ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-
+    <?= $this->include("backoffice/template/content-header"); ?>
     <section class="content-header mb-0">
         <div class="container-fluid">
             <div class="row">
@@ -50,6 +50,7 @@
             </div>
         </div>
     </section>
+
     <section class="content mt-0">
         <div class="container-fluid">
             <div class="row">

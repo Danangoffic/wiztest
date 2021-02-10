@@ -14,13 +14,17 @@ use App\Models\PemeriksaModel;
 use App\Models\StatusHasilModel;
 use App\Models\TestModel;
 use App\Controllers\BaseController;
+use App\Controllers\Midtrans_handlers;
 use App\Models\CustomerHomeServiceModel;
 use App\Models\CustomerOverloadModel;
 use App\Models\HasilLaboratoriumModel;
 use App\Models\KehadiranModel;
+use App\Models\KuotaModel;
+use App\Models\PemanggilanModel;
 use App\Models\PembayaranModel;
 use App\Models\UserDetailModel;
 use App\Models\UserModel;
+use Dompdf\Dompdf;
 use TCPDF;
 
 // use CodeIgniter\Validation\Validation;
@@ -214,6 +218,8 @@ class Peserta extends BaseController
         $this->jenisPemeriksaanModel = new PemeriksaanModel();
         $this->customerPublic = new Customer;
         $this->customer_overload = new CustomerOverloadModel();
+        $this->pembayaran_model = new PembayaranModel();
+        $kuotaModel = new KuotaModel();
 
         $nama = $this->request->getPost('nama');
         $nik = $this->request->getPost('nik');
@@ -241,7 +247,7 @@ class Peserta extends BaseController
         $kehadiran = 22;
         $tgl_kunjungan = $this->request->getPost('tgl_kunjungan');
         $id_jam_kunjungan = $this->request->getPost('jam_kunjungan');
-        $dataJamKunjungan = $this->customerPublic->kuotaModel->find($id_jam_kunjungan);
+        $dataJamKunjungan = $kuotaModel->find($id_jam_kunjungan);
         $jam_kunjungan = $dataJamKunjungan['jam'];
         $status_pembayaran = $this->request->getPost('status_pembayaran');
         $pemeriksa =  $this->request->getPost('nama_pemeriksa');
@@ -256,7 +262,23 @@ class Peserta extends BaseController
         // $dataTest = $this->testModel->find($id_test);
         try {
             $customer_UNIQUE = $this->customerPublic->getOrderId($id_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
-            $no_urutan = $this->customerPublic->getUrutan($id_test, $tgl_kunjungan, $id_pemeriksaan, $id_layanan, $jam_kunjungan);
+
+            $no_urutan = $this->customerPublic->getUrutan($id_test, $tgl_kunjungan, $id_pemeriksaan, $jenis_layanan, $jam_kunjungan);
+            // echo db_connect()->showLastQuery();
+            // exit();
+            // dd($customer_UNIQUE);
+
+            // $dataMarketing = $marketing_model->find($marketing);
+            // $dataLayanan = $this->layananModel->find($jenis_layanan);
+
+            if ($id_test == 2 || $id_test == "2") {
+                $nomor_bilik = 1;
+            } else if ($id_test == 3 || $id_test == "3") {
+                $nomor_bilik = 2;
+            } else {
+                $hitung_bilik = 6 % $no_urutan;
+                $nomor_bilik = $hitung_bilik + 2;
+            }
 
             $data_layanan_test = $this->layananTestModel->get_by_key(['id_layanan' => $id_layanan, 'id_test' => $id_test, 'id_pemeriksaan' => $id_pemeriksaan])->getRowArray();
             $id_jenis_test_customer = $data_layanan_test['id'];
@@ -290,13 +312,14 @@ class Peserta extends BaseController
                 'tahap' => 1,
                 'kehadiran' => $kehadiran,
                 'no_antrian' => $no_urutan,
+                'nomor_bilik' => $nomor_bilik,
                 'jam_kunjungan' => $jam_kunjungan,
                 'tgl_kunjungan' => $tgl_kunjungan,
                 'status_pembayaran' => $status_pembayaran,
                 'status_peserta' => $status_peserta
             ];
             $insert = $this->customerModel->insert($DataInsertCustomer);
-            $insert_id = null;
+            // $insert_id = null;
             if ($insert) {
                 $insert_id = $this->customerModel->getInsertID();
                 $InvoiceCustomer = $this->customerPublic->getInvoiceNumber($insert_id);
@@ -334,10 +357,26 @@ class Peserta extends BaseController
                 'status_pembayaran' => $status_pembayaran,
                 'jenis_pembayaran' => $status_pembayaran
             ];
-            $insertPembayaran = $this->customerPublic->PembayaranModel->insert($dataInsertPembayaran);
-            $id_pembayaran = $this->customerPublic->PembayaranModel->getInsertID();
+            $insertPembayaran = $this->pembayaran_model->insert($dataInsertPembayaran);
+            $id_pembayaran = $this->pembayaran_model->getInsertID();
             if ($id_pembayaran && $insertPembayaran) {
-                $this->session->setFlashdata('success', 'Berhasil tambahkan data peserta tes');
+                if ($status_pembayaran == "Lunas" || $status_pembayaran == "Invoice") {
+                    $arrayInsertPemanggilan = array(
+                        'id_customer' => $insert_id,
+                        'id_layanan_test' => $id_jenis_test_customer,
+                        'status_pemanggilan' => '11',
+                        'tgl_kunjungan' => $tgl_kunjungan,
+                        'jam_kunjungan' => $jam_kunjungan,
+                        'bilik' => $nomor_bilik,
+                        'antrian' => $no_urutan
+                    );
+                    $PemanggilanModel = new PemanggilanModel();
+                    $PemanggilanModel->insert($arrayInsertPemanggilan);
+                    $MH = new Midtrans_handlers;
+                    $MH->send_whatsapp($insert_id);
+                }
+                $message_extra = "Silahkan antri pada bilik " . $nomor_bilik . " dengan nomor antrian " . $no_urutan;
+                $this->session->setFlashdata('success', 'Berhasil tambahkan data peserta tes. ' . $message_extra);
                 return redirect()->to('/backoffice/peserta');
             } else {
                 $this->session->setFlashdata('error', 'Gagal tambahkan data peserta tes');
@@ -368,7 +407,7 @@ class Peserta extends BaseController
 
         // $Midtrans = new Midtrans();
         $Customer = $this->customerModel->detailRegistrasi($id)->getFirstRow();
-        $nama = $Customer['nama'];
+        $nama = $Customer->nama;
         $order_id = $Customer->customer_unique;
 
         $tipe_pembayaran = $Customer->tipe_pembayaran;
@@ -377,15 +416,20 @@ class Peserta extends BaseController
             /**
              * GET STATUS PEMBAYARAN MELALUI MIDTRANS
              */
-            $midtrans_status = \Midtrans::status($order_id);
+            $midtrans_bo = new Midtrans;
 
-            $jenis_pembayaran = ucwords(str_replace("_", " ", $midtrans_status['payment_type']));
-            $status_pembayaran = $midtrans_status['transaction_status'];
-            $midtrans_gross_amount = (int) $midtrans_status['gross_amount'];
-            $has_va = ($midtrans_status['va_numbers']) ? $midtrans_status['va_numbers'] : null;
+            \Midtrans::$serverKey = $midtrans_bo->server_key;
+            \Midtrans::$isProduction = $midtrans_bo->production_mode;
 
-            $va = ($has_va != null) ? $has_va['va_number'] : null;
-            $bank = ($has_va != null) ? $has_va['bank'] : null;
+            $midtrans_status = (object) \Midtrans::status($order_id);
+
+            $jenis_pembayaran = ucwords(str_replace("_", " ", $midtrans_status->payment_type));
+            $status_pembayaran = $midtrans_status->transaction_status;
+            $midtrans_gross_amount = (int) $midtrans_status->gross_amount;
+            $has_va = ($midtrans_status->va_numbers) ? $midtrans_status->va_numbers : null;
+
+            $va = ($has_va != null) ? $has_va[0]->va_number : null;
+            $bank = ($has_va != null) ? $has_va[0]->bank : null;
             $amt = 'Rp ' . number_format($midtrans_gross_amount, 0, ",", ".");
         } elseif ($tipe_pembayaran == "langsung") {
             $amount = $Customer->amount;
@@ -471,35 +515,19 @@ class Peserta extends BaseController
         $html .= '<link rel="stylesheet" href="/assets/dist/css/adminlte.min.css">';
         // $html .= '';
         // $this->dompdf->setIsHtml5ParserEnabled(true);
-        require_once('tcpdf_include.php');
-        $PDF = new TCPDF('L', PDF_UNIT, 'A5', true, 'UTF-8', false);
+        // require_once('tcpdf_include.php');
+        $PDF = new Dompdf();
 
-        $PDF->SetCreator(PDF_CREATOR);
-        $PDF->SetAuthor('Dea Venditama');
-        $PDF->SetTitle('Invoice');
-        $PDF->SetSubject('Invoice');
 
-        $PDF->setPrintHeader(false);
-        $PDF->setPrintFooter(false);
-
-        $PDF->addPage();
 
         //PDFutput the HTML content
-        $PDF->writeHTML($html, true, false, true, false, '');
+        $PDF->loadHtml($html);
         //line ini penting
         $this->response->setContentType('application/pdf');
+        $PDF->render();
+        $PDF->stream("Invoice-{$nama_customer}.pdf", ['attachment' => 0]);
         //Close and output PDF document
-        $PDF->Output('Invoice-' . $name_attn . '.pdf', 'I');
-
-        // $this->dompdf->loadHtml($html);
-        // Render the PDF
-
-        // $this->dompdf->render();
-        // Output the generated PDF to Browser
-        // $stylsheet = new Stylesheet($this->dompdf);
-        // $stylsheet->set_base_path('/assets/dist/css/adminlte.min.css');
-        // $this->dompdf->setBasePath('/assets/dist/css/adminlte.min.css');
-        // $this->dompdf->stream("Invoice - " . $name_attn, array("Attachment" => false));
+        // $PDF->Output('Invoice-' . $name_attn . '.pdf', 'I');
     }
 
     public function print_pdf_peserta($id_customer)
@@ -759,7 +787,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/registrasi");
         }
         $order_id = $data_customer['customer_unique'];
-        $cancel_payment = \Midtrans::cancel($order_id);
+        // $midtrans_bo = new Midtrans;
+        // \Midtrans::$isProduction = $midtrans_bo->production_mode;
+        // \Midtrans::$serverKey = $midtrans_bo->server_key;
+        // $cancel_payment = \Midtrans::cancel($order_id);
         $status_peserta = $data_customer['status_peserta'];
         if ($status_peserta == 21) {
             $customer_overload = $this->customer_overload->where(['id_customer' => $id_customer])->get()->getRowArray();
