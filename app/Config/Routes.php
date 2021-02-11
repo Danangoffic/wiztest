@@ -34,7 +34,7 @@ $routes->setAutoRoute(true);
 $routes->get('/', 'Customer::index');
 $routes->add('/backoffice', 'backoffice\Home::index');
 $routes->get('/backoffice/login', 'backoffice\User::login');
-$routes->post('/backoffice/login', 'backoffice\User::doLogin');
+$routes->post('/backoffice/doLogin', 'backoffice\User::doLogin');
 
 
 $routes->get('/detail_form2', 'Customer::detail_form2');
