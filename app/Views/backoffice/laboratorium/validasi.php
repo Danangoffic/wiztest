@@ -60,7 +60,7 @@
                     <h5 class="card-header"><?= $title; ?></h5>
                     <div class="card-body">
                         <a href="import_data" class="btn btn-success btn-sm mb-3">Import Excel PCR</a>
-                        <a href="insert_antigen" class="btn btn-success btn-sm mb-3">Insert Data Antigen</a>
+                        <a href="data_peserta_antigen" class="btn btn-success btn-sm mb-3">Insert Data Antigen</a>
                         <a href="insert_rapid" class="btn btn-success btn-sm mb-3">Insert Data Rapid Test</a>
                         <div class="table-responsive">
                             <table class="table table-bordered table-sm table-condensed" id="data_laboratorium">
