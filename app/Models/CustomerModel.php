@@ -245,9 +245,14 @@ class CustomerModel extends Model
         } else {
             $cond = "= {$id_test}";
         }
+        $builder2 = db_connect()->query("select id_customer as id from hasil_laboratorium")->getResultArray();
+        $ids = array();
+        foreach ($builder2 as $key => $c) {
+            $ids[] = $c['id'];
+        }
         $builder = db_connect()
             ->table($this->table)
-            ->whereNotIn('id', 'select id_customer from hasil_laboratorium')
+            ->whereNotIn('id', $ids)
             ->where('jenis_test', 'select id from data_layanan_test where id_test ' . $cond)
             ->orderBy("id", 'DESC');
         return $builder->get();
@@ -317,6 +322,12 @@ class CustomerModel extends Model
                     $builder->whereIn('a.kehadiran', $extra['kehadiran']);
                 } else {
                     $builder->where("a.kehadiran", $extra['kehadiran']);
+                }
+            }
+            if (array_key_exists('jenis_test', $extra)) {
+                $jenis_test = $extra['jenis_test'];
+                if (is_array($jenis_test)) {
+                    $builder->whereIn('a.jenis_test', $jenis_test);
                 }
             }
         } else {
