@@ -326,14 +326,14 @@ class Swabber extends ResourceController
             );
             if ($this->bilik_model->insert($array_insert)) {
                 $this->session->setFlashdata("success", "Berhasil Tambahkan Bilik dengan nomor bilik " . $nomor_bilik);
-                return redirect()->to("/backoffice/swabber");
+                return redirect()->to("/swabber");
             } else {
                 $this->session->setFlashdata("error", "Gagal Tambahkan Bilik");
-                return redirect()->to("/backoffice/swabber/create_bilik");
+                return redirect()->to("/swabber/create_bilik");
             }
         } else {
             $this->session->setFlashdata("error", "Gagal Tambahkan Bilik karena user bukan swabber");
-            return redirect()->to("/backoffice/swabber/create_bilik");
+            return redirect()->to("/swabber/create_bilik");
         }
     }
 
