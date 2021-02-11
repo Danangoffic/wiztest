@@ -19,7 +19,7 @@
             <div class="card-body login-card-body">
                 <p class="login-box-msg">Sign in</p>
 
-                <form action="<?= base_url('backoffice/login'); ?>" method="post">
+                <form action="/backoffice/doLogin" method="post">
 
                     <input type="hidden" name="csrf_token" value="<?= csrf_hash(); ?>">
                     <div class="input-group mb-3">

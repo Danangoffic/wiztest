@@ -31,101 +31,110 @@
                     </a>
                 </li>
                 <?php
-                $menu_open = ($page == 'walk_in' || $page == 'antrian_swab_walk_in' || $page == 'antrian_rapid_antigen' || $page == 'home_service') ? 'menu-is-open menu-open' : '';
-                $menu_aktif = ($page == 'walk_in' || $page == 'antrian_swab_walk_in' || $page == 'antrian_rapid_antigen' || $page == 'home_service') ? 'active' : '';
+                $user_level = $session->get("user_level");
+                if ($user_level == 1 || $user_level == 4 || $user_level == 99 || $user_level == 103 || $user_level == 104) :
+                    $menu_open = ($page == 'walk_in' || $page == 'antrian_swab_walk_in' || $page == 'antrian_rapid_antigen' || $page == 'home_service') ? 'menu-is-open menu-open' : '';
+                    $menu_aktif = ($page == 'walk_in' || $page == 'antrian_swab_walk_in' || $page == 'antrian_rapid_antigen' || $page == 'home_service') ? 'active' : '';
                 ?>
-                <li class="nav-item <?= $menu_open; ?>">
-                    <a href="#" class="nav-link <?= $menu_aktif; ?>">
-                        <i class="nav-icon fas fa-home"></i>
-                        <p>
-                            Frontoffice <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                    <li class="nav-item <?= $menu_open; ?>">
+                        <a href="#" class="nav-link <?= $menu_aktif; ?>">
+                            <i class="nav-icon fas fa-home"></i>
+                            <p>
+                                Frontoffice <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
 
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/frontoffice/walk_in'); ?>" class="nav-link <?= ($page == "walk_in") ? 'active' : ''; ?>">
-                                <i class="far fa-circle"></i>
-                                <small>Walk in</small>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/frontoffice/antrian_swab_walk_in'); ?>" class="nav-link <?= ($page == "antrian_swab_walk_in") ? 'active' : ''; ?>">
-                                <i class="far fa-circle"></i>
-                                <small>Antrian Swab Walk In</small>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/frontoffice/antrian_rapid_antigen'); ?>" class="nav-link <?= ($page == "antrian_rapid_antigen") ? 'active' : ''; ?>">
-                                <i class="far fa-circle"></i>
-                                <small>Antrian Rapid/Antigen Walkin</small>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/home_service'); ?>" class="nav-link <?= ($page == "home_service") ? 'active' : ''; ?>">
-                                <i class="far fa-circle"></i>
-                                <small>Home Service</small>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/frontoffice/walk_in'); ?>" class="nav-link <?= ($page == "walk_in") ? 'active' : ''; ?>">
+                                    <i class="far fa-circle"></i>
+                                    <small>Walk in</small>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/frontoffice/antrian_swab_walk_in'); ?>" class="nav-link <?= ($page == "antrian_swab_walk_in") ? 'active' : ''; ?>">
+                                    <i class="far fa-circle"></i>
+                                    <small>Antrian Swab Walk In</small>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/frontoffice/antrian_rapid_antigen'); ?>" class="nav-link <?= ($page == "antrian_rapid_antigen") ? 'active' : ''; ?>">
+                                    <i class="far fa-circle"></i>
+                                    <small>Antrian Rapid/Antigen Walkin</small>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/home_service'); ?>" class="nav-link <?= ($page == "home_service") ? 'active' : ''; ?>">
+                                    <i class="far fa-circle"></i>
+                                    <small>Home Service</small>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 <?php
-                $menu_open = ($page == 'registrasi' || $page == 'registrasi_overkuota' || $page == 'instansi') ? 'menu-is-open menu-open' : '';
-                $menu_aktif = ($page == 'registrasi' || $page == 'registrasi_overkuota' || $page == 'instansi') ? 'active' : '';
+                endif;
+                if ($user_level == 1 || $user_level == 4 || $user_level == 99 || $user_level == 103 || $user_level == 104) :
+                    $menu_open = ($page == 'registrasi' || $page == 'registrasi_overkuota' || $page == 'instansi') ? 'menu-is-open menu-open' : '';
+                    $menu_aktif = ($page == 'registrasi' || $page == 'registrasi_overkuota' || $page == 'instansi') ? 'active' : '';
                 ?>
-                <li class="nav-item <?= $menu_open; ?>">
-                    <a href="#" class="nav-link <?= $menu_aktif; ?>">
-                        <i class="nav-icon fas fa-copy"></i>
-                        <p>
-                            Registrasi
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/registrasi'); ?>" class="nav-link <?= ($page == 'registrasi') ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Registrasi</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/pesert_overkuota/create'); ?>" class="nav-link <?= ($page == 'registrasi_overkuota') ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Registrasi Over Kuota</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/instansi'); ?>" class="nav-link <?= ($page == 'instansi') ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Data Instansi</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-chart-pie"></i>
-                        <p>
-                            Laboratorium
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/laboratorium/validasi'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Validasi Hasil</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/laboratorium/hasil'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Hasil Pemeriksaan</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                    <li class="nav-item <?= $menu_open; ?>">
+                        <a href="#" class="nav-link <?= $menu_aktif; ?>">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>
+                                Registrasi
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/registrasi'); ?>" class="nav-link <?= ($page == 'registrasi') ? 'active' : ''; ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Registrasi</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/pesert_overkuota/create'); ?>" class="nav-link <?= ($page == 'registrasi_overkuota') ? 'active' : ''; ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Registrasi Over Kuota</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/instansi'); ?>" class="nav-link <?= ($page == 'instansi') ? 'active' : ''; ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Instansi</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 <?php
+                endif;
+                if ($user_level == 1 || $user_level == 6 || $user_level == 7 || $user_level == 8 || $user_level == 99 || $user_level == 100) :
+                ?>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-chart-pie"></i>
+                            <p>
+                                Laboratorium
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/laboratorium/validasi'); ?>" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Validasi Hasil</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/laboratorium/hasil'); ?>" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Hasil Pemeriksaan</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                <?php
+                endif;
                 $menu_open = ($page == 'reporting_hasil' || $page == 'reporting_marketing' || $page == 'reporting_dinkes') ? 'menu-is-open menu-open' : '';
                 $menu_aktif = ($page == 'reporting_hasil' || $page == 'reporting_marketing' || $page == 'reporting_dinkes') ? 'active' : '';
                 ?>
