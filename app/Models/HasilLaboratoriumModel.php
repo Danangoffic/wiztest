@@ -13,6 +13,8 @@ class HasilLaboratoriumModel extends Model
     // protected $useSoftDeletes = true;
 
     protected $allowedFields = [
+        'valid',
+        'well',
         'id_customer',
         'id_alat',
         'id_sample',
@@ -44,11 +46,35 @@ class HasilLaboratoriumModel extends Model
         'catatan',
         'has_file',
         'id_file',
-        'valid'
     ];
 
     protected $useTimestamps = true;
     // protected $createdField  = 'created_at';
     // protected $updatedField  = 'updated_at';
     // protected $deletedField  = 'deleted_at';
+
+    public function by_file_id($id_file = null)
+    {
+        if ($id_file == null) {
+            return $id_file;
+        }
+        $builder = db_connect()->table($this->table)->where('id_file', $id_file)->orderBy('id', 'ASC');
+        return $builder->get()->getResultArray();
+    }
+
+    public function by_id_customer($id_customer = null)
+    {
+        if ($id_customer == null) return $id_customer;
+        $builder = db_connect()->table($this->table)->where('id_customer', $id_customer)->limit(1);
+        return $builder->get()->getRowArray();
+    }
+
+    public function by_valid($valid = null)
+    {
+        $builder = db_connect()
+            ->table($this->table)->select()
+            ->where('valid', $valid)
+            ->orderBy('id', 'desc');
+        return $builder->get()->getResultArray();
+    }
 }

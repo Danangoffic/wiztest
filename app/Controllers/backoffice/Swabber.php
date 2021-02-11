@@ -290,9 +290,11 @@ class Swabber extends ResourceController
         $ids_user_bilik = null;
         $user_swabber = $this->user_model->get_by_user_level(100);
         if ($data_bilik != null)
-            foreach ($data_bilik as $key => $bilik) $ids_user_bilik['id'] = $bilik['assigned_to'];
+            foreach ($data_bilik as $key => $bilik) {
+                $ids_user_bilik['id'][] = $bilik['assigned_to'];
+            }
         if ($ids_user_bilik != null)
-            $user_swabber = $user_swabber->whereNotIn("id", $ids_user_bilik);
+            $user_swabber = $user_swabber->whereNotIn("id", $ids_user_bilik['id']);
 
         $data_user_swabber = $user_swabber->get()->getResultArray();
 
@@ -324,14 +326,14 @@ class Swabber extends ResourceController
             );
             if ($this->bilik_model->insert($array_insert)) {
                 $this->session->setFlashdata("success", "Berhasil Tambahkan Bilik dengan nomor bilik " . $nomor_bilik);
-                return redirect()->to("/backoffice/swabber");
+                return redirect()->to("/swabber");
             } else {
                 $this->session->setFlashdata("error", "Gagal Tambahkan Bilik");
-                return redirect()->to("/backoffice/swabber/create_bilik");
+                return redirect()->to("/swabber/create_bilik");
             }
         } else {
             $this->session->setFlashdata("error", "Gagal Tambahkan Bilik karena user bukan swabber");
-            return redirect()->to("/backoffice/swabber/create_bilik");
+            return redirect()->to("/swabber/create_bilik");
         }
     }
 

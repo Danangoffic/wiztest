@@ -2,52 +2,51 @@
 <?= $this->section('content'); ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
+    <?= $this->include("backoffice/template/content-header"); ?>
     <section class="content-header mb-0">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <!-- filtering box -->
                     <div id="accordion">
-                        <div class="card collapsed-card">
-                            <div class="card-header" id="headingOne">
-                                <button class="btn btn-default" data-card-widget="collapse">
-                                    Filtering
-                                </button>
-                            </div>
+                        <form action="" method="POST">
+                            <div class="card collapsed-card">
+                                <div class="card-header" id="headingOne">
+                                    <button class="btn btn-default" data-card-widget="collapse">
+                                        Filtering
+                                    </button>
+                                </div>
 
-                            <div id="collapseOne" class="collapsing" aria-labelledby="headingOne" data-parent="#accordion">
                                 <div class="card-body">
-                                    <form action="<?= base_url('backoffice/laboratorium/hasil'); ?>" method="POST">
-                                        <input type="hidden" name="filtering" value="on">
-                                        <div class="form-group row">
-                                            <div class="col-md-8 col-offset-3">
-                                                <div class="row">
-                                                    <div class="col-12 row">
-                                                        <label for="date1" class="col-md-2 col-form-label">Tanggal Kunjungan</label>
-                                                        <div class="col-md-6">
-                                                            <input type="date" class="form-control" id="date1" name="date1" value="" max="">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-12 row">
-                                                        <div class="col-md-2">&nbsp;</div>
-                                                        <div class="col-md-6">s/d</div>
-                                                    </div>
-                                                    <div class="col-12 row">
-                                                        <label for="date2" class="col-md-2 col-form-label">&nbsp;</label>
-                                                        <div class="col-md-6">
-                                                            <input type="date" class="form-control" id="date2" name="date2" value="" max="">
-                                                        </div>
+
+                                    <input type="hidden" name="filtering" value="on">
+                                    <div class="form-group row">
+                                        <div class="col-md-8 col-offset-3">
+                                            <div class="row">
+                                                <div class="col-12 row">
+                                                    <label for="date1" class="col-md-2 col-form-label">Kloter</label>
+                                                    <div class="col-md-6">
+                                                        <select name="id_file" id="kloter" class="form-control">
+                                                            <?php
+                                                            foreach ($data_import as $key => $file) {
+                                                            ?>
+                                                                <option value="<?= $file['id']; ?>"><?= $file['file']; ?></option>
+                                                            <?php
+                                                            }
+                                                            ?>
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
                                 </div>
                                 <div class="card-footer">
                                     <button type="submit" class="btn btn-primary">Filter</button>
-                                    </form>
+
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -60,7 +59,7 @@
                     <h5 class="card-header"><?= $title; ?></h5>
                     <div class="card-body">
                         <a href="import_data" class="btn btn-success btn-sm mb-3">Import Excel PCR</a>
-                        <a href="insert_antigen" class="btn btn-success btn-sm mb-3">Insert Data Antigen</a>
+                        <a href="data_peserta_antigen" class="btn btn-success btn-sm mb-3">Insert Data Antigen</a>
                         <a href="insert_rapid" class="btn btn-success btn-sm mb-3">Insert Data Rapid Test</a>
                         <div class="table-responsive">
                             <table class="table table-bordered table-sm table-condensed" id="data_laboratorium">
@@ -91,6 +90,49 @@
                                     </tr>
                                 </thead>
                                 <tbody id="data_hasil2">
+                                    <?php
+                                    if ($data_customer_lab != null) {
+                                        $no = 1;
+                                        foreach ($data_customer_lab as $key => $cust) {
+                                            $status_valid = $cust['valid'];
+                                            $tipe_row = ($status_valid == "yes") ? "bg-success" : '';
+                                            $id_customer = $cust['id_customer'];
+                                            $detail_customer = $customer_model->deep_detail_by_id($id_customer)->getRowArray();
+                                            $paket_pemeriksaan = $detail_customer['nama_test'] . " " . $detail_customer['nama_layanan'];
+                                    ?>
+                                            <tr class="<?= $tipe_row; ?>">
+                                                <td><?= $no++; ?></td>
+                                                <td><?= $detail_customer['tgl_kunjungan']; ?></td>
+                                                <td><?= $detail_customer['customer_unique']; ?></td>
+                                                <td><?= $paket_pemeriksaan; ?></td>
+                                                <td><?= $detail_customer['nik']; ?></td>
+                                                <td><?= $detail_customer['nama']; ?></td>
+                                                <td><?= $cust['waktu_ambil_sampling']; ?></td>
+                                                <td><?= $cust['waktu_periksa_sampling']; ?></td>
+                                                <td><?= $cust['waktu_selesai_periksa']; ?></td>
+                                                <td><?= $detail_customer['nama_test']; ?></td>
+                                                <td><?= $cust['status_cov']; ?></td>
+                                                <td><?= $cust['status_gene']; ?></td>
+                                                <td><?= $cust['status_orf']; ?></td>
+                                                <td><?= $cust['value_ic']; ?></td>
+                                                <td><?= $cust['status_igg']; ?></td>
+                                                <td><?= $cust['status_igm']; ?></td>
+                                                <td></td>
+                                                <td>
+                                                    <?php
+                                                    if ($status_valid != "yes") {
+                                                    ?>
+                                                        <a class="btn btn-success btn-sm" href="verifikasi_peserta/<?= $cust['id_customer']; ?>" target="_blank" rel="noopener noreferrer">Verifikasi</a>
+                                                    <?php
+                                                    }
+                                                    ?>
+                                                </td>
+                                            </tr>
+                                    <?php
+                                        }
+                                    }
+
+                                    ?>
                                 </tbody>
                             </table>
                         </div>
@@ -100,13 +142,6 @@
         </div>
     </section>
 </div>
-
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/dataTables.responsive.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/dataTables.buttons.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js'); ?>"></script>
 <script>
     $(document).ready(() => {
         $("#data_laboratorium").DataTable({

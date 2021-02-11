@@ -33,7 +33,7 @@
     <section class="content">
         <?= form_open('/backoffice/laboratorium/save_verifikasi'); ?>
         <?= form_hidden('id_test', $id_test); ?>
-
+        <?= form_hidden('id', $detail_hasil_lab['id']); ?>
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
@@ -114,35 +114,42 @@
                                 $atribut_label = ['class' => 'col-md-4 col-label-form'];
 
                                 echo form_label('Result', 'status_result', $atribut_label);
-                                $atribut_result = [
-                                    'class' => "form-control select2",
-                                    'id' => 'status_result',
-                                    'required'
-                                ];
-                                echo "<div class=\"col-md-8\">" . form_dropdown('status_result', $status_hasil, [], $atribut_result) . "</div>";
                                 ?>
+                                <div class="col-md-8">
+                                    <select name="result" required id="result" class="form-control select2">
+                                        <?php foreach ($status_hasil as $hasil => $val) {
+                                            $selected = $val == $detail_hasil_lab['status_cov'] ? 'selected' : '';
+                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
+                                        }; ?>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group row">
                                 <?php
                                 echo form_label('N gene', 'status_n_gene', $atribut_label);
-                                $atribut_ngene = [
-                                    'class' => "form-control select2",
-                                    'id' => 'status_n_gene',
-                                    'required'
-                                ];
-                                echo "<div class=\"col-md-8\">" . form_dropdown('status_n_gene', $status_ngene, [], $atribut_ngene) . "</div>";
+
                                 ?>
+                                <div class="col-md-8">
+                                    <select name="status_gene" id="status_gene" class="form-control select2">
+                                        <?php foreach ($status_gene_n as $gen => $val) {
+                                            $selected = ($val == $detail_hasil_lab['status_gene']) ? 'selected' : '';
+                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
+                                        } ?>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group row">
                                 <?php
-                                echo form_label('ORF1ab', 'status_orf', $atribut_label);
-                                $atribut_orf = [
-                                    'class' => "form-control select2",
-                                    'id' => 'status_orf',
-                                    'required'
-                                ];
-                                echo "<div class=\"col-md-8\">" . form_dropdown('status_orf', $status_orf, [], $atribut_orf) . "</div>";
+                                echo form_label('Gene ORF1ab', 'status_orf', $atribut_label);
                                 ?>
+                                <div class="col-md-8">
+                                    <select name="status_orf" id="status_orf" class="form-control select2">
+                                        <?php foreach ($status_ngene as $ngene => $val) {
+                                            $selected = ($val == $detail_hasil_lab['status_orf']) ? 'selected' : '';
+                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
+                                        } ?>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group row">
                                 <?php
@@ -152,7 +159,7 @@
                                     'id' => 'nilai_ic',
                                     'required'
                                 ];
-                                echo "<div class=\"col-md-8\">" . form_input('nilai_ic', '0', $atribut_nilai_ic, 'number') . "</div>";
+                                echo "<div class=\"col-md-8\">" . form_input('nilai_ic', $detail_hasil_lab['value_ic'], $atribut_nilai_ic, 'number') . "</div>";
                                 ?>
                             </div>
                         </div>
@@ -167,24 +174,30 @@
                             <div class="form-group row">
                                 <?php
                                 echo form_label('Result', 'result', $atribut_label);
-                                $atribut_result = [
-                                    'class' => "form-control select2",
-                                    'id' => 'result',
-                                    'required'
-                                ];
-                                echo "<div class=\"col-md-8\">" . form_dropdown('result', $status_hasil, [], $atribut_result) . "</div>";
+                                // echo "<div class=\"col-md-8\">" . form_dropdown('result', $status_hasil, ["{$detail_hasil_lab['status_cov']}"], $atribut_result) . "</div>";
                                 ?>
+                                <div class="col-md-8">
+                                    <select name="result" required id="result" class="form-control select2">
+                                        <?php foreach ($status_hasil as $hasil => $val) {
+                                            $selected = $val == $detail_hasil_lab['status_cov'] ? 'selected' : '';
+                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
+                                        }; ?>
+                                    </select>
+                                </div>
+
                             </div>
                             <div class="form-group row">
                                 <?php
-                                echo form_label('Gene ORF1ab', 'gene_orf', $atribut_label);
-                                $atribut_gene_orf = [
-                                    'class' => "form-control select2",
-                                    'id' => 'gene_orf',
-                                    'required'
-                                ];
-                                echo "<div class=\"col-md-8\">" . form_dropdown('gene_orf', $status_gene, [], $atribut_gene_orf) . "</div>";
+                                echo form_label('Gene ORF1ab', 'status_orf', $atribut_label);
                                 ?>
+                                <div class="col-md-8">
+                                    <select name="status_orf" id="status_orf" class="form-control select2">
+                                        <?php foreach ($status_ngene as $ngene => $val) {
+                                            $selected = ($val == $detail_hasil_lab['status_orf']) ? 'selected' : '';
+                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
+                                        } ?>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group row">
                                 <?php
@@ -198,15 +211,15 @@
                                 ?>
                             </div>
                             <div class="form-group row">
-                                <?php
-                                echo form_label('Gene Hex/N', 'gene_hex_n', $atribut_label);
-                                $atribut_hex_n = [
-                                    'class' => "form-control select2",
-                                    'id' => 'gene_hex_n',
-                                    'required'
-                                ];
-                                echo "<div class=\"col-md-8\">" . form_dropdown('gene_hex_n', $status_gene_n, [], $atribut_hex_n) . "</div>";
-                                ?>
+                                <?= form_label('Gene Hex/N', 'gene_hex_n', $atribut_label); ?>
+                                <div class="col-md-8">
+                                    <select name="status_gene" id="status_gene" class="form-control select2">
+                                        <?php foreach ($status_gene_n as $gen => $val) {
+                                            $selected = ($val == $detail_hasil_lab['status_gene']) ? 'selected' : '';
+                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
+                                        } ?>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group row">
                                 <?php
@@ -227,14 +240,14 @@
                                     'id' => 'nilai_ic',
                                     'required'
                                 ];
-                                echo "<div class=\"col-md-8\">" . form_input('nilai_ic', '0', $atribut_nilai_ic, 'number') . "</div>";
+                                echo "<div class=\"col-md-8\">" . form_input('nilai_ic', $detail_hasil_lab['value_ic'], $atribut_nilai_ic, 'number') . "</div>";
                                 ?>
                             </div>
                         </div>
                         <div class="card-footer">
                             <div class="float-right">
-                                <button class="btn btn-default mr-3" id="backButton" type="button" onclick="history.back()"><i class="fa fa-chevron-left"></i> Kembali</button>
-                                <button class="btn btn-success" id="saveButton" type="submit"><i class="fa fa-save"></i> Simpan</button>
+                                <!-- <button class="btn btn-default mr-3" id="backButton" type="button" onclick="history.back()"><i class="fa fa-chevron-left"></i> Kembali</button> -->
+                                <button class="btn btn-success" id="saveButton" type="submit"><i class="fa fa-check"></i> Validasi</button>
                             </div>
                         </div>
                     </div>
@@ -247,7 +260,7 @@
 </div>
 <script>
     $(document).ready(function() {
-        $("select").select2({
+        $(".select2").select2({
             theme: "bootstrap4"
         })
     })

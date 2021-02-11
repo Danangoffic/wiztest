@@ -100,21 +100,18 @@
         </div>
     </section>
 </div>
-
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/dataTables.responsive.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/dataTables.buttons.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js'); ?>"></script>
 <script>
     $(document).ready(() => {
+        get_data();
         $("#data_laboratorium").DataTable({
             ordering: false,
             processing: true,
             info: false,
             deferRender: true
         });
+    });
+
+    function get_data() {
         $.ajax({
             url: "<?= base_url('backoffice/laboratorium/get_data_laboratorium'); ?>",
             type: "GET",
@@ -147,8 +144,8 @@
                         <td>${v.status_igm}</td>
                         <td>${v.catatan}</td>
                         <td>
-                            <a class="btn btn-success btn-sm" target="_blank" href="/backoffice/laboratorium/input/${v.id_hasil}">Input</a>
-                            <a class="btn btn-primary btn-sm" target="_blank" href="/backoffice/laboratorium/print/${v.id_hasil}">Cetak Hasil</a>
+                            <a class="btn btn-success btn-sm my-2" target="_blank" href="/backoffice/laboratorium/input/${v.id_customer}">Input</a>
+                            <a class="btn btn-primary btn-sm my-2" target="_blank" href="/backoffice/laboratorium/print/${v.id_customer}">Cetak&nbsp;Hasil</a>
                         </td>
                     </tr>
                     `
@@ -156,7 +153,6 @@
                 $("#data_hasil2").html(html_hasil);
             }
         })
-
-    });
+    }
 </script>
 <?= $this->endSection(); ?>

@@ -277,7 +277,7 @@ class Afiliasi extends ResourceController
                     'nomor_bilik' => $nomor_bilik,
                     'jam_kunjungan' => $jam_kunjungan,
                     'tgl_kunjungan' => $tgl_kunjungan,
-                    'status_pembayaran' => 'invoice',
+                    'status_pembayaran' => 'Invoice',
                     'status_peserta' => "20",
                     'is_corporate' => "yes",
                     'id_corporate' => $id_inserted

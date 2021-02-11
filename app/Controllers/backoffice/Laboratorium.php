@@ -106,16 +106,25 @@ class Laboratorium extends ResourceController
         if (!$this->session->has('logged_in')) {
             return redirect()->to('/backoffice/login');
         }
+        $db_file_lab = db_connect()->table('data_file_lab');
+        $filtering = ($this->request->getPost('filtering')) ? $this->request->getPost('filtering') : "";
+        if ($filtering == "on") {
+            $id_file = $this->request->getPost('id_file');
+            $data_customer_lab = $this->laboratoriumModel->by_file_id($id_file);
+        } else {
+            $data_customer_lab = null;
+        }
+        $data_file_lab = $db_file_lab->orderBy('id', 'DESC')->get()->getResultArray();
+        // dd($data_customer_lab);
         $data = [
             'page' => 'laboratorium',
             'title' => 'Validasi Laboratorium',
             'session' => $this->session,
-            'data' => $this->laboratoriumModel->findAll(),
             'status' => $this->statusHasilModel,
-            'customer' => $this->customer
-            // 'data' => $this->get_data_laboratorium()
+            'data_import' => $data_file_lab,
+            'customer_model' => $this->customer,
+            'data_customer_lab' => $data_customer_lab
         ];
-        // dd($this->session->get('nama'));
         return view('backoffice/laboratorium/validasi', $data);
     }
 
@@ -160,13 +169,7 @@ class Laboratorium extends ResourceController
         if (!$this->session->has('logged_in')) {
             return redirect()->to('/backoffice/login');
         }
-        // $user_level = $this->session->get("user_level");
-        // $level = array(1, 6, 7, 8, 99);
-        // // in_array($level);
-        // if (!in_array($user_level, $level)) {
-        //     $this->session->setFlashdata("error", "Anda tidak mempunyai akses");;
-        //     return redirect()->to("/backoffice/login");
-        // }
+
         $data_list_peserta_antigen = $this->customer->get_peserta_test(3)->getResultArray();
 
         $data = array(
@@ -186,7 +189,7 @@ class Laboratorium extends ResourceController
         if (!$this->session->has('logged_in')) {
             return redirect()->to('/backoffice/login');
         }
-
+        $detail_hasil_lab = $this->laboratoriumModel->by_id_customer($id_customer);
         $detail_customer = $this->customer->detail_customer($id_customer);
         $id_layanan_test = $detail_customer['jenis_test'];
         $detail_layanan_test = $this->layananTestModel->find($id_layanan_test);
@@ -200,16 +203,20 @@ class Laboratorium extends ResourceController
             'layanan_test_model' => $this->layananTestModel,
             'layanan_model' => $this->layananModel,
             'test_model' => $this->testModel,
-            'id_test' => $id_test
+            'id_test' => $id_test,
+            'detail_hasil_lab' => $detail_hasil_lab,
+            'status_hasil' => ['', 'Negative', 'Positive'],
+            'status_ngene' => ['', 'Negative', 'Positive'],
+            'status_orf' => ['', 'Negative', 'Positive'],
+            'status_gene_n' => ['', 'Negative', 'Positive'],
         );
         return view("backoffice/laboratorium/verifikasi_peserta", $data);
     }
 
     public function save_verifikasi()
     {
-        $status_result = $this->request->getPost("status_result");
-        $status_n_gene = $this->request->getPost("status_n_gene");
-
+        $status_result = $this->request->getPost("result");
+        $status_n_gene = $this->request->getPost("status_gene");
         $status_orf = $this->request->getPost("status_orf");
         $nilai_ic = $this->request->getPost("nilai_ic");
 
@@ -218,6 +225,28 @@ class Laboratorium extends ResourceController
 
         $gene_hex_n = $this->request->getPost("gene_hex_n");
         $nilai_ct_hex_n = $this->request->getPost("nilai_ct_hex_n");
+
+        $nilai_ic = $this->request->getPost("nilai_ic");
+        $id = $this->request->getPost("id");
+        $id_dokter = $this->session->get('id_user');
+        $update_data_verifikasi = [
+            'status_cov' => $status_result,
+            'status_gene' => $status_n_gene,
+            'value_ic' => $nilai_ic,
+            'value_orf' => $nilai_ct_orf,
+            'value_n_gene' => $nilai_ct_hex_n,
+            'status_orf' => $status_orf,
+            'valid' => "yes",
+            'updated_by' => $this->session->get('id_user')
+        ];
+        $update = $this->laboratoriumModel->update($id, $update_data_verifikasi);
+        if ($update) {
+            $this->session->setFlashdata("success", "Berhasil validasi peserta");
+            return redirect()->to("/backoffice/laboratorium/validasi");
+        } else {
+            $this->session->setFlashdata("error", "Gagal validasi peserta");
+            return redirect()->back();
+        }
     }
 
 
@@ -239,10 +268,12 @@ class Laboratorium extends ResourceController
                 $fileexcel = $this->request->getFile("excel");
                 if ($fileexcel) {
                     $origin_file_name = $fileexcel->getName();
+                    $fileLocation = $fileexcel->getTempName();
                     // $file = $fileexcel->getExtension;
                     $insert_file = array('file' => $origin_file_name);
                     $insert = $this->fileLabModel->insert($insert_file);
                     $id_file = $this->fileLabModel->getInsertID();
+
                     // $origin_mime_type = $fileexcel->getExtension;
                     // $date_now = date("dmYHis");
                     // $name = ($this->request->getPost("file_name") == null || $this->request->getPost("file_name") == "") ? $origin_file_name . "-" . $date_now . "." . $origin_mime_type : $this->request->getPost("file_name");
@@ -256,143 +287,79 @@ class Laboratorium extends ResourceController
                     // }
                     $excelReader  = new PHPExcel();
                     //mengambil lokasi temp file
-                    $fileLocation = $fileexcel->getTempName();
+
                     //baca file
                     $objPHPExcel = PHPExcel_IOFactory::load($fileLocation);
                     //ambil sheet active
                     $sheet    = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
-                    //looping untuk mengambil data
-                    // $table = "<table width='100%' border='1'>";
-                    // $table .= "<thead><tr>";
-                    // $table .= "<td>Well</td>";
-                    // $table .= "<td>SampleID</td>";
-                    // $table .= "<td>Sample</td>";
-                    // $table .= "<td>SampleType</td>";
-                    // $table .= "<td>gene</td>";
-                    // $table .= "<td>Dye</td>";
-                    // $table .= "<td>ct</td>";
-                    // $table .= "<td>concentration</td>";
-                    // $table .= "<td>c_unit</td>";
-                    // $table .= "<td>standard_c</td>";
-                    // $table .= "<td>ref_dye</td>";
-                    // $table .= "<td>unique_ID</td>";
-                    // $table .= "<td>replicate</td>";
-                    // $table .= "<td>QC</td>";
-                    // $table .= "</tr></thead>";
+
                     $reader_index = 1;
                     $indx = 0;
                     try {
                         // dd($sheet);
                         foreach ($sheet as $idx => $data) {
+                            $status_ins = false;
                             //skip index 1 karena title excel
-                            if ($idx == 1) {
+                            if ($idx < 9) {
                                 continue;
                             }
                             // dd($data);
                             $array_insert[$indx] = array();
                             $Well = $data['A'];
-                            $SampleID = $data['B'];
+                            $SampleID = $data['D'];
                             $Sample = $data['C'];
-                            $SampleType = $data['D'];
-                            $Dye = $data['E'];
-                            $gene = $data['F'];
-                            $ct = $data['G'];
-                            $concentration = $data['H'];
-                            $c_unit = $data['I'];
-                            $standard_c = $data['J'];
-                            $ref_dye = $data['K'];
-                            $unique_ID = $data['L'];
-                            $replicate = $data['M'];
-                            $QC = $data['N'];
-                            $customer = $this->customer->where(['customer_unique' => $SampleID])->get()->getRowArray();
-                            // dd($customer);
-                            if ($customer != null) {
-                                $id_customer = $customer['id'];
-                                // echo $reader_index;
-                                if ($reader_index == 1) {
-                                    // $array_insert[$indx]['id_customer'] 
-                                    $this->id_customer = $id_customer;
-                                    // $array_insert[$indx]['value_orf'] = 
-                                    $this->value_orf = $ct;
-                                    // $array_insert[$indx]['status_orf'] 
-                                    $this->status_orf = ($ct != "--" || $ct != "") ? 6 : 5;
-                                    // print_r($array_insert);
-                                } elseif ($reader_index == 2) {
-                                    // $array_insert[$indx]['value_n_gene'] 
-                                    $this->value_n_gene = $ct;
-                                    // $array_insert[$indx]['status_gene'] 
-                                    $this->status_gene = ($ct != "--" || $ct != "") ? 4 : 3;
-                                    // print_r($array_insert);
-                                    // dd($data);
-                                } elseif ($reader_index == 3) {
-                                    // $array_insert[$indx]['value_ic'] 
-                                    $this->value_ic = $ct;
-                                    // $array_insert[$indx]['status_pemeriksaan'] 
-                                    $this->status_pemeriksaan = "7";
-                                    // $array_insert[$indx]['status_kirim'] 
-                                    $this->status_kirim = "9";
-                                    // $array_insert[$indx]['created_by'] 
-                                    $this->created_by = $this->session->get("id_user");
-                                    // $array_insert[$indx]['updated_by'] 
-                                    $this->updated_by = $this->session->get("id_user");
-                                    // $array_insert[$indx]['waktu_ambil_sampling'] 
-                                    $this->waktu_ambil_sampling = date("Y-m-d H:i:s");
-                                    // $array_insert[$indx]['catatan'] 
-                                    $this->catatan = $QC;
-                                    // $array_insert[$indx]['has_file'] 
-                                    $this->has_file = "yes";
-                                    // $array_insert[$indx]['id_file'] 
-                                    $this->id_file = $id_file;
-                                    // print_r($array_insert);
-                                }
-                                // dd($array_insert);
-                                if ($reader_index == 3) {
-                                    $array_insert = array(
-                                        'id_customer' => $this->id_customer,
-                                        'value_orf' => $this->value_orf,
-                                        'status_orf' => $this->status_orf,
-                                        'value_n_gene' => $this->value_n_gene,
-                                        'status_gene' => $this->status_gene,
-                                        'value_ic' => $this->value_ic,
-                                        'status_pemeriksaan' => $this->status_pemeriksaan,
-                                        'status_kirim' => $this->status_kirim,
-                                        'created_by' => $this->created_by,
-                                        'updated_by' => $this->updated_by,
-                                        'waktu_ambil_sampling' => $this->waktu_ambil_sampling,
-                                        'catatan' => $this->catatan,
-                                        'has_file' => $this->has_file,
-                                        'id_file' => $this->id_file,
-                                    );
-                                    // print_r($array_insert);
-                                    // dd($array_insert);
-                                    $this->laboratoriumModel->insert($array_insert);
-                                    $indx++;
-                                }
-                                $reader_index++;
-                                if ($reader_index == 4) {
-                                    $reader_index = 1;
-                                };
+                            $SampleType = $data['E'];
+                            $SamplingDate = $data['G'];
+                            $SubmittingDate = $data['H'];
+                            $ReportingDate = $data['I'];
+                            $FamCt = $data['J'];
+                            $StatusORF = $data['K'];
+                            $HexCt = $data['L'];
+                            $status_gene = $data['M'];
+                            $Cy5Ct = $data['N']; // IC
+                            $StatusIc = $data['O'];
+                            $statusCov = $data['P'];
+                            $flag = $data['Q'];
+
+                            $customer = $this->customer->get_by_customer_unique($SampleID);
+                            if ($customer == null) {
+                                $this->session->setFlashdata('error', 'peserta tidak ditemukan pada sample id ' . $SampleID);
+                            } else {
+                                $status_ins = true;
                             }
-
-
-                            // $table .= "<tr>";
-                            // $table .= "<td>" . $Well . "</td>";
-                            // $table .= "<td>" . $SampleID . "</td>";
-                            // $table .= "<td>" . $Sample . "</td>";
-                            // $table .= "<td>" . $SampleType . "</td>";
-                            // $table .= "<td>" . $gene . "</td>";
-                            // $table .= "<td>" . $Dye . "</td>";
-                            // $table .= "<td>" . $ct . "</td>";
-                            // $table .= "<td>" . $concentration . "</td>";
-                            // $table .= "<td>" . $c_unit . "</td>";
-                            // $table .= "<td>" . $standard_c . "</td>";
-                            // $table .= "<td>" . $ref_dye . "</td>";
-                            // $table .= "<td>" . $unique_ID . "</td>";
-                            // $table .= "<td>" . $replicate . "</td>";
-                            // $table .= "<td>" . $QC . "</td>";
-                            // $table .= "</tr>";
+                            if ($status_ins) {
+                                $created_by = $this->session->get('id_user');
+                                $updated_by = $this->session->get("id_user");
+                                $id_customer = $customer['id'];
+                                $array_insert = array(
+                                    'well' => $Well,
+                                    'id_customer' => $id_customer,
+                                    'status_cov' => $statusCov,
+                                    'value_orf' => $FamCt,
+                                    'status_orf' => $StatusORF,
+                                    'value_n_gene' => $HexCt,
+                                    'status_gene' => $status_gene,
+                                    'value_ic' => $Cy5Ct,
+                                    'status_ic' => $StatusIc,
+                                    'status_pemeriksaan' => 7,
+                                    'status_kirim' => 9,
+                                    'created_by' => $created_by,
+                                    'updated_by' => $updated_by,
+                                    'waktu_ambil_sampling' => $this->waktu_ambil_sampling,
+                                    'catatan' => $flag,
+                                    'has_file' => "yes",
+                                    'id_file' => $id_file,
+                                    'waktu_ambil_sampling' => $SamplingDate,
+                                    'waktu_periksa_sampling' => $SubmittingDate,
+                                    'waktu_selesai_periksa' => $ReportingDate,
+                                );
+                                // print_r($array_insert);
+                                // dd($array_insert);
+                                $this->laboratoriumModel->insert($array_insert);
+                            }
                         }
                         // exit();
+                        $fileexcel->move(ROOTPATH . 'public/assets/excels_lab/', $origin_file_name);
                         $this->session->setFlashdata("success", "Berhasil Upload excel");
                         return redirect()->to("/backoffice/laboratorium/hasil");
                     } catch (\Throwable $th) {
@@ -412,22 +379,23 @@ class Laboratorium extends ResourceController
     public function get_data_laboratorium()
     {
         try {
-            $data_laboratorium = $this->laboratoriumModel->findAll();
+            $data_laboratorium = $this->laboratoriumModel->by_valid("yes");
+            // return db_connect()->showLastQuery();
             if ($data_laboratorium == null) {
                 return $this->failNotFound('Not found');
             }
             $result = array();
             foreach ($data_laboratorium as $key => $value) {
-                $detailCustomer = $this->customer->find($value['id_customer']);
+                $detailCustomer = $this->customer->deep_detail_by_id($value['id_customer'])->getRowArray();
                 $detailLayananTest = $this->layananTestModel->find($detailCustomer['jenis_test']);
                 $detailTest = $this->testModel->find($detailLayananTest['id_test']);
                 $detailLayanan = $this->layananModel->find($detailLayananTest['id_layanan']);
                 $detailSample = $this->sampleModel->find($value['id_sample']);
-                $statusCov = '';
-                $statusGene = '';
-                $statusOrf = '';
-                $statusIgg = '';
-                $statusIgm = '';
+                $statusCov = $value['status_cov'];
+                $statusGene = $value['status_gene'];
+                $statusOrf = $value['status_orf'];
+                $statusIgg = $value['status_igg'];
+                $statusIgm = $value['status_igm'];
                 $statusKirim = '';
                 if ($value['status_cov'] !== null) {
                     $detailHasilCov = $this->statusHasilModel->find($value['status_cov']);
@@ -465,9 +433,9 @@ class Laboratorium extends ResourceController
                     'paket_pemeriksaan' => $paket_pemeriksaan,
                     'nama_customer' => $detailCustomer['nama'],
                     'nik' => $detailCustomer['nik'],
-                    'waktu_sampling' => substr($value['waktu_ambil_sampling'], 0, 10),
-                    'waktu_periksa' => substr($value['waktu_periksa_sampling'], 0, 10),
-                    'waktu_selesa_periksa' => substr($value['waktu_selesai_periksa'], 0, 10),
+                    'waktu_sampling' => $value['waktu_ambil_sampling'],
+                    'waktu_periksa' => $value['waktu_periksa_sampling'],
+                    'waktu_selesa_periksa' => $value['waktu_selesai_periksa'],
                     'status_cov' => $statusCov,
                     'status_gene' => $statusGene,
                     'status_orf' => $statusOrf,
@@ -489,11 +457,12 @@ class Laboratorium extends ResourceController
 
     public function input($id_customer)
     {
-        $detail_customer = $this->customer->find($id_customer);
+        $detail_customer = $this->customer->deep_detail_by_id($id_customer)->getRowArray();
         if ($detail_customer == null) {
             $this->session->setFlashdata("error", "customer not found");
         }
-        $hasil_lab = $this->laboratoriumModel->where(['id_customer' => $id_customer])->first();
+        $hasil_lab = $this->laboratoriumModel->by_id_customer($id_customer);
+        // dd($hasil_lab);
         $layanan_test = $this->layananTestModel->find($detail_customer['jenis_test']);
         $new_reg = date_create($detail_customer['created_at']);
         $tgl_registrasi = date_format($new_reg, "Y-m-d");
