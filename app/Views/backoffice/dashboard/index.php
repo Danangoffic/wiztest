@@ -82,7 +82,7 @@
                     $alert_temp = "alert-info";
                 }
             ?>
-                <div class="row <?= ($id_tester > 1) ? 'mt-5' : ''; ?>">
+                <div class="row <?= ($id_tester > 1) ? 'mt-2' : ''; ?>">
                     <div class="col-md-12">
                         <div class="alert <?= $alert_temp; ?>">
                             <h4><i class="icon fas fa-info" title="SWAB PCR section"></i> <?= $nama_tester; ?></h4>
@@ -193,7 +193,12 @@
                                     </tbody>
                                 </table>
 
-                                <table class="table table-bordered table-condensed table-sm mt-5">
+
+                            </div>
+                        </div>
+                        <div class="card card-outline <?= $card_temp; ?>">
+                            <div class="card-body p-0">
+                                <table class="table table-bordered table-condensed table-sm table-hover">
                                     <thead>
                                         <tr>
                                             <th class="text-center">MARKETING</th>
@@ -211,8 +216,8 @@
                                         (a.tgl_kunjungan BETWEEN '{$date1}' AND '{$date2}') 
                                         AND b.id_test = '{$id_tester}' ;")->getFirstRow();
                                             $customer_marketing = $data_marketing->customers_marketing;
-                                            echo "<td>{$nama_marketing}</td>";
-                                            echo "<td class=\"text-center\">{$customer_marketing}</td>";
+                                            echo "<tr><td>{$nama_marketing}</td>";
+                                            echo "<td class=\"text-center\">{$customer_marketing}</td></tr>";
                                         }
                                         ?>
                                     </tbody>
@@ -260,7 +265,7 @@
                         <div class="card <?= $card_temp; ?> card-outline">
                             <div class="card-body p-0">
                                 <div class="table-responsive">
-                                    <table class="table table-bordered table-condensed table-sm">
+                                    <table class="table table-bordered table-condensed table-sm table-hover">
                                         <thead>
                                             <tr>
                                                 <th class="text-center align-middle" rowspan="2">CORPORATE</th>

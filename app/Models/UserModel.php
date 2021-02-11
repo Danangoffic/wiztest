@@ -28,15 +28,11 @@ class UserModel extends Model
         }
     }
 
-    public function loginUser1($email = false, $password = false)
+    public function loginUser1($email, $password)
     {
         if ($email && $password) {
-            return $this->where(['email' => $email, 'password' => md5($password)])->first();
-            // db_connect()
-            //     ->table($this->table)
-            //     ->select()
-            //     ->where('email', $email)
-            //     ->where('password', $password);
+            $builder = db_connect()->table($this->table)->where('email', $email)->where('password', md5($password))->limit(1);
+            return $builder->get()->getFirstRow('array');
         } else {
             return false;
         }

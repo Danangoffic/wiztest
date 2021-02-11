@@ -89,13 +89,16 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
+                <div class="col-md-12">
+                    <div class="callout callout-info">
+                        <h5>Data Antrian Bilik</h5>
+                    </div>
+                </div>
                 <?php
                 if ($session->get("user_level") == 1 || $session->get("user_level") == 99) {
                 ?>
                     <div class="col-md-12">
-                        <div class="callout callout-info">
-                            <h5>Data Antrian Bilik</h5>
-                        </div>
+
                         <a href="/swabber/create_bilik" class="btn btn-primary btn-sm mb-3">Tambah Data Bilik</a>
                     </div>
                 <?php

@@ -43,7 +43,7 @@ class Home extends BaseController
     public function index()
     {
         // session_destroy();
-        if (!$this->session->get('logged_in')) {
+        if (!$this->session->has('logged_in')) {
             return redirect()->to('/backoffice/login');
         }
         $date_now = date('Y-m-d');
