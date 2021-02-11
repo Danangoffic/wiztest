@@ -44,30 +44,38 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <?php
-                                    // dd($session->get("id_user"));
-                                    // dd($data_bilik);
-                                    foreach ($data_bilik as $key => $bilik_swabber) {
-                                        $id_swabber = $bilik_swabber['assigned_to'];
-                                        $swabber = $detail_user->where(['id_user' => $id_swabber])->first();
-                                        // dd(db_connect()->showLastQuery());
-                                        $nama = $swabber['nama'];
-                                        $nama = ucwords($nama);
-                                        $nomor = $bilik_swabber['nomor_bilik'];
-                                    ?>
-                                        <div class="col-md-6">
-                                            <div class="row">
-                                                <div class="col-md-4">Nama</div>
-                                                <div class="col-md-8"><strong><?= $nama; ?></strong></div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4">Bilik</div>
-                                                <div class="col-md-8"><strong><?= $nomor; ?></strong></div>
-                                            </div>
-                                        </div>
-                                    <?php
-                                    }
-                                    ?>
+
+                                    <div class="col-md-6">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>User</th>
+                                                    <th>Bilik</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                // dd($session->get("id_user"));
+                                                // dd($data_bilik);
+                                                foreach ($data_bilik as $key => $bilik_swabber) {
+                                                    $id_swabber = $bilik_swabber['assigned_to'];
+                                                    $swabber = $detail_user->where(['id_user' => $id_swabber])->first();
+                                                    // dd(db_connect()->showLastQuery());
+                                                    $nama = $swabber['nama'];
+                                                    $nama = ucwords($nama);
+                                                    $nomor = $bilik_swabber['nomor_bilik'];
+                                                ?>
+                                                    <tr>
+                                                        <td><?= $nama; ?></td>
+                                                        <td><?= $nomor; ?></td>
+                                                    </tr>
+                                                <?php
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -101,7 +109,7 @@
                         <div class="col-md-6">
                             <div class="card card-primary">
                                 <div class="card-header">
-                                    <h5 class="card-title">Antrian Swabber</h5>
+                                    <h5 class="card-title">Antrian Swabber Bilik <?= $bilik_swabber['nomor_bilik']; ?></h5>
                                 </div>
                                 <div class="card-body">
                                     <table class="table table-bordered table-hover table-sm">
@@ -121,7 +129,7 @@
                         <div class="col-md-6">
                             <div class="card card-primary">
                                 <div class="card-header">
-                                    <h5 class="card-title">Booking Swabber</h5>
+                                    <h5 class="card-title">Booking Swabber Bilik <?= $bilik_swabber['nomor_bilik']; ?></h5>
                                 </div>
                                 <div class="card-body">
                                     <table class="table table-bordered table-hover table-sm">
