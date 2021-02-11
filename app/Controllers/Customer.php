@@ -123,13 +123,14 @@ class Customer extends ResourceController
             $dataMarketing = $this->marketing_model->find($marketing);
             $dataLayanan = $this->layananModel->find($jenis_layanan);
 
-            if ($jenis_test == 2 || $jenis_test == "2") {
-                $nomor_bilik = 1;
-            } else if ($jenis_test == 3 || $jenis_test == "3") {
-                $nomor_bilik = 2;
+            if ($jenis_test == 2 || $jenis_test == "2" || $jenis_test == 3 || $jenis_test == "3") {
+                $nomor_bilik = 3;
             } else {
-                $hitung_bilik = 6 % $no_urutan;
-                $nomor_bilik = $hitung_bilik + 2;
+                $hitung_bilik = 7 % $no_urutan;
+                if ($hitung_bilik == 0 || $hitung_bilik == 3) {
+                    $hitung_bilik++;
+                }
+                $nomor_bilik = $hitung_bilik;
             }
 
             // echo "Urutan : " . $no_urutan;

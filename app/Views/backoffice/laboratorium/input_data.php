@@ -175,31 +175,30 @@
                         <div class="card-body">
                             <div class="form-group row">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-3">Waktu Kunjungan</label>
-                                <div class="col-md-9 row">
-                                    <input class="form-control col-md-6" type="date" name="tanggalkunjungan" value="<?= $customer['tgl_kunjungan']; ?>" readonly />
-                                    <input class="form-control col-md-6" type="time" name="jamkunjungan" value="<?= $customer['jam_kunjungan']; ?>" readonly />
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input class="form-control " type="date" name="tanggalkunjungan" value="<?= $customer['tgl_kunjungan']; ?>" readonly />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input class="form-control " type="time" name="jamkunjungan" value="<?= $customer['jam_kunjungan']; ?>" readonly />
+                                        </div>
+
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-3">Jenis Pemeriksaan</label>
                                 <div class="col-md-9">
-                                    <select class="form-control" name="idpemeriksaan" id="idpemeriksaan" onchange="changeFuncJenis('idpemeriksaan');">
-                                        <option value="">--Pilih--</option>
-                                        <?php
-                                        foreach ($test as $key => $te) {
-                                        ?>
-                                            <option value="<?= $te['id']; ?>"><?= $te['nama_test']; ?></option>
-                                        <?php
-                                        }
-                                        ?>
-                                    </select>
+                                    <input type="text" name="" value="<?= $customer['nama_test']; ?>" id="" class="form-control disabled" disabled readonly>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-3">Alat Pemeriksaan</label>
                                 <div class="col-md-9">
                                     <!-- <select class="form-control" name="idalat" id="idalat" onchange="changeFuncalat('idalat');"> -->
-                                    <select class="form-control" name="idalat" id="idalat">
+                                    <input type="text" name="" value="Tianlong" id="" class="form-control disabled" disabled readonly>
+                                    <!-- <select class="form-control" name="idalat" id="idalat">
                                         <option value="">--Pilih--</option>
                                         <?php
                                         foreach ($alat as $key => $al) {
@@ -208,31 +207,28 @@
                                         <?php
                                         }
                                         ?>
-                                    </select>
+                                    </select> -->
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-3">Waktu Ambil Sampling</label>
                                 <div class="col-md-9">
-                                    <input type="date" name="tanggalsampling" value="<?= substr($detail_hasil['waktu_ambil_sampling'], 0, 10); ?>" />
-                                    <input type="time" name="jamsampling" value="<?= substr($detail_hasil['waktu_ambil_sampling'], 10, 5); ?>" />
+                                    <?= $detail_hasil['waktu_ambil_sampling']; ?>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-3">Waktu Periksa Sampling</label>
                                 <div class="col-md-9">
-                                    <input type="date" name="tanggalperiksa" value="<?= substr($detail_hasil['waktu_periksa_sampling'], 0, 10); ?>" />
-                                    <input type="time" name="jamperiksa" value="<?= substr($detail_hasil['waktu_periksa_sampling'], 10, 5); ?>" />
+                                    <?= $detail_hasil['waktu_periksa_sampling']; ?>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-3">Waktu Selesai Periksa</label>
                                 <div class="col-md-9">
-                                    <input type="date" name="tanggalselesai" value="<?= substr($detail_hasil['waktu_selesai_sampling'], 0, 10); ?>" />
-                                    <input type="time" name="jamselesai" value="<?= substr($detail_hasil['waktu_selesai_sampling'], 10, 5); ?>" />
+                                    <?= $detail_hasil['waktu_selesai_periksa']; ?>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-3">Jenis Sample</label>
                                 <div class="col-md-9">
                                     <select name="jenissample" class="form-control">
@@ -245,15 +241,16 @@
                                         ?>
                                     </select>
                                 </div>
-                            </div>
+                            </div> -->
                             <div id="swab">
                                 <div class="form-group row">
                                     <label class="control-label col-md-3 col-sm-3 col-xs-3">2019-nCoV</label>
                                     <div class="col-md-9">
-                                        <select name="status_cov" id="status_cov" class="form-control">
+                                        <input type="text" name="" value="<?= $detail_hasil['status_cov']; ?>" id="" class="form-control disabled" disabled readonly>
+                                        <!-- <select name="status_cov" id="status_cov" class="form-control">
                                             <option value="1"> Negatif</option>
                                             <option value="2">Positif</option>
-                                        </select>
+                                        </select> -->
                                     </div>
                                 </div>
 
@@ -261,43 +258,45 @@
                                 <div class="form-group row">
                                     <label class="control-label col-md-3 col-sm-3 col-xs-3">N gene</label>
                                     <div class="col-md-9">
-                                        <select name="status_n_gene" id="status_n_gene" class="form-control" onchange="changeFunc('fam');">
+                                        <input type="text" name="" value="<?= $detail_hasil['status_gene']; ?>" id="" class="form-control disabled" disabled readonly>
+                                        <!-- <select name="status_n_gene" id="status_n_gene" class="form-control" onchange="changeFunc('fam');">
                                             <option value="3">Undetection</option>
                                             <option value="4" selected> Detection</option>
 
-                                        </select>
+                                        </select> -->
                                     </div>
                                 </div>
                                 <div id="uraianfam">
                                     <div class="form-group row">
                                         <label class="control-label col-md-3 col-sm-3 col-xs-3">Nilai FAM / N gene</label>
                                         <div class="col-md-9">
-                                            <input type="text" class="form-control" name="uraianfam" value="<?= $detail_hasil['value_n_gene']; ?>" id="value_n_gene">
+                                            <input type="text" class="form-control" name="uraianfam" value="<?= $detail_hasil['value_n_gene']; ?>" id="value_n_gene" disabled readonly>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="control-label col-md-3 col-sm-3 col-xs-3">ORF1ab</label>
                                     <div class="col-md-9">
-                                        <select name="status_orf" id="status_orf" class="form-control" onchange="changeFunc('rox');">
+                                        <input type="text" name="" value="<?= $detail_hasil['status_orf']; ?>" id="" class="form-control disabled" disabled readonly>
+                                        <!-- <select name="status_orf" id="status_orf" class="form-control" onchange="changeFunc('rox');">
                                             <option value="5">Undetection</option>
-                                            <option value="6" selected> Detection</option>
+                                            <option value="6"> Detection</option>
 
-                                        </select>
+                                        </select> -->
                                     </div>
                                 </div>
                                 <div id="uraianrox">
                                     <div class="form-group row">
                                         <label class="control-label col-md-3 col-sm-3 col-xs-3">Nilai ROX / ORF1ab</label>
                                         <div class="col-md-9">
-                                            <input type="text" class="form-control" name="uraianrox" value="<?= $detail_hasil['value_orf']; ?>" id="value_orf">
+                                            <input type="text" class="form-control" name="uraianrox" value="<?= $detail_hasil['value_orf']; ?>" id="value_orf" disabled readonly>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="control-label col-md-3 col-sm-3 col-xs-3">IC</label>
                                     <div class="col-md-9">
-                                        <input type="text" class="form-control" name="vic" value="<?= $detail_hasil['detail_ic']; ?>">
+                                        <input type="text" class="form-control" name="vic" value="<?= $detail_hasil['value_ic']; ?>" readonly disabled>
                                     </div>
                                 </div>
                             </div>
