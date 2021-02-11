@@ -88,7 +88,7 @@
                         <div class="callout callout-info">
                             <h5>Data Antrian Bilik</h5>
                         </div>
-                        <a href="/backoffice/swabber/create_bilik" class="btn btn-primary btn-sm mb-3">Tambah Data Bilik</a>
+                        <a href="/swabber/create_bilik" class="btn btn-primary btn-sm mb-3">Tambah Data Bilik</a>
                     </div>
                 <?php
                 }

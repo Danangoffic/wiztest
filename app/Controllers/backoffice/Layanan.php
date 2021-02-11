@@ -296,7 +296,7 @@ class Layanan extends ResourceController
         $data = file_get_contents($img_url);
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
         // It will be called downloaded.pdf
-        $html = '<center>' . $nama . '<br>' . $tgl_lahir . '<br> ' . $nama_test . ' ' . $nama_layanan . '<img importance="" width=\'150\' height=\'75\' src="' . $base64 . '" id=""></center>';
+        $html = '<center>' . $nama . '<br>' . $tgl_lahir . '<br> ' . $nama_test . ' ' . $nama_layanan . '<br><img importance="" width=\'150\' height=\'75\' src="' . $base64 . '" id=""></center>';
         $fileHTMLVIEW = view('backoffice/layanan/print_barcode', ['base64' => $base64, 'url' => $url, 'detailCustomer' => $detailCustomer, 'original_img' => $img_url, 'html_img' => $html]);
         // return $fileHTMLVIEW;
         // exit();

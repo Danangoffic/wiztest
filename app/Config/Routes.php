@@ -206,7 +206,8 @@ $routes->get("led/(:num)", "Antrian::bilik/$1");
 $routes->get("/api/wa", "backoffice\Whatsapp_service::coba_wa");
 $routes->post("/api/save-hs", "Customer::home_service_registration");
 // $routes->post("/save-rujukan", "Afiliasi::save_rujukan");
-$routes->get("swabber", "backoffice\Swabber::index");
+$routes->add("swabber", "backoffice\Swabber::index");
+$routes->add("/swabber/(:segment)", "backoffice\Swabber::$1");
 $routes->post("/api/print-barcode-swabber", "backoffice\Swabber::print_barcode");
 
 $routes->get("/backoffice/reporting/(:segment)", "backoffice\Reporting::$1");
