@@ -251,20 +251,23 @@ class Peserta extends BaseController
         $jam_kunjungan = $dataJamKunjungan['jam'];
         $status_pembayaran = $this->request->getPost('status_pembayaran');
         $pemeriksa =  $this->request->getPost('nama_pemeriksa');
+        $detail_layanan_test = $this->layananTestModel->where(['id_test' => $id_test, 'id_layanan' => $id_layanan, 'id_pemeriksaan' => $id_pemeriksaan])->get()->getRowArray();
+        $id_layanan_test = $detail_layanan_test['id'];
 
         try {
-            $customer_UNIQUE = $this->customerPublic->getOrderId($id_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
+            $customer_UNIQUE = $this->customerPublic->getOrderId($id_layanan_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
 
-            $no_urutan = $this->customerPublic->getUrutan($id_test, $tgl_kunjungan, $id_pemeriksaan, $jenis_layanan, $jam_kunjungan);
+            $no_urutan = $this->customerPublic->getUrutan($id_layanan_test, $tgl_kunjungan, $id_pemeriksaan, $jenis_layanan, $jam_kunjungan);
 
 
-            if ($id_test == 2 || $id_test == "2") {
-                $nomor_bilik = 1;
-            } else if ($id_test == 3 || $id_test == "3") {
-                $nomor_bilik = 2;
+            if ($id_test == 2 || $id_test == "2" || $id_test == 3 || $id_test == "3") {
+                $nomor_bilik = 3;
             } else {
-                $hitung_bilik = 6 % $no_urutan;
-                $nomor_bilik = $hitung_bilik + 2;
+                $hitung_bilik = $no_urutan % 7;
+                if ($hitung_bilik == 0 || $hitung_bilik == 3) {
+                    $hitung_bilik++;
+                }
+                $nomor_bilik = $hitung_bilik;
             }
 
             $data_layanan_test = $this->layananTestModel->get_by_key(['id_layanan' => $id_layanan, 'id_test' => $id_test, 'id_pemeriksaan' => $id_pemeriksaan])->getRowArray();
@@ -899,7 +902,7 @@ class Peserta extends BaseController
     {
 
         $this->pembayaran_model = new PembayaranModel();
-
+        $this->kehadiran_model = new KehadiranModel();
 
         $today = date("Y-m-d");
         $customerDetail = $this->customerModel->detail_customer($id_peserta);

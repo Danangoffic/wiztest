@@ -511,7 +511,7 @@
             let phone = $("#phone").val().toString();
             let confirmPhone = $("#confirmphone").val().toString();
             let email = $("#email").val();
-            let jenis_kelamin = $("#jenis_kelamin").val();
+            let jenis_kelamin = $("[name=jenis_kelamin]:checked").val();
             let tempat_lahir = $("#tempat_lahir").val();
             let tgl_lahir = $("#tgl_lahir").val();
             let alamat = $("#alamat").val();
