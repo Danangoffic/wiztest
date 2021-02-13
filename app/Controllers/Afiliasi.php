@@ -27,7 +27,6 @@ use App\Models\TestModel;
 use CodeIgniter\RESTful\ResourceController;
 use PHPExcel;
 use PHPExcel_IOFactory;
-use PHPExcel_Settings;
 
 class Afiliasi extends ResourceController
 {
@@ -182,7 +181,6 @@ class Afiliasi extends ResourceController
             $new_name_file = $nama_instansi . "-" . date('dmYHis') . "{$id_instansi}-" . $fileexcel->getRandomName();
             $excelReader  = new PHPExcel();
             //mengambil lokasi temp file
-            PHPExcel_Settings::setZipClass(PHPExcel_Settings::PCLZIP);
             $fileLocation = $fileexcel->getTempName();
             //baca file
             $objPHPExcel = PHPExcel_IOFactory::load($fileLocation);

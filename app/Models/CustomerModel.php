@@ -79,7 +79,7 @@ class CustomerModel extends Model
             ->where('tgl_kunjungan', $tgl_kunjungan)->get();
     }
 
-    public function getCustomerAvailableByDate($jenis_test, $faskes_asal = '1', $tgl_kunjungan, $jam_kunjungan = null)
+    public function getCustomerAvailableByDate($jenis_test, $faskes_asal = '3', $tgl_kunjungan, $jam_kunjungan = null)
     {
         $query = db_connect()
             ->table('customers')
@@ -225,7 +225,7 @@ class CustomerModel extends Model
         if ($tipe == "antrian") {
             $builder->where('kehadiran', '23');
         }
-        $builder->where('is_printed', "0");
+        $builder->where('is_printed', 0);
         $builder->orderBy('no_antrian', 'ASC');
         return $builder->get();
     }
