@@ -24,7 +24,7 @@ class Instansi extends BaseController
     public $customers_corporate_model;
     public function __construct()
     {
-        $this->session = session();
+        $this->session = \config\Services::session();
         $this->kotaModel = new KotaModel();
         $this->marketingModel = new MarketingModel();
         $this->instansiModel = new InstansiModel();
@@ -75,9 +75,10 @@ class Instansi extends BaseController
             'tgl_lahir' => $tgl_lahir,
             'phone' => $phone,
             'email' => $email,
+            'afiliated' => "yes",
             'pic_marketing' => $pic_marketing,
-            'created_by' => session('id_user'),
-            'updated_by' => session('id_user')
+            'created_by' => $this->session->get('id_user'),
+            'updated_by' => $this->session->get('id_user')
         );
         try {
             $save = $this->instansiModel->insert($data_insert);
@@ -127,6 +128,7 @@ class Instansi extends BaseController
         $kehadiran_customers = $customerModel->deep_detail_by_id(null, $filter_instansi)->getResultArray();
         $filter_instansi['kehadiran'] = 22;
         $ketidak_hadiran_customers = $customerModel->deep_detail_by_id(null, $filter_instansi)->getResultArray();
+
         $total_kehadiran = count($kehadiran_customers);
         $total_customer = count($customers);
         $total_tidak_hadir = count($ketidak_hadiran_customers);
@@ -198,15 +200,16 @@ class Instansi extends BaseController
 
     public function update_instansi($id_instansi)
     {
-        $nama = $this->request->getVar('nama');
-        $alamat = $this->request->getVar('alamat');
-        $kota = $this->request->getVar('kota');
-        $nama_user = $this->request->getVar('nama_user');
-        $tempat_lahir = $this->request->getVar('tempat_lahir');
-        $tgl_lahir = $this->request->getVar('tgl_lahir');
-        $phone = $this->request->getVar('phone');
-        $email = $this->request->getVar('email');
-        $pic_marketing = $this->request->getVar('pic_marketing');
+        $nama = $this->request->getPost('nama');
+        $alamat = $this->request->getPost('alamat');
+        $kota = $this->request->getPost('kota');
+        $nama_user = $this->request->getPost('nama_user');
+        $tempat_lahir = $this->request->getPost('tempat_lahir');
+        $tgl_lahir = $this->request->getPost('tgl_lahir');
+        $phone = $this->request->getPost('phone');
+        $email = $this->request->getPost('email');
+        $pic_marketing = (int) $this->request->getPost('pic_marketing');
+        // dd($this->request->getPost());
         $data_insert = array(
             'nama' => $nama,
             'alamat' => $alamat,
@@ -217,21 +220,21 @@ class Instansi extends BaseController
             'phone' => $phone,
             'email' => $email,
             'pic_marketing' => $pic_marketing,
-            'created_by' => session('id_user'),
-            'updated_by' => session('id_user')
+            'created_by' => $this->session->get('id_user'),
+            'updated_by' => $this->session->get('id_user')
         );
         try {
             $save = $this->instansiModel->update($id_instansi, $data_insert);
+            // dd(db_connect()->showLastQuery());
             if ($save) {
                 $this->session->setFlashdata('success', 'Berhasil ubah instansi');
-                return redirect(base_url('backoffice/registrasi/instansi'));
             } else {
-                $this->session->setFlashdata('error', 'Gagal tambahkan instansi');
-                return redirect(base_url('backoffice/instansi/edit_instansi/' . $id_instansi));
+                $this->session->setFlashdata('error', 'Gagal Ubah instansi');
             }
+            return redirect()->to('/backoffice/instansi/edit/' . $id_instansi);
         } catch (\Throwable $th) {
-            $this->session->setFlashdata('error', 'Server error untuk tambahkan instansi');
-            return redirect(base_url('backoffice/instansi/edit_instansi/' . $id_instansi));
+            $this->session->setFlashdata('error', 'Server error untuk ubah instansi');
+            return redirect()->to('/backoffice/instansi/edit/' . $id_instansi);
         }
     }
 

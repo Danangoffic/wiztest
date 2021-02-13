@@ -77,4 +77,29 @@ class HasilLaboratoriumModel extends Model
             ->orderBy('id', 'desc');
         return $builder->get()->getResultArray();
     }
+
+    public function customers_by_test($id_test = false, $valid = "no", $date1 = false, $date2 = false)
+    {
+        $builder = db_connect()
+            ->table('customers a')
+            ->select("b.*, d.nama_test, e.nama_layanan, a.created_at as tgl_registrasi, a.nama, a.nik, a.customer_unique, a.jenis_kelamin, a.alamat, a.tgl_kunjungan, a.jam_kunjungan")
+            ->join('hasil_laboratorium b', 'a.id = b.id_customer')
+            ->join('data_layanan_test c', 'a.jenis_test = c.id')
+            ->join('jenis_test d', 'c.id_test = d.id')
+            ->join('jenis_layanan e', 'c.id_layanan = e.id');
+        if ($id_test) {
+            $builder->where('c.id_test', $id_test);
+        }
+        if ($date1 && $date2) {
+            $builder->where("a.tgl_kunjungan between '{$date1}' and '{$date2}' ");
+        } else {
+            if ($date1) {
+                $builder->where('a.tgl_kunjungan', $date1);
+            } elseif ($date2) {
+                $builder->where('a.tgl_kunjungan', $date2);
+            }
+        }
+        $builder->where('b.valid', $valid)->orderBy('b.id', 'DESC');
+        return $builder->get()->getResultArray();
+    }
 }

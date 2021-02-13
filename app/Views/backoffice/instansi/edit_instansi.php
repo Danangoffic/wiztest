@@ -30,7 +30,8 @@
                                 <h5 class="card-heading"><?= $title; ?></h5>
                             </div>
                             <div class="card-body">
-                                <form action="<?= base_url('backoffice/instansi/update/' . $id); ?>" method="post">
+                                <form action="/backoffice/instansi/update_instansi/<?= $id; ?>" method="post">
+                                    <?= csrf_field(); ?>
                                     <div class="form-group row">
                                         <label class="col-3" for="nama">Nama</label>
                                         <div class="col-9">
@@ -60,31 +61,31 @@
                                     <div class="form-group row">
                                         <label for="nama_user" class="col-3">Nama User</label>
                                         <div class="col-9">
-                                            <input type="text" class="form-control" id="nama_user" name="nama_user" required autocomplete="off" placeholder="Nama User" value="<?= $data_instansi['nama_user']; ?>">
+                                            <input type="text" class="form-control" id="nama_user" name="nama_user" autocomplete="off" placeholder="Nama User" value="<?= $data_instansi['nama_user']; ?>">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="tempat_lahir" class="col-3">Tempat Lahir</label>
                                         <div class="col-9">
-                                            <input type="text" class="form-control" id="tempat_lahir" name="tempat_lahir" required autocomplete="off" placeholder="Tempat Lahir" value="<?= $data_instansi['tempat_lahir']; ?>">
+                                            <input type="text" class="form-control" id="tempat_lahir" name="tempat_lahir" autocomplete="off" placeholder="Tempat Lahir" value="<?= $data_instansi['tempat_lahir']; ?>">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="tgl_lahir" class="col-3">Tanggal Lahir</label>
                                         <div class="col-9">
-                                            <input type="date" class="form-control" id="tgl_lahir" name="tgl_lahir" required autocomplete="off" value="<?= $data_instansi['tgl_lahir']; ?>">
+                                            <input type="date" class="form-control" id="tgl_lahir" name="tgl_lahir" autocomplete="off" value="<?= $data_instansi['tgl_lahir']; ?>">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="phone" class="col-3">Nomor HP</label>
                                         <div class="col-9">
-                                            <input type="number" class="form-control" id="phone" name="phone" required autocomplete="off" placeholder="Nomor HP" value="<?= $data_instansi['phone']; ?>">
+                                            <input type="number" class="form-control" id="phone" name="phone" autocomplete="off" placeholder="Nomor HP" value="<?= $data_instansi['phone']; ?>">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="email" class="col-3">Email</label>
                                         <div class="col-9">
-                                            <input type="email" class="form-control" id="email" name="email" required autocomplete="off" placeholder="Email Instansi. Contoh: Email@mail.com" value="<?= $data_instansi['email']; ?>">
+                                            <input type="email" class="form-control" id="email" name="email" autocomplete="off" placeholder="Email Instansi. Contoh: Email@mail.com" value="<?= $data_instansi['email']; ?>">
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -102,7 +103,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <button class="btn btn-default" id="backButton" role="button" type="button" onclick="history.back()"><i class="fa fa-chevron-left"></i> Kembali</button>
+                                        <a class="btn btn-default" id="backButton" role="button" type="button" href="/backoffice/instansi/<?= $id; ?>"><i class="fa fa-chevron-left"></i> Kembali</a>
                                         <button class="btn btn-success" id="saveButton" role="button" type="submit"><i class="fa fa-save"></i> Simpan</button>
                                     </div>
                                 </form>
@@ -112,18 +113,6 @@
                 </div>
             </section>
         </div>
-
-        <script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js'); ?>"></script>
-        <script src="<?= base_url('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'); ?>"></script>
-        <script src="<?= base_url('assets/plugins/datatables-responsive/js/dataTables.responsive.min.js'); ?>"></script>
-        <script src="<?= base_url('assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js'); ?>"></script>
-        <script src="<?= base_url('assets/plugins/datatables-buttons/js/dataTables.buttons.min.js'); ?>"></script>
-        <script src="<?= base_url('assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js'); ?>"></script>
-        <script>
-            $(document).ready(() => {
-                $("#data_customer").DataTable();
-            });
-        </script>
         <?= $this->endSection(); ?>
     </section>
 </div>

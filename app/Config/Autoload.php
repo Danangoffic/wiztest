@@ -50,9 +50,9 @@ class Autoload extends AutoloadConfig
 			'App'         => APPPATH,                // To ensure filters, etc still found,
 			APP_NAMESPACE => APPPATH,                // For custom namespace
 			'Config'      => APPPATH . 'Config',
-			'TCPDF'      => APPPATH . 'ThirdParty/tecnickcom',
+			// 'TCPDF'      => APPPATH . 'ThirdParty/tecnickcom',
 			'Escpos'      => APPPATH . 'ThirdParty/Escpos',
-			'Dompdf'	 => APPPATH . "ThirdParty/Dompdf/Dompdf/src"
+			'Dompdf'	 => APPPATH . "ThirdParty/Dompdf/src"
 			// 'escpospos'	  => ROOTPATH . "vendor/autoload.php"
 		];
 

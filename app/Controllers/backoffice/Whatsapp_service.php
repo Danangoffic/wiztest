@@ -47,7 +47,7 @@ class Whatsapp_service extends ResourceController
     {
         // header('Content-Type: application/json; charset=utf-8');
 
-        $cek_customer = $this->customer_model->find($id_customer);
+        $cek_customer = $this->customer_model->deep_detail_by_id($id_customer)->getRowArray();
         if ($cek_customer == null) {
             return $this->failForbidden();
         }
@@ -64,22 +64,21 @@ class Whatsapp_service extends ResourceController
         // } else {
         //     $new_phone = $phone;
         // }
-        $jenis_test = $cek_customer['jenis_test'];
-        $layanan_test = $this->layanan_test_model->find($jenis_test);
-        $id_layanan = $layanan_test['id_layanan'];
-        $id_test = $layanan_test['id_test'];
-        $layanan = $this->layanan_model->find($id_layanan);
-        $test = $this->test_model->find($id_test);
         $tgl_kunjungan = $cek_customer['tgl_kunjungan'];
-        $nama_layanan = $layanan['nama_layanan'];
-        $nama_test = $test['nama_test'];
+        $nama_layanan = $cek_customer['nama_layanan'];
+        $nama_test = $cek_customer['nama_test'];
+
+        $nama_pesanan = "{$nama_test} {$nama_layanan}";
 
         // MAKE SURE PHONE NUMBER USING REGION CODE
         // $APIkey = $api_key_wasap;
         // $phone = $new_phone;
-        $message = 'Terima kasih kepada Bpk/Ibu ' . $cek_customer['nama'] .
-            " yang telah melakukan pembayaran pada kami untuk mengikuti test *{$jenis_test}* pada tanggal *{$tgl_kunjungan}*. \n
-            Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.";
+        $message = "Terima kasih kepada Bpk/Ibu {$cek_customer['nama']}, \n" .
+            "telah melakukan pembayaran pada kami untuk mengikuti Test *{$nama_test}* pada tanggal *{$tgl_kunjungan}*." .
+            "Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.";
+        // $message = 'Terima kasih kepada Bpk/Ibu ' . $cek_customer['nama'] .
+        //     " yang telah melakukan pembayaran pada kami untuk mengikuti test *{$nama_test}* pada tanggal *{$tgl_kunjungan}*. \n
+        //     Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.";
         $str = base_url("/api/hadir/" . $id_customer);
         $url_img = $this->layanan_bo->getUrlQRCode($str);
         // $image = "<img download src=data:image/png;base64," . base64_encode($url_img) . ">";
@@ -90,16 +89,8 @@ class Whatsapp_service extends ResourceController
             'message' => $message,
             'urlDownloadImage' => $url_img,
         );
-        $this->curl = curl_init();
-        curl_setopt($this->curl, CURLOPT_URL, $url);
-        curl_setopt($this->curl, CURLOPT_HEADER, 0);
-        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($this->curl, CURLOPT_TIMEOUT, 600);
-        curl_setopt($this->curl, CURLOPT_POST, 1);
-        curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
-        $result = curl_exec($this->curl);
+
+        $result = $this->send_curl($url, $data);
         if (!$result) {
             // return $this->fail('failed', 400, 'failed');
             return false;
@@ -131,7 +122,7 @@ class Whatsapp_service extends ResourceController
         if ($id_customer == null) {
             return $this->failForbidden();
         }
-        $cek_customer = $this->customer_model->find($id_customer);
+        $cek_customer = $this->customer_model->deep_detail_by_id($id_customer)->getRowArray();
         if ($cek_customer == null) {
             return $this->failNotFound();
         }
@@ -141,31 +132,19 @@ class Whatsapp_service extends ResourceController
             return $this->fail("mobile phone is not recognised", 400, 'Failed');
         }
         $new_phone = $this->new_phone_number($phone);
-        // $get_0 = substr($phone, 0, 1);
-        // if ($get_0 == "0") {
-        //     $new_0_to_region = str_replace("0", "+62", $get_0);
-        //     $new_phone = (int)$phone;
-        //     $new_phone = $new_0_to_region . $new_phone;
-        // } else {
-        //     $new_phone = $phone;
-        // }
-        $jenis_test = $cek_customer['jenis_test'];
-        $layanan_test = $this->layanan_test_model->find($jenis_test);
-        $id_layanan = $layanan_test['id_layanan'];
-        $id_test = $layanan_test['id_test'];
-        $layanan = $this->layanan_model->find($id_layanan);
-        $test = $this->test_model->find($id_test);
+
+
         $tgl_kunjungan = $cek_customer['tgl_kunjungan'];
         $nama = $cek_customer['nama'];
-        $nama_layanan = $layanan['nama_layanan'];
-        $nama_test = $test['nama_test'];
+        $nama_layanan = $cek_customer['nama_layanan'];
+        $nama_test = $cek_customer['nama_test'];
 
         // MAKE SURE PHONE NUMBER USING REGION CODE
         // $APIkey = $api_key_wasap;
         // $phone = $new_phone;
-        $message = "Terima kasih kepada Bpk/Ibu {$nama} " .
-            " yang telah melakukan pembayaran pada kami untuk mengikuti test *{$jenis_test}* pada tanggal *{$tgl_kunjungan}*. \n
-            Berikut kami lampirkan Invoice. " . base_url('/api/print_invoice/no-ttd/' . $no_invoice);
+        $message = "Terima kasih kepada Bpk/Ibu {$nama}, \n" .
+            "telah melakukan pembayaran pada kami untuk mengikuti Test *{$nama_test}* pada tanggal *{$tgl_kunjungan}*." .
+            "Berikut kami lampirkan link untuk Invoice pembayaran anda.\n" . base_url('/api/print_invoice/no-ttd/' . $no_invoice);
 
         $url = $this->url_send_txt;
         $data = array(
@@ -173,16 +152,9 @@ class Whatsapp_service extends ResourceController
             'phoneNumber'  => $new_phone,
             'message' => $message
         );
-        $this->curl = curl_init();
-        curl_setopt($this->curl, CURLOPT_URL, $url);
-        curl_setopt($this->curl, CURLOPT_HEADER, 0);
-        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($this->curl, CURLOPT_TIMEOUT, 600);
-        curl_setopt($this->curl, CURLOPT_POST, 1);
-        curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
-        $result = curl_exec($this->curl);
+
+
+        $result = $this->send_curl($url, $data);
         if (!$result) {
             // return $this->fail('failed', 400, 'failed');
             return false;
@@ -190,6 +162,42 @@ class Whatsapp_service extends ResourceController
         }
         curl_close($this->curl);
         // return $this->respond($result, 200, 'success');
+        return true;
+    }
+
+    public function send_hasil_test($customer)
+    {
+        $phone = $customer['phone'];
+        if ($phone == "" || $phone == null) {
+            return $this->fail("mobile phone is not recognised", 400, 'Failed');
+        }
+        $new_phone = $this->new_phone_number($phone);
+
+        $tgl_kunjungan = $customer['tgl_kunjungan'];
+        $nama = $customer['nama'];
+        $nama_layanan = $customer['nama_layanan'];
+        $nama_test = $customer['nama_test'];
+
+        // MAKE SURE PHONE NUMBER USING REGION CODE
+        // $APIkey = $api_key_wasap;
+        // $phone = $new_phone;
+        $message = "Terima kasih kepada Bpk/Ibu {$nama} \n" .
+            " telah melakukan Test *{$nama_test}* pada klinik kami pada tanggal *{$tgl_kunjungan}*." .
+            "Berikut kami lampirkan link untuk hasil test anda.\n" . base_url('/api/get_hasil_lab/' . $customer['id']);
+
+        $url = $this->url_send_txt;
+        $data = array(
+            'APIKey'     => $this->api_key,
+            'phoneNumber'  => $new_phone,
+            'message' => $message
+        );
+
+
+        $result = $this->send_curl($url, $data);
+        if (!$result) {
+            return false;
+        }
+        curl_close($this->curl);
         return true;
     }
 

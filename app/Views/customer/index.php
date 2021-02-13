@@ -452,7 +452,7 @@
             let marketing = $("#marketing").val();
             let jenis_layanan_test = $("#jenis_layanan_test").val();
             let instansi = 1;
-            let faskes_asal = 1;
+            let faskes_asal = 3;
             let jenis_pemeriksaan = 1;
             let jenis_test = $("[name=jenis_test]:checked").val();
 
