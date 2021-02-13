@@ -57,15 +57,15 @@ class Instansi extends BaseController
 
     public function save_instansi()
     {
-        $nama = $this->request->getVar('nama');
-        $alamat = $this->request->getVar('alamat');
-        $kota = $this->request->getVar('kota');
-        $nama_user = $this->request->getVar('nama_user');
-        $tempat_lahir = $this->request->getVar('tempat_lahir');
-        $tgl_lahir = $this->request->getVar('tgl_lahir');
-        $phone = $this->request->getVar('phone');
-        $email = $this->request->getVar('email');
-        $pic_marketing = $this->request->getVar('pic_marketing');
+        $nama = $this->request->getPost('nama');
+        $alamat = $this->request->getPost('alamat');
+        $kota = $this->request->getPost('kota');
+        $nama_user = $this->request->getPost('nama_user');
+        $tempat_lahir = $this->request->getPost('tempat_lahir');
+        $tgl_lahir = $this->request->getPost('tgl_lahir');
+        $phone = $this->request->getPost('phone');
+        $email = $this->request->getPost('email');
+        $pic_marketing = $this->request->getPost('pic_marketing');
         $data_insert = array(
             'nama' => $nama,
             'alamat' => $alamat,
@@ -84,14 +84,14 @@ class Instansi extends BaseController
             $save = $this->instansiModel->insert($data_insert);
             if ($save) {
                 $this->session->setFlashdata('success', 'Berhasil tambahkan instansi');
-                return redirect()->to("/backoffice/registrasi/instansi");
+                return redirect()->to("/backoffice/instansi");
             } else {
                 $this->session->setFlashdata('error', 'Gagal tambahkan instansi');
-                return redirect()->to("/backoffice/instansi/create");
+                return redirect()->to("/backoffice/create");
             }
         } catch (\Throwable $th) {
             $this->session->setFlashdata('error', 'Server error untuk tambahkan instansi');
-            return redirect()->to('/backoffice/instansi/create');
+            return redirect()->to('/backoffice/create');
         }
     }
 

@@ -117,10 +117,8 @@
                                 ?>
                                 <div class="col-md-8">
                                     <select name="result" required id="result" class="form-control select2">
-                                        <?php foreach ($status_hasil as $hasil => $val) {
-                                            $selected = $val == $detail_hasil_lab['status_cov'] ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        }; ?>
+                                        <option value="Positive" <?= ($detail_hasil_lab['status_cov'] == "Positive") ? "selected" : ""; ?>>Positive</option>
+                                        <option value="Negative" <?= ($detail_hasil_lab['status_cov'] == "Negative") ? "selected" : ""; ?>>Negative</option>
                                     </select>
                                 </div>
                             </div>
@@ -131,10 +129,9 @@
                                 ?>
                                 <div class="col-md-8">
                                     <select name="status_gene" id="status_gene" class="form-control select2">
-                                        <?php foreach ($status_gene_n as $gen => $val) {
-                                            $selected = ($val == $detail_hasil_lab['status_gene']) ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        } ?>
+                                        <option value="Positive" <?= ($detail_hasil_lab['status_gene'] == "Positive") ? "selected" : ""; ?>>Positive</option>
+                                        <option value="Negative" <?= ($detail_hasil_lab['status_gene'] == "Negative") ? "selected" : ""; ?>>Negative</option>
+
                                     </select>
                                 </div>
                             </div>
@@ -144,10 +141,9 @@
                                 ?>
                                 <div class="col-md-8">
                                     <select name="status_orf" id="status_orf" class="form-control select2">
-                                        <?php foreach ($status_ngene as $ngene => $val) {
-                                            $selected = ($val == $detail_hasil_lab['status_orf']) ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        } ?>
+                                        <option value="Positive" <?= ($detail_hasil_lab['status_orf'] == "Positive") ? "selected" : ""; ?>>Positive</option>
+                                        <option value="Negative" <?= ($detail_hasil_lab['status_orf'] == "Negative") ? "selected" : ""; ?>>Negative</option>
+
                                     </select>
                                 </div>
                             </div>
@@ -178,10 +174,8 @@
                                 ?>
                                 <div class="col-md-8">
                                     <select name="result" required id="result" class="form-control select2">
-                                        <?php foreach ($status_hasil as $hasil => $val) {
-                                            $selected = $val == $detail_hasil_lab['status_cov'] ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        }; ?>
+                                        <option value="Positive" <?= ($detail_hasil_lab['status_cov'] == "Positive") ? "selected" : ""; ?>>Positive</option>
+                                        <option value="Negative" <?= ($detail_hasil_lab['status_cov'] == "Negative") ? "selected" : ""; ?>>Negative</option>
                                     </select>
                                 </div>
 
@@ -192,10 +186,8 @@
                                 ?>
                                 <div class="col-md-8">
                                     <select name="status_orf" id="status_orf" class="form-control select2">
-                                        <?php foreach ($status_ngene as $ngene => $val) {
-                                            $selected = ($val == $detail_hasil_lab['status_orf']) ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        } ?>
+                                        <option value="Positive" <?= ($detail_hasil_lab['status_orf'] == "Positive") ? "selected" : ""; ?>>Positive</option>
+                                        <option value="Negative" <?= ($detail_hasil_lab['status_orf'] == "Negative") ? "selected" : ""; ?>>Negative</option>
                                     </select>
                                 </div>
                             </div>
@@ -207,17 +199,15 @@
                                     'id' => 'nilai_ct_orf',
                                     'required'
                                 ];
-                                echo "<div class=\"col-md-8\">" . form_input('nilai_ct_orf', '0', $atribut_ct, 'number') . "</div>";
+                                echo "<div class=\"col-md-8\">" . form_input('nilai_ct_orf', "{$detail_hasil_lab['value_orf']}", $atribut_ct, 'number') . "</div>";
                                 ?>
                             </div>
                             <div class="form-group row">
                                 <?= form_label('Gene Hex/N', 'gene_hex_n', $atribut_label); ?>
                                 <div class="col-md-8">
                                     <select name="status_gene" id="status_gene" class="form-control select2">
-                                        <?php foreach ($status_gene_n as $gen => $val) {
-                                            $selected = ($val == $detail_hasil_lab['status_gene']) ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        } ?>
+                                        <option value="Positive" <?= ($detail_hasil_lab['status_gene'] == "Positive") ? "selected" : ""; ?>>Positive</option>
+                                        <option value="Negative" <?= ($detail_hasil_lab['status_gene'] == "Negative") ? "selected" : ""; ?>>Negative</option>
                                     </select>
                                 </div>
                             </div>
@@ -229,7 +219,7 @@
                                     'id' => 'nilai_ct_hex_n',
                                     'required'
                                 ];
-                                echo "<div class=\"col-md-8\">" . form_input('nilai_ct_hex_n', '0', $atribut_ct_hex_n, 'number') . "</div>";
+                                echo "<div class=\"col-md-8\">" . form_input('nilai_ct_hex_n', "{$detail_hasil_lab['value_n_gene']}", $atribut_ct_hex_n, 'number') . "</div>";
                                 ?>
                             </div>
                             <div class="form-group row">

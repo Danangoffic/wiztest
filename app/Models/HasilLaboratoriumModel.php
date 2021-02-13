@@ -65,7 +65,7 @@ class HasilLaboratoriumModel extends Model
     public function by_id_customer($id_customer = null)
     {
         if ($id_customer == null) return $id_customer;
-        $builder = db_connect()->table($this->table)->where('id_customer', $id_customer)->limit(1);
+        $builder = db_connect()->table($this->table)->where('id_customer', $id_customer)->select()->limit(1);
         return $builder->get()->getRowArray();
     }
 

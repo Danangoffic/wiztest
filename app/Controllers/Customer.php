@@ -700,11 +700,12 @@ class Customer extends ResourceController
         $id_segmen = $this->request->getVar('segmen');
         // dd($this->request->getVar());
         try {
-            $check_jenis_test = $this->testModel->find($id_jenis_test);
+            $check_jenis_test = $this->layananTestModel->find($id_jenis_test);
+            // echo dd(db_connect()->showLastQuery());
             // echo "Hasil id : {$check_jenis_test['id']}";
             if ($check_jenis_test['id']) {
-                $check_data_layanan_test = $this->layananTestModel
-                    ->where(['id_test' => $id_jenis_test, 'id_pemeriksaan' => $id_jenis_pemeriksaan, 'id_segmen' => $id_segmen])->get()->getResultArray();
+                $check_data_layanan_test = $this->layananTestModel->where(['id_test' => $id_jenis_test, 'id_pemeriksaan' => $id_jenis_pemeriksaan, 'id_segmen' => $id_segmen])->get()->getResultArray();
+
                 if ($check_data_layanan_test != null) {
                     $data = array();
                     foreach ($check_data_layanan_test as $key => $dlt) {
@@ -728,6 +729,48 @@ class Customer extends ResourceController
             } else {
                 return $this->failForbidden();
             }
+        } catch (\Throwable $th) {
+            return $this->respond(array('message' => $th->getMessage()), 500, 'error');
+        }
+    }
+
+    public function select_test_corporate()
+    {
+        $this->testModel = new TestModel();
+        $this->layananModel = new LayananModel();
+        $this->layananTestModel = new LayananTestModel();
+
+        $id_test = $this->request->getVar('id_test');
+        $id_jenis_pemeriksaan = $this->request->getVar('type');
+        $id_segmen = $this->request->getVar('segmen');
+        // $data_test = $this->layananTestModel->where(['id_test' => $id_test, 'id_pemeriksaan' => $id_jenis_pemeriksaan, 'id_segmen' => $id_segmen])->get()->getResultArra();
+        // dd($this->request->getVar());
+        try {
+            $check_data_layanan_test = $this->layananTestModel->where(['id_test' => $id_test, 'id_pemeriksaan' => $id_jenis_pemeriksaan, 'id_segmen' => $id_segmen])->get()->getResultArray();
+
+            if ($check_data_layanan_test != null) {
+                $data = array();
+                foreach ($check_data_layanan_test as $key => $dlt) {
+                    $detail_layanan = $this->layananModel->find($dlt['id_layanan']);
+                    $detail_test = $this->testModel->find($dlt['id_test']);
+                    $data[] = array(
+                        'id' => $dlt['id'],
+                        'biaya' => $dlt['biaya'],
+                        'nama_layanan' => $detail_layanan['nama_layanan'],
+                        'nama_test' => $detail_test['nama_test']
+                    );
+                }
+                if (count($data) > 0) {
+                    return $this->respond(array('data' => $data), 200, 'success');
+                } else {
+                    return $this->failNotFound('not found');
+                }
+            } else {
+                return $this->failNotFound('not found');
+            }
+            // } else {
+            //     return $this->failForbidden();
+            // }
         } catch (\Throwable $th) {
             return $this->respond(array('message' => $th->getMessage()), 500, 'error');
         }
