@@ -12,7 +12,7 @@
                         <div class="alert alert-success alert-dismissible">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                             <h5><i class="icon fas fa-check"></i> Berhasil</h5>
-                            <p><?= session()->getFlashdata('success'); ?></p>
+                            <p><?= $session->getFlashdata('success'); ?></p>
                         </div>
                     <?php
                     }
@@ -21,7 +21,7 @@
                         <div class="alert alert-warning alert-dismissible">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                             <h5><i class="icon fas fa-exclamation-triangle"></i> Gagal!</h5>
-                            <p><?= session()->getFlashdata('error'); ?></p>
+                            <p><?= $session->getFlashdata('error'); ?></p>
                         </div>
                     <?php
                     }
@@ -159,7 +159,7 @@
                                     'id' => 'nilai_ic',
                                     'required'
                                 ];
-                                echo "<div class=\"col-md-8\">" . form_input('nilai_ic', $detail_hasil_lab['value_ic'], $atribut_nilai_ic, 'number') . "</div>";
+                                echo "<div class=\"col-md-8\">" . form_input('nilai_ic', "{$detail_hasil_lab['value_ic']}", $atribut_nilai_ic, 'number') . "</div>";
                                 ?>
                             </div>
                         </div>
@@ -240,7 +240,7 @@
                                     'id' => 'nilai_ic',
                                     'required'
                                 ];
-                                echo "<div class=\"col-md-8\">" . form_input('nilai_ic', $detail_hasil_lab['value_ic'], $atribut_nilai_ic, 'number') . "</div>";
+                                echo "<div class=\"col-md-8\">" . form_input('nilai_ic', "{$detail_hasil_lab['value_ic']}", $atribut_nilai_ic, 'number') . "</div>";
                                 ?>
                             </div>
                         </div>

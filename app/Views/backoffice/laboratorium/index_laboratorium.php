@@ -58,11 +58,11 @@
             <div class="col-12">
                 <div class="card card-primary">
                     <h5 class="card-header"><?= $title; ?></h5>
-                    <div class="card-body">
-                        <a href="import_data" class="btn btn-success btn-sm mb-3">Import Excel PCR</a>
+                    <div class="card-body p-0">
+                        <!-- <a href="import_data" class="btn btn-success btn-sm mb-3">Import Excel PCR</a>
                         <a href="insert_antigen" class="btn btn-success btn-sm mb-3">Insert Data Antigen</a>
-                        <a href="insert_rapid" class="btn btn-success btn-sm mb-3">Insert Data Rapid Test</a>
-                        <div class="table-responsive">
+                        <a href="insert_rapid" class="btn btn-success btn-sm mb-3">Insert Data Rapid Test</a> -->
+                        <div class="table-responsive m-0">
                             <table class="table table-bordered table-sm table-condensed" id="data_laboratorium">
                                 <thead class="text-center text-justify">
                                     <tr>
@@ -91,6 +91,9 @@
                                     </tr>
                                 </thead>
                                 <tbody id="data_hasil2">
+                                    <tr>
+                                        <td colspan="18" class="text-center">Loading...</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -145,7 +148,7 @@
                         <td>${v.catatan}</td>
                         <td>
                             <a class="btn btn-success btn-sm my-2" target="_blank" href="/backoffice/laboratorium/input/${v.id_customer}">Input</a>
-                            <a class="btn btn-primary btn-sm my-2" target="_blank" href="/backoffice/laboratorium/print/${v.id_customer}">Cetak&nbsp;Hasil</a>
+                            <a class="btn btn-primary btn-sm my-2" target="_blank" href="/api/get_hasil_lab/${v.id_customer}">Cetak&nbsp;Hasil</a>
                         </td>
                     </tr>
                     `

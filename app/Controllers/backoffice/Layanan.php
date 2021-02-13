@@ -136,7 +136,7 @@ class Layanan extends ResourceController
         $html = view('backoffice/layanan/invoice_pdf_print', $data);
         $this->dompdf->setPageOrientation('L');
         $this->dompdf->setCellMargins(0, 0, 0, 0);
-        $this->dompdf->SetCreator(PDF_CREATOR);
+        $this->dompdf->SetCreator("PT QUICKTEST LABORATORIUM INDONESIA");
         $this->dompdf->SetAuthor('QUICKTEST LABORATORIUM INDONESIA');
         $this->dompdf->SetTitle('Invoice');
         $this->dompdf->SetSubject('Invoice');

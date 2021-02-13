@@ -100,7 +100,7 @@ class CustomerModel extends Model
         $builder = $db->table('customers a')->select('a.*, b.nama as nama_instansi, c.nama_marketing')
             ->join('instansi b', 'b.id = a.instansi')
             ->join('marketing c', 'c.id = a.id_marketing');
-        $builder->where('a.inoice_number', $invoiceNumber);
+        $builder->where('a.invoice_number', $invoiceNumber);
         return $builder->get();
     }
 
@@ -264,7 +264,8 @@ class CustomerModel extends Model
         $builder = $db->table('customers a')->select('a.*, 
         b.nama as nama_instansi, 
         c.nama_marketing, 
-        d.biaya, e.nama_layanan, f.nama_test, g.nama_pemeriksaan, 
+        d.biaya, d.id_test, d.id_layanan, d.id_pemeriksaan, d.id_segmen, 
+        e.nama_layanan, f.nama_test, g.nama_pemeriksaan, 
         h.tipe_pembayaran, h.va_number, h.amount, h.jenis_pembayaran, h.status_pembayaran')
             ->join('instansi b', 'b.id = a.instansi')
             ->join('marketing c', 'c.id = a.id_marketing')
@@ -273,6 +274,7 @@ class CustomerModel extends Model
             ->join('jenis_test f', 'f.id = d.id_test')
             ->join('jenis_pemeriksaan g', 'g.id = d.id_pemeriksaan')
             ->join('data_pembayaran h', 'h.id_customer = a.id');
+
         if ($extra != null) {
             if (array_key_exists('is_corporate', $extra)) {
                 $is_corporate = $extra['is_corporate'];
@@ -335,7 +337,7 @@ class CustomerModel extends Model
         }
 
         if ($id != null) {
-            $builder->where('a.id', $id);
+            $builder->where('a.id', $id)->limit(1);
         }
         return $builder->get();
     }

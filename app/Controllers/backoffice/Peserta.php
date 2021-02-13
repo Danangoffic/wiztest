@@ -344,7 +344,17 @@ class Peserta extends BaseController
                 'status_pembayaran' => $status_pembayaran,
                 'jenis_pembayaran' => $status_pembayaran
             ];
+
+            $this->hasil_lab = new HasilLaboratoriumModel();
             $insertPembayaran = $this->pembayaran_model->insert($dataInsertPembayaran);
+
+            if ($id_jenis_test_customer == 2 || $id_jenis_test_customer == 3) {
+                $dataInsertHasilAwal = [
+                    'valid' => "no",
+                    'id_customer' => $insert_id
+                ];
+                $insertHasil = $this->hasil_lab->insert($dataInsertHasilAwal);
+            }
             $id_pembayaran = $this->pembayaran_model->getInsertID();
             if ($id_pembayaran && $insertPembayaran) {
                 if ($status_pembayaran == "Lunas" || $status_pembayaran == "Invoice") {

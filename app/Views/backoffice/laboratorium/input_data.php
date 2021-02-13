@@ -404,7 +404,7 @@
                                 <button class="btn btn-secondary btn-sm" onclick="return window.close()">Kembali</button>
                                 <button href="" class="btn btn-success btn-sm">Simpan</button>
                                 <a href="/api/get_hasil_lab/<?= $customer['id']; ?>" class="btn btn-primary btn-sm">Cetak Hasil(en)</a>
-                                <button class="btn btn-primary btn-sm" type="button" onclick="kirim_hasil()">Kirim Hasil</button>
+                                <a class="btn btn-primary btn-sm" type="button" href="send_hasil_peserta/<?= $customer['id']; ?>">Kirim Hasil</a>
                             </div>
                         </div>
                     </div>
@@ -423,7 +423,7 @@
 
     function kirim_hasil() {
         let id_customer = <?= $customer['id']; ?>;
-        $.post("<?= base_url('api/kirim-hasil'); ?>", {
+        $.get("<?= base_url('backoffice/laboratorium/send_hasil_peserta/'); ?>" + id_customer, {
             id_customer
         }, (data) => {
 
