@@ -104,6 +104,7 @@ class Customer extends ResourceController
         $detail_layanan_test = $this->layanan_test_model->find($jenis_test);
         $jenis_pemeriksaan = $detail_layanan_test['id_pemeriksaan'];
         $jenis_layanan = $detail_layanan_test['id_layanan'];
+        $id_test = $detail_layanan_test['id_test'];
         $faskes_asal = $this->request->getPost('faskes_asal');
         $instansi = $this->request->getPost('instansi');
         $kehadiran = 0;
@@ -123,10 +124,10 @@ class Customer extends ResourceController
             $dataMarketing = $this->marketing_model->find($marketing);
             $dataLayanan = $this->layananModel->find($jenis_layanan);
 
-            if ($jenis_test == 2 || $jenis_test == "2" || $jenis_test == 3 || $jenis_test == "3") {
+            if ($id_test == 2 || $id_test == "2" || $id_test == 3 || $id_test == "3") {
                 $nomor_bilik = 3;
             } else {
-                $hitung_bilik = 7 % $no_urutan;
+                $hitung_bilik = $no_urutan % 7;
                 if ($hitung_bilik == 0 || $hitung_bilik == 3) {
                     $hitung_bilik++;
                 }
