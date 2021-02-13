@@ -41,6 +41,7 @@ $routes->get('/detail_form2', 'Customer::detail_form2');
 $routes->get('/cek_jadwal', 'Customer::jadwal_available');
 $routes->get('/menu', 'Customer::getMenu');
 $routes->get('/select-test', 'Customer::getSelectedTest');
+$routes->get("/select-test-corporate", "Customer::select_test_corporate");
 $routes->get('/home-service', 'Customer::home_service');
 $routes->post('/api/registration', 'Customer::registrasi');
 $routes->post('/api/get_server_key', 'Customer::get_server_key');

@@ -41,19 +41,19 @@
                             <div class="form-group row">
                                 <label for="nama_user" class="col-3">Nama User</label>
                                 <div class="col-9">
-                                    <input type="text" class="form-control" id="nama_user" name="nama_user" required autocomplete="off" placeholder="Nama User">
+                                    <input type="text" class="form-control" id="nama_user" name="nama_user" autocomplete="off" placeholder="Nama User">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="tempat_lahir" class="col-3">Tempat Lahir</label>
                                 <div class="col-9">
-                                    <input type="text" class="form-control" id="tempat_lahir" name="tempat_lahir" required autocomplete="off" placeholder="Tempat Lahir">
+                                    <input type="text" class="form-control" id="tempat_lahir" name="tempat_lahir" autocomplete="off" placeholder="Tempat Lahir">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="tgl_lahir" class="col-3">Tanggal Lahir</label>
                                 <div class="col-9">
-                                    <input type="date" class="form-control" id="tgl_lahir" name="tgl_lahir" required autocomplete="off">
+                                    <input type="date" class="form-control" id="tgl_lahir" name="tgl_lahir" autocomplete="off">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -65,13 +65,13 @@
                             <div class="form-group row">
                                 <label for="email" class="col-3">Email</label>
                                 <div class="col-9">
-                                    <input type="email" class="form-control" id="email" name="email" required autocomplete="off" placeholder="Email Instansi. Contoh: Email@mail.com">
+                                    <input type="email" class="form-control" id="email" name="email" autocomplete="off" placeholder="Email Instansi. Contoh: Email@mail.com">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="pic_marketing" class="col-3">PIC Marketing</label>
                                 <div class="col-9">
-                                    <select name="pic_marketing" id="pic_marketing" class="form-control">
+                                    <select name="pic_marketing" id="pic_marketing" required class="form-control">
                                         <?php
                                         foreach ($data_marketing as $key => $value) {
                                         ?>
