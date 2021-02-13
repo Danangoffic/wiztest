@@ -24,7 +24,6 @@ use CodeIgniter\RESTful\ResourceController;
 use Dompdf\Dompdf;
 use PHPExcel;
 use PHPExcel_IOFactory;
-use PHPExcel_Settings;
 
 // use App\Controllers;
 // use CodeIgniter\Controller;
