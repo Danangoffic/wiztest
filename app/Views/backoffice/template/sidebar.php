@@ -173,8 +173,12 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
+                <?php
+                $menu_open = ($page == 'instansi' || $page == 'invoice' || $page == 'invoice_aps') ? 'menu-is-open menu-open' : '';
+                $menu_aktif = ($page == 'instansi' || $page == 'invoice' || $page == 'invoice_aps') ? 'active' : '';
+                ?>
+                <li class="nav-item <?= $menu_open; ?>">
+                    <a href="#" class="nav-link <?= $menu_aktif; ?>">
                         <i class="nav-icon fas fa-edit"></i>
                         <p>
                             Finance
@@ -183,27 +187,31 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="<?= base_url('backoffice/finance/instansi'); ?>" class="nav-link">
+                            <a href="<?= base_url('backoffice/finance/instansi'); ?>" class="nav-link <?= ($page == "instansi") ? "active" : ""; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Data Instansi</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= base_url('backoffice/finance/invoice'); ?>" class="nav-link">
+                            <a href="<?= base_url('backoffice/finance/invoice'); ?>" class="nav-link <?= ($page == "invoice") ? "active" : ""; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Data Invoice</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?= base_url('backoffice/finance/invoice_aps'); ?>" class="nav-link">
+                            <a href="<?= base_url('backoffice/finance/invoice_aps'); ?>" class="nav-link <?= ($page == "invoice_aps") ? "active" : ""; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Data Invoice APS</p>
                             </a>
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
+                <?php
+                $menu_open = ($page == 'faskes' || $page == 'marketing' || $page == 'dokter' || $page == "petugas" || $page == "kota" || $page == "lokasi" || $page == "user") ? 'menu-is-open menu-open' : '';
+                $menu_aktif = ($page == 'faskes' || $page == 'marketing' || $page == 'dokter' || $page == "petugas" || $page == "kota" || $page == "lokasi" || $page == "user") ? 'active' : '';
+                ?>
+                <li class="nav-item <?= $menu_open; ?>">
+                    <a href="#" class="nav-link <?= $menu_aktif; ?>">
                         <i class="nav-icon fas fa-table"></i>
                         <p>
                             Master Data
@@ -215,6 +223,12 @@
                             <a href="<?= base_url('backoffice/faskes'); ?>" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Faskes Asal</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/backoffice/marketing" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Marketing</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -348,12 +362,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="/led/1" class="nav-link">
                         <p>Tampilan Antrian Swab</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="/led/3" class="nav-link">
                         <p>Tampilan Antrian Rapid/Antigen</p>
                     </a>
                 </li>
