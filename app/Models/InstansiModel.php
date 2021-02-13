@@ -15,6 +15,15 @@ class InstansiModel extends Model
     protected $allowedFields = [
         'nama',
         'alamat',
+        'nama_user',
+        'tempat_lahir',
+        'tgl_lahir',
+        'phone',
+        'email',
+        'is_discounted',
+        'discount',
+        'pic_marketing',
+        'afiliated',
         'created_by',
         'updated_by'
     ];

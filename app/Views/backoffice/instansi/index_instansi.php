@@ -40,6 +40,16 @@
                                     foreach ($data as $key => $value) {
                                         // $data_user = ($value['id_user'] !== "" || $value['id_user'] !== null) ? $userModel->find(['id' => $value['id_user']]) : '';
                                         // $data_marketing = ($value['pic_marketing'] !== "" || $value['pic_marketing'] !== null) ? $marketingModel->find($value['pic_marketing']) : '';
+                                        // var_dump($value);
+                                        // exit();
+                                        if ($value['pic_marketing'] == null) {
+                                            $nama_marketing = "";
+                                        } else {
+                                            $detail_marketing = $marketingModel->find($value['pic_marketing']);
+                                            // dd(db_connect()->showLastQuery());
+                                            $nama_marketing = ucwords($detail_marketing['nama_marketing']);
+                                        }
+
                                     ?>
                                         <tr>
                                             <td><?= $no++; ?></td>
@@ -49,7 +59,7 @@
                                             <td><?= $value['tempat_lahir'] . ', ' . $value['tgl_lahir']; ?></td>
                                             <td><?= $value['phone']; ?></td>
                                             <td><?= $value['email']; ?></td>
-                                            <td><?= $value['pic_marketing']; ?></td>
+                                            <td><?= $nama_marketing; ?></td>
                                             <td>
                                                 <a href="<?= base_url('backoffice/instansi/' . $value['id']); ?>" class="btn btn-primary btn-sm">Detail</a>
                                                 <a href="<?= base_url('backoffice/instansi/edit/' . $value['id']); ?>" class="btn btn-success btn-sm">Edit</a>

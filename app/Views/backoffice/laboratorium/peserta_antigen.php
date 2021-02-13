@@ -84,7 +84,7 @@
                                         <tr>
                                             <td><?= $no++; ?></td>
                                             <td><?= $tgl_kunjungan; ?></td>
-                                            <td><?= $regisrasi; ?></td>
+                                            <td><?= $registrasi; ?></td>
                                             <td><?= $nik; ?></td>
                                             <td><?= $nama; ?></td>
                                             <td>
@@ -104,12 +104,7 @@
     </section>
 </div>
 
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/dataTables.responsive.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/dataTables.buttons.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js'); ?>"></script>
+
 <script>
     $(document).ready(() => {
         $("#data_laboratorium").DataTable({
