@@ -28,6 +28,19 @@
             </div>
         </div>
         <div class="col-md-12">
+            <?php if ($session->getFlashdata('success')) : ?>
+                <div class="alert alert-success" role="alert">
+                    Success! <?= $session->getFlashdata('success'); ?>
+                </div>
+            <?php endif;
+            if ($session->getFlashdata('error')) : ?>
+                <div class="alert alert-warning" role="alert">
+                    Gagal! <?= $session->getFlashdata('error'); ?>
+                </div>
+            <?php endif; ?>
+
+        </div>
+        <div class="col-md-12">
             <div class="card">
                 <h4 class="card-header bg-primary text-white">
                     Form Peserta <?= $data_instansi['nama']; ?>
@@ -108,7 +121,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <button type="submit" class="btn btn-primary btn-block">Submit Peserta</button>
+                                <button type="submit" class="btn btn-primary btn-block" id="btn-submit">Submit Peserta</button>
                             </div>
                         </div>
 

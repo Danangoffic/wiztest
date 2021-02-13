@@ -119,7 +119,8 @@ class Afiliasi extends ResourceController
             'data_instansi' => $data_instansi,
             'data_marketing' => $data_marketing,
             'id_instansi' => $id_instansi,
-            'id_marketing' => $data_marketing['id']
+            'id_marketing' => $data_marketing['id'],
+            'session' => $this->session
         ];
         return view('customer/corporate', $data);
     }
@@ -163,7 +164,7 @@ class Afiliasi extends ResourceController
             $tgl_kunjungan = $this->request->getPost("tgl_kunjungan");
             $jam_kunjungan = $this->request->getPost("jam_kunjungan");
             $id_layanan_test = $this->request->getPost("id_layanan");
-            $faskes_asal = 1;
+            $faskes_asal = 3;
 
             $detail_layanan_test = $this->layananTestModel->find($id_layanan_test);
 
@@ -199,7 +200,9 @@ class Afiliasi extends ResourceController
                 $tempat_lahir = $data['F'];
                 $tgl_lahir = $data['G'];
                 $alamat = $data['H'];
-
+                if ($nama == "" || $nama == null) {
+                    break;
+                }
                 $customer_UNIQUE = $this->customers_controller->getOrderId($id_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
                 $no_urutan = $this->customers_controller->getUrutan($id_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan);
 
@@ -310,6 +313,11 @@ class Afiliasi extends ResourceController
                 $this->send_email_customer_afiliasi($insert_id);
                 $this->send_whatsapp_customer_afiliasi($insert_id);
             }
+            $this->session->setFlashdata('succcess', "Berhasil Submit Data Peserta Pada Kami");
+            return redirect()->to('/afiliasi/corporate/' . $id_instansi);
+        } else {
+            $this->session->setFlashdata('error', "Gagal Submit Data Peserta Pada Kami");
+            return redirect()->back();
         }
     }
 
