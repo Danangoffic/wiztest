@@ -209,7 +209,7 @@ class Swabber extends ResourceController
     public function do_update_customer_been_printed()
     {
         $id_customer = $this->request->getVar("id_customer");
-        $is_printed = "3";
+        $is_printed = 3;
         $arr_update = ['is_printed' => $is_printed];
         $update = $this->customer_model->update($id_customer, $arr_update);
         if ($update) {
