@@ -108,6 +108,7 @@ class Afiliasi extends ResourceController
             ->groupBy('id_test')
             ->get()
             ->getResultArray();
+        // dd(db_connect()->showLastQuery());
         // $getData = $this->sysParamModel->getByVgroupAndParamter('MIDTRANS_KEY', 'CLIENT_KEY');
         $data = [
             'title' => "Quicktest.id || Pendaftaran Test Afiliasi Corporate " . $data_instansi['nama'],
