@@ -19,7 +19,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'db9888113b284a2b9d4cf94116126dcd80cdbaae',
+    'reference' => '89a33e944d1402616ef5319d95a862e229f09844',
     'name' => 'codeigniter4/framework',
   ),
   'versions' => 
@@ -40,7 +40,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'db9888113b284a2b9d4cf94116126dcd80cdbaae',
+      'reference' => '89a33e944d1402616ef5319d95a862e229f09844',
     ),
     'doctrine/instantiator' => 
     array (
@@ -535,12 +535,12 @@ private static $installed = array (
     ),
     'setasign/fpdi' => 
     array (
-      'pretty_version' => 'v2.3.5',
-      'version' => '2.3.5.0',
+      'pretty_version' => 'v2.3.6',
+      'version' => '2.3.6.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'f2246c8669bd25834f5c264425eb0e250d7a9312',
+      'reference' => '6231e315f73e4f62d72b73f3d6d78ff0eed93c31',
     ),
     'squizlabs/php_codesniffer' => 
     array (

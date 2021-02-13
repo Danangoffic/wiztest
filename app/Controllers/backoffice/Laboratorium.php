@@ -343,7 +343,7 @@ class Laboratorium extends ResourceController
                     // }
                     $excelReader  = new PHPExcel();
                     //mengambil lokasi temp file
-                    PHPExcel_Settings::setZipClass(PHPExcel_Settings::PCLZIP);
+                    //PHPExcel_Settings::setZipClass(PHPExcel_Settings::PCLZIP);
                     //baca file
                     $objPHPExcel = PHPExcel_IOFactory::load($fileLocation);
                     //ambil sheet active
