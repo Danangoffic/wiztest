@@ -29,11 +29,11 @@ class Marketing extends BaseController
         if (!$this->session->has('logged_in')) {
             return redirect()->to(base_url());
         }
-        if ($this->session->get("user_level") == 1 || $this->session->get('user_level') == 2) {
-            // return true;
-        } else {
-            return redirect()->to(base_url());
-        }
+        // if ($this->session->get("user_level") == 1 || $this->session->get('user_level') == 2) {
+        //     // return true;
+        // } else {
+        //     return redirect()->to(base_url());
+        // }
 
         $db_url_app_reg = db_connect()->table('system_parameter')->where(['vgroup' => 'URL', 'parameter' => "APP_REGISTRATION"])->get()->getFirstRow();
         $decode_url = base64_decode($db_url_app_reg->value);
