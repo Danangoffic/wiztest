@@ -25,6 +25,7 @@
                                         <th>Nomor HP</th>
                                         <th>Email</th>
                                         <th>PIC Marketing</th>
+                                        <th>Link Afiliasi</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -49,6 +50,7 @@
                                             // dd(db_connect()->showLastQuery());
                                             $nama_marketing = ucwords($detail_marketing['nama_marketing']);
                                         }
+                                        $url_afiliasi = ($value['afiliated'] == "yes") ? "https://reg.quicktest.id/corporate/" . $value['id'] : "";
 
                                     ?>
                                         <tr>
@@ -60,6 +62,9 @@
                                             <td><?= $value['phone']; ?></td>
                                             <td><?= $value['email']; ?></td>
                                             <td><?= $nama_marketing; ?></td>
+                                            <td>
+                                                <a href="<?= $url_afiliasi; ?>" target="_blank" rel="noopener noreferrer"><?= $url_afiliasi; ?></a>
+                                            </td>
                                             <td>
                                                 <a href="<?= base_url('backoffice/instansi/' . $value['id']); ?>" class="btn btn-primary btn-sm">Detail</a>
                                                 <a href="<?= base_url('backoffice/instansi/edit/' . $value['id']); ?>" class="btn btn-success btn-sm">Edit</a>

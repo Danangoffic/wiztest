@@ -7,21 +7,21 @@
             <div class="row">
                 <div class="col-md-12">
                     <?php
-                    if (session()->getFlashdata('success')) {
+                    if ($session->getFlashdata('success')) {
                     ?>
                         <div class="alert alert-success alert-dismissible">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                             <h5><i class="icon fas fa-check"></i> Berhasil</h5>
-                            <p><?= session()->getFlashdata('success'); ?></p>
+                            <p><?= $session->getFlashdata('success'); ?></p>
                         </div>
                     <?php
                     }
-                    if (session()->getFlashdata('error')) {
+                    if ($session->getFlashdata('error')) {
                     ?>
                         <div class="alert alert-warning alert-dismissible">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                             <h5><i class="icon fas fa-exclamation-triangle"></i> Gagal!</h5>
-                            <p><?= session()->getFlashdata('error'); ?></p>
+                            <p><?= $session->getFlashdata('error'); ?></p>
                         </div>
                     <?php
                     }
@@ -100,12 +100,7 @@
         </div>
     </section>
 </div>
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/dataTables.responsive.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/dataTables.buttons.min.js'); ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js'); ?>"></script>
+
 <script>
     $(document).ready(() => {
         $("table").DataTable({
