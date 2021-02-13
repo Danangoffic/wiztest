@@ -141,7 +141,7 @@
 
     function get_selected_test(id_jenis_test) {
         $.ajax({
-            url: "<?= base_url('select-test'); ?>",
+            url: "<?= base_url('/select-test-corporate'); ?>",
             type: "GET",
             data: {
                 id_test: id_jenis_test,
@@ -167,7 +167,7 @@
             $.each(result_data, (k, v) => {
                 html_radio += `<label class="label-control">
                                     <input type="radio" name="id_layanan" onchange="return getJadwal('${v.id}', '${v.nama_test}', '${v.nama_layanan}', '${v.biaya}')" value="${v.id}"> 
-                                    ${v.nama_test} ${v.nama_layanan} <b class="text-primary">${v.biaya}</b>
+                                    ${v.nama_test} ${v.nama_layanan} <b class="text-primary">Rp ${formatNumber(v.biaya)}</b>
                                 </label><br>`;
             });
             $("#data_tipe").html(html_radio)

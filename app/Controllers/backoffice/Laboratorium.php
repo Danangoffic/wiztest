@@ -231,6 +231,7 @@ class Laboratorium extends ResourceController
             return redirect()->to('/backoffice/login');
         }
         $detail_hasil_lab = $this->laboratoriumModel->by_id_customer($id_customer);
+        dd(db_connect()->showLastQuery());
         if ($detail_hasil_lab == null) {
             $detail_customer = $this->customer->detail_customer($id_customer);
             if ($detail_customer) {
@@ -260,10 +261,10 @@ class Laboratorium extends ResourceController
             'test_model' => $this->testModel,
             'id_test' => $id_test,
             'detail_hasil_lab' => $detail_hasil_lab,
-            'status_hasil' => ['', 'Negative', 'Positive'],
-            'status_ngene' => ['', 'Negative', 'Positive'],
-            'status_orf' => ['', 'Negative', 'Positive'],
-            'status_gene_n' => ['', 'Negative', 'Positive'],
+            'status_hasil' => ['val' => 'Negative', 'val' => 'Positive'],
+            'status_ngene' => ['val' => 'Negative', 'val' => 'Positive'],
+            'status_orf' => ['val' => 'Negative', 'val' => 'Positive'],
+            'status_gene_n' => ['val' => 'Negative', 'val' => 'Positive'],
         );
         return view("backoffice/laboratorium/verifikasi_peserta", $data);
     }
