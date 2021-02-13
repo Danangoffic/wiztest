@@ -36,7 +36,7 @@ class Midtrans extends ResourceController
     public function __construct()
     {
         //set production mode (true to production mode, false to development mode)
-        $this->production_mode = false;
+        $this->production_mode = true;
 
         //set serverkey, clientkey, snapurljs on customers payment where production mode is set
         $this->server_key = ($this->production_mode) ? $this->server_key_prod : $this->server_key_dev;

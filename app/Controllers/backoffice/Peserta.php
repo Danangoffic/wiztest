@@ -411,18 +411,18 @@ class Peserta extends BaseController
         $order_id = $Customer->customer_unique;
 
         $tipe_pembayaran = $Customer->tipe_pembayaran;
-
+        // dd($order_id);
         if ($tipe_pembayaran == "midtrans") {
             /**
              * GET STATUS PEMBAYARAN MELALUI MIDTRANS
              */
             $midtrans_bo = new Midtrans;
-
-            \Midtrans::$serverKey = $midtrans_bo->server_key;
             \Midtrans::$isProduction = $midtrans_bo->production_mode;
+            \Midtrans::$serverKey = $midtrans_bo->server_key;
+            // dd(\Midtrans::$isProduction);
 
             $midtrans_status = (object) \Midtrans::status($order_id);
-
+            // dd($midtrans_status);
             $jenis_pembayaran = ucwords(str_replace("_", " ", $midtrans_status->payment_type));
             $status_pembayaran = $midtrans_status->transaction_status;
             $midtrans_gross_amount = (int) $midtrans_status->gross_amount;
