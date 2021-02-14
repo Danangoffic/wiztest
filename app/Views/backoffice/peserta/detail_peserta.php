@@ -96,6 +96,7 @@
                                 <tbody>
                                     <tr>
                                         <?php
+                                        $user_level = intval($session->get('user_level'));
                                         $jam_kunjungan = substr($data_customer->jam_kunjungan, 0, 5);
                                         $getStatus = $status_hadir->find($data_customer->kehadiran);
                                         $status_kehadiran = $getStatus['nama_status'];
@@ -121,15 +122,17 @@
                                             endif;
                                             ?>
                                             <a href="<?= base_url('backoffice/peserta/edit/' . $data_customer->id); ?>" class="btn btn-primary btn-sm m-2" id="edit">Edit</a>
-                                            <a href="<?= base_url('backoffice/peserta/hapus/' . $data_customer->id); ?>" class="btn btn-danger btn-sm m-2" id="hapus">Hapus</a>
+                                            <?php if (in_array($user_level, array(1, 99, 103))) : ?>
+                                                <a href="<?= base_url('backoffice/peserta/hapus/' . $data_customer->id); ?>" class="btn btn-danger btn-sm m-2" id="hapus">Hapus</a>
                                             <?php
+                                            endif;
                                             if ($data_customer->kehadiran == 22) {
                                             ?>
 
 
                                                 <a href="<?= base_url('backoffice/peserta/reschedule/' . $data_customer->id); ?>" class="btn btn-info btn-sm disabled m-2" id="reschedule">Reschedule</a>
                                                 <?php
-                                                if (lcfirst($transactionStatus) == "settlement" || lcfirst($transactionStatus) == "invoice" || lcfirst($transactionStatus) == "lunas") {
+                                                if (lcfirst($transactionStatus) == "settlement" || lcfirst($transactionStatus) == "Invoice" || lcfirst($transactionStatus) == "Lunas") {
                                                 ?>
                                                     <a href="<?= base_url('backoffice/peserta/hadirkan_peserta/' . $data_customer->id); ?>" class="btn btn-primary btn-sm">Hadir</a>
                                             <?php

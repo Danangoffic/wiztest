@@ -73,7 +73,8 @@
                     </li>
                 <?php
                 endif;
-                if ($user_level == 1 || $user_level == 4 || $user_level == 99 || $user_level == 103 || $user_level == 104) :
+                if (in_array($user_level, array(1, 4, 103))) :
+
                     $menu_open = ($page == 'registrasi' || $page == 'registrasi_overkuota' || $page == 'instansi') ? 'menu-is-open menu-open' : '';
                     $menu_aktif = ($page == 'registrasi' || $page == 'registrasi_overkuota' || $page == 'instansi') ? 'active' : '';
                 ?>
@@ -108,7 +109,7 @@
                     </li>
                 <?php
                 endif;
-                if ($user_level == 1 || $user_level == 6 || $user_level == 7 || $user_level == 8 || $user_level == 99 || $user_level == 100) :
+                if (in_array($user_level, array(1, 6, 7, 8, 99, 100, 103))) :
                 ?>
                     <li class="nav-item">
                         <a href="#" class="nav-link">
@@ -135,242 +136,267 @@
                     </li>
                 <?php
                 endif;
-                $menu_open = ($page == 'reporting_hasil' || $page == 'reporting_marketing' || $page == 'reporting_dinkes') ? 'menu-is-open menu-open' : '';
-                $menu_aktif = ($page == 'reporting_hasil' || $page == 'reporting_marketing' || $page == 'reporting_dinkes') ? 'active' : '';
+                if (in_array($user_level, array(1, 2, 99))) :
+                    $menu_open = ($page == 'reporting_hasil' || $page == 'reporting_marketing' || $page == 'reporting_dinkes') ? 'menu-is-open menu-open' : '';
+                    $menu_aktif = ($page == 'reporting_hasil' || $page == 'reporting_marketing' || $page == 'reporting_dinkes') ? 'active' : '';
                 ?>
-                <li class="nav-item <?= $menu_open; ?>">
-                    <a href="#" class="nav-link <?= $menu_aktif; ?>">
-                        <i class="nav-icon fas fa-tree"></i>
-                        <p>
-                            Laporan
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="/backoffice/reporting/hasil" class="nav-link <?= ($page == "reporting_hasil") ? "active" : ""; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Data Hasil</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/backoffice/reporting/marketing" class="nav-link <?= ($page == "reporting_marketing") ? "active" : ""; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Data Marketing</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/customer/kehadiran'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Data Kehadiran Peserta</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
+                    <li class="nav-item <?= $menu_open; ?>">
+                        <a href="#" class="nav-link <?= $menu_aktif; ?>">
+                            <i class="nav-icon fas fa-tree"></i>
+                            <p>
+                                Laporan
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/backoffice/reporting/hasil" class="nav-link <?= ($page == "reporting_hasil") ? "active" : ""; ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Hasil</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/backoffice/reporting/marketing" class="nav-link <?= ($page == "reporting_marketing") ? "active" : ""; ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Marketing</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/customer/kehadiran'); ?>" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Kehadiran Peserta</p>
+                                </a>
+                            </li>
+                            <!-- <li class="nav-item">
                             <a href="/backoffice/reporting/dinkes" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Laporan Dinkes</p>
                             </a>
-                        </li>
-                    </ul>
-                </li>
+                        </li> -->
+                        </ul>
+                    </li>
                 <?php
-                $menu_open = ($page == 'instansi' || $page == 'invoice' || $page == 'invoice_aps') ? 'menu-is-open menu-open' : '';
-                $menu_aktif = ($page == 'instansi' || $page == 'invoice' || $page == 'invoice_aps') ? 'active' : '';
+                endif;
+                if (in_array($user_level, array(1, 2, 3, 99, 101))) :
+                    $menu_open = ($page == 'instansi' || $page == 'invoice' || $page == 'invoice_aps') ? 'menu-is-open menu-open' : '';
+                    $menu_aktif = ($page == 'instansi' || $page == 'invoice' || $page == 'invoice_aps') ? 'active' : '';
                 ?>
-                <li class="nav-item <?= $menu_open; ?>">
-                    <a href="#" class="nav-link <?= $menu_aktif; ?>">
-                        <i class="nav-icon fas fa-edit"></i>
-                        <p>
-                            Finance
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/finance/instansi'); ?>" class="nav-link <?= ($page == "instansi") ? "active" : ""; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Data Instansi</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/finance/invoice'); ?>" class="nav-link <?= ($page == "invoice") ? "active" : ""; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Data Invoice</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/finance/invoice_aps'); ?>" class="nav-link <?= ($page == "invoice_aps") ? "active" : ""; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Data Invoice APS</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                    <li class="nav-item <?= $menu_open; ?>">
+                        <a href="#" class="nav-link <?= $menu_aktif; ?>">
+                            <i class="nav-icon fas fa-edit"></i>
+                            <p>
+                                Finance
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/finance/instansi'); ?>" class="nav-link <?= ($page == "instansi") ? "active" : ""; ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Instansi</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/finance/invoice'); ?>" class="nav-link <?= ($page == "invoice") ? "active" : ""; ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Invoice</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/finance/invoice_aps'); ?>" class="nav-link <?= ($page == "invoice_aps") ? "active" : ""; ?>">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Invoice APS</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 <?php
-                $menu_open = ($page == 'faskes' || $page == 'marketing' || $page == 'dokter' || $page == "petugas" || $page == "kota" || $page == "lokasi" || $page == "user") ? 'menu-is-open menu-open' : '';
-                $menu_aktif = ($page == 'faskes' || $page == 'marketing' || $page == 'dokter' || $page == "petugas" || $page == "kota" || $page == "lokasi" || $page == "user") ? 'active' : '';
+                endif;
+                if (in_array($user_level, array(1, 2, 99))) {
+                    $menu_open = ($page == 'faskes' || $page == 'marketing' || $page == 'dokter' || $page == "petugas" || $page == "kota" || $page == "lokasi" || $page == "user") ? 'menu-is-open menu-open' : '';
+                    $menu_aktif = ($page == 'faskes' || $page == 'marketing' || $page == 'dokter' || $page == "petugas" || $page == "kota" || $page == "lokasi" || $page == "user") ? 'active' : '';
                 ?>
-                <li class="nav-item <?= $menu_open; ?>">
-                    <a href="#" class="nav-link <?= $menu_aktif; ?>">
-                        <i class="nav-icon fas fa-table"></i>
-                        <p>
-                            Master Data
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/faskes'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Faskes Asal</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/backoffice/marketing" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Marketing</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/dokter'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Dokter Pemeriksa</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/petugas'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Petugas Pemeriksa</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/kota'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Master Kota</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/lokasi_input'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Lokasi Penginputan</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/user'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Master User</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-table"></i>
-                        <p>
-                            Pengaturan
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/settings'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Pengaturan</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/user/activity'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Log Activity Users</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-table"></i>
-                        <p>
-                            Tools
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/print/barcode'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Cetak Barcode</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/print/hasil'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Cetak Hasil</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-table"></i>
-                        <p>
-                            Pengelolaan
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/setting/broadcasting'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Broadcasting</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/setting/peserta'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Data Peserta</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/kategori_gudang'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Kategori Gudang</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="<?= base_url('backoffice/gudang'); ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Gudang</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                    <li class="nav-item <?= $menu_open; ?>">
+                        <a href="#" class="nav-link <?= $menu_aktif; ?>">
+                            <i class="nav-icon fas fa-table"></i>
+                            <p>
+                                Master Data
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <?php if (in_array($user_level, array(1, 99))) : ?>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('backoffice/faskes'); ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Faskes Asal</p>
+                                    </a>
+                                </li>
+                            <?php endif;
+                            if (in_array($user_level, array(1, 2, 99))) :
+                            ?>
+                                <li class="nav-item">
+                                    <a href="/marketing" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Marketing</p>
+                                    </a>
+                                </li>
+                            <?php endif;
+                            if (in_array($user_level, array(1, 99))) :
+                            ?>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('backoffice/dokter'); ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Dokter Pemeriksa</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('backoffice/petugas'); ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Petugas Pemeriksa</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('backoffice/kota'); ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Master Kota</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('backoffice/lokasi_input'); ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Lokasi Penginputan</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('backoffice/user'); ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Master User</p>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </li>
+                <?php }
+                if (in_array($user_level, array(1, 99))) :
+                ?>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-table"></i>
+                            <p>
+                                Pengaturan
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/settings'); ?>" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Pengaturan</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/user/activity'); ?>" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Log Activity Users</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                <?php endif;
+                if (in_array($user_level, array(1, 99))) :
+                ?>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-table"></i>
+                            <p>
+                                Tools
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/print/barcode'); ?>" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Cetak Barcode</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/print/hasil'); ?>" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Cetak Hasil</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                <?php
+                endif;
+                if (in_array($user_level, array(1, 99))) : ?>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-table"></i>
+                            <p>
+                                Pengelolaan
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/setting/broadcasting'); ?>" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Broadcasting</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/setting/peserta'); ?>" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Data Peserta</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/kategori_gudang'); ?>" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Kategori Gudang</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?= base_url('backoffice/gudang'); ?>" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Gudang</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                <?php endif;
+                if (in_array($user_level, array(1, 8, 99, 100, 103))) :
+                ?>
+                    <li class="nav-item">
+                        <a href="/swabber" class="nav-link">
+                            <p>Swabber</p>
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a href="/swabber" class="nav-link">
-                        <p>Swabber</p>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <p>Antrian Swab</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <p>Antrian Rapid/Antigen</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/led/1" class="nav-link">
-                        <p>Tampilan Antrian Swab</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/led/3" class="nav-link">
-                        <p>Tampilan Antrian Rapid/Antigen</p>
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <p>Antrian Swab</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <p>Antrian Rapid/Antigen</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/led/1" class="nav-link">
+                            <p>Tampilan Antrian Swab</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/led/3" class="nav-link">
+                            <p>Tampilan Antrian Rapid/Antigen</p>
+                        </a>
+                    </li>
+                <?php endif; ?>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

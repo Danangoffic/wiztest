@@ -81,6 +81,7 @@
                                     <tbody>
                                         <?php
                                         $no = 1;
+                                        $user_level = intval($session->get('user_level'));
                                         foreach ($data_customer as $key => $value) {
                                             // $DetailInstansi = new Ins
                                             $dataInstansi = $instansiModel->find($value['instansi']);
@@ -118,7 +119,9 @@
                                                 <td><?= $status_hadir; ?></td>
                                                 <td nowrap>
                                                     <a href="<?= base_url('backoffice/peserta/' . $value['id']); ?>" class="btn btn-primary btn-sm">Detail</a>
-                                                    <a href="<?= base_url('backoffice/peserta/hapus/' . $value['id']); ?>" class="btn btn-danger btn-sm">Hapus</a>
+                                                    <?php if (in_array($user_level, array(1, 99, 103))) : ?>
+                                                        <a href="<?= base_url('backoffice/peserta/hapus/' . $value['id']); ?>" class="btn btn-danger btn-sm">Hapus</a>
+                                                    <?php endif; ?>
                                                 </td>
                                             </tr>
                                         <?php
