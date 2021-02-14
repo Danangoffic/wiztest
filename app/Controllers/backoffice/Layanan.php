@@ -181,6 +181,21 @@ class Layanan extends ResourceController
         return $url;
     }
 
+    public function put_content_qr_code($value = "", $qr_name)
+    {
+
+        $qr = $this->get_qr_code($value);
+        $get_content = file_get_contents($qr);
+        return file_put_contents("assets/qr/{$qr_name}.png", $get_content, FILE_APPEND);
+    }
+
+    public function put_content_pdf($url, $name)
+    {
+        $get_content = file_get_contents($url);
+        $name_file = $name . ".pdf";
+        return file_put_contents("assets/pdf/" . $name_file, $get_content, FILE_APPEND);
+    }
+
     public function setCodeBarCode($code = "code128")
     {
         $this->codeBarCode = $code;

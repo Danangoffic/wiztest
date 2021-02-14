@@ -104,7 +104,7 @@ class Customer extends ResourceController
         $detail_layanan_test = $this->layanan_test_model->find($jenis_test);
         $jenis_pemeriksaan = $detail_layanan_test['id_pemeriksaan'];
         $jenis_layanan = $detail_layanan_test['id_layanan'];
-        $id_test = $detail_layanan_test['id_test'];
+        $id_test = intval($detail_layanan_test['id_test']);
         $faskes_asal = $this->request->getPost('faskes_asal');
         $instansi = $this->request->getPost('instansi');
         $kehadiran = 0;
@@ -124,12 +124,12 @@ class Customer extends ResourceController
             $dataMarketing = $this->marketing_model->find($marketing);
             $dataLayanan = $this->layananModel->find($jenis_layanan);
 
-            if ($id_test == 2 || $id_test == "2" || $id_test == 3 || $id_test == "3") {
+            if ($id_test == 2 || $id_test == 3) {
                 $nomor_bilik = 3;
             } else {
                 $hitung_bilik = $no_urutan % 7;
-                if ($hitung_bilik == 0 || $hitung_bilik == 3) {
-                    $hitung_bilik++;
+                if ($hitung_bilik == 0 || $hitung_bilik >= 3) {
+                    $hitung_bilik += 1;
                 }
                 $nomor_bilik = $hitung_bilik;
             }
@@ -261,12 +261,11 @@ class Customer extends ResourceController
     public function getUrutan($type_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan)
     {
 
-        $data = $this->customerModel->getCustomerAvailableByDate($type_test, '1', $tgl_kunjungan, $jam_kunjungan)->getRowArray();
-
-        if ($data != null) {
-            $totalData = (intval($data['no_antrian'])) ? intval($data['no_antrian']) : 0;
-        } else {
+        $data = $this->customerModel->get_no_antrian($type_test, '3', $tgl_kunjungan, $jam_kunjungan)->getRowArray();
+        if ($data == null) {
             $totalData = 0;
+        } else {
+            $totalData = (intval($data['no_antrian'])) ? intval($data['no_antrian']) : 0;
         }
         return $totalData + 1;
     }
@@ -785,6 +784,7 @@ class Customer extends ResourceController
         $this->PembayaranModel = new PembayaranModel();
         $this->afiliasi = new Afiliasi;
         $this->CustomerHomeServiceModel = new CustomerHomeServiceModel();
+        $afiliasiController = new Afiliasi;
         try {
             $token = $this->request->getVar('token');
             if (!$token) {
@@ -794,12 +794,16 @@ class Customer extends ResourceController
             $list_peserta = count($peserta);
             if ($list_peserta < 5) {
                 $this->session->setFlashdata('error', "Daftar peserta yang di daftarkan minimal adalah 5 orang");
-                return redirect()->to("/home-service");
+                return $this->failUnauthorized('Daftar peserta yang di daftarkan minimal adalah 5 orang');
+                // return redirect()->to("/home-service");
             }
             $tgl_kunjungan = $this->request->getVar("tgl_kunjungan");
             $jam_kunjungan = $this->request->getVar("jam_kunjungan");
             $p = $peserta[0];
             $detail_jenis_test = $this->layananTestModel->find($p['jenis_test']);
+
+            $id_test = intval($detail_jenis_test['id_test']);
+
             $detail_layanan = $this->layananModel->find($detail_jenis_test['id_layanan']);
             $detail_test = $this->testModel->find($detail_jenis_test['id_test']);
             $jenis_pemeriksaan = $detail_jenis_test['id_pemeriksaan'];
@@ -819,6 +823,16 @@ class Customer extends ResourceController
             $customer_UNIQUE = $this->getOrderId($jenis_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
             $no_urutan = $this->getUrutan($jenis_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan);
 
+            if ($id_test == 2 || $id_test == 3) {
+                $nomor_bilik = 3;
+            } else {
+                $hitung_bilik = ($no_urutan % 7);
+                if ($hitung_bilik == 0 || $hitung_bilik >= 3) {
+                    $hitung_bilik += 1;
+                }
+                $nomor_bilik = $hitung_bilik;
+            }
+
             $array_insert = array(
                 'jenis_test' => $p['jenis_test'],
                 'jenis_pemeriksaan' => $jenis_pemeriksaan,
@@ -835,10 +849,10 @@ class Customer extends ResourceController
                 'status_test' => 'menunggu',
                 'tahap' => 1,
                 'kehadiran' => '22',
-                'no_antrian' => '0',
+                'no_antrian' => $no_urutan,
                 'jam_kunjungan' => $jam_kunjungan,
                 'tgl_kunjungan' => $tgl_kunjungan,
-                'status_pembayaran' => 'invoice',
+                'status_pembayaran' => 'Invoice',
                 'status_peserta' => "20",
             );
             $this->CustomerHomeServiceModel->insert($array_insert);
@@ -890,10 +904,10 @@ class Customer extends ResourceController
                     'status_test' => 'menunggu',
                     'tahap' => 1,
                     'kehadiran' => '22',
-                    'no_antrian' => '0',
+                    'no_antrian' => $no_urutan,
                     'jam_kunjungan' => $jam_kunjungan,
                     'tgl_kunjungan' => $tgl_kunjungan,
-                    'status_pembayaran' => 'invoice',
+                    'status_pembayaran' => 'Invoice',
                     'status_peserta' => "20",
                     'is_hs' => "yes",
                     'id_hs' => $id_hs

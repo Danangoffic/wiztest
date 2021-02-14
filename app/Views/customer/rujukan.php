@@ -222,6 +222,7 @@
         let tanggal_lahir = $("#tanggal_lahir").val();
         let alamat = $("#alamat").val();
         let tgl_kunjungan = $("#tgl_kunjungan").val();
+        let jenis_test = $("[name=id_layanan_test]:checked").val();
         let id_rujukan = '<?= $id_rujukan ?>';
         let id_marketing = marketing;
         let temp_peserta = {
@@ -247,9 +248,14 @@
             url: '/rujukan/save_rujukan',
             type: "POST",
             data: temp_peserta,
-            success: function(data, status){
+            success: function(data, status) {
                 showToast('success', "Berhasil submit peserta");
                 reset_inputs();
+                document.getElementById("btn_submit").disabled = false;
+                $("#btn_submit").html("Submit Peserta");
+            },
+            error: function(err) {
+                showError('Gagal submit peserta');
                 document.getElementById("btn_submit").disabled = false;
                 $("#btn_submit").html("Submit Peserta");
             }
@@ -261,52 +267,6 @@
         $("#data_jam").empty();
         $(".btn-test").removeClass("btn-primary active");
         document.getElementById("form_add_peserta").reset();
-    }
-
-    function show_peserta_table() {
-        let html_table = "";
-        $.each(array_table_peserta, (k, v) => {
-            html_table += `<tr id="peserta${k}">
-            <td>${v.nama}</td>
-            <td>${v.nik}</td>
-            <td>${v.nama_layanan} ${v.nama_test}</td>
-            <td>${v.biaya}</td>
-            <td><button class="btn btn-sm btn-danger btn-icon" type="button" role="button" onclick="return remove_peserta(${k})">Hapus</button></td>
-            </tr>`;
-        });
-        $("#data_peserta").html(html_table);
-        if (array_peserta.length >= 5) {
-            $("#collective").show();
-        } else {
-            $("#collective").hide();
-        }
-    }
-
-    function remove_peserta(key) {
-        array_table_peserta.splice(key, 1);
-        array_peserta.splice(key, 1);
-        $("#peserta" + key).hide();
-    }
-
-    function cancelData(result) {
-        console.log('result', result);
-    }
-
-    function showPayment(midtransToken) {
-        snap.pay(midtransToken, {
-            onSuccess: result => {
-                updateData(result);
-            },
-            onPending: result => {
-                updateData(result);
-            },
-            onError: result => {
-                cancelData(result);
-            },
-            onClose: () => {
-                cancelData(result);
-            }
-        });
     }
 
     function showError(text) {
@@ -344,28 +304,7 @@
         });
     }
 
-    function submit_peserta_hs() {
-        let url_hs = '<?= base_url('api/save-hs'); ?>';
-        let data = {
-            token: '<?= csrf_hash(); ?>',
-            peserta: array_peserta
-        };
-        $.ajax({
-            url: url_hs,
-            type: 'post',
-            data: data,
-            success: function(data, status, xhr) {
-                showToast('success', 'Berhasil simpan data peserta untuk home service, ' +
-                    'silahkan cek pada email masing masing peserta untuk pengecekan qr code ' +
-                    'yang nantinya dibutuhkan saat kehadiran');
-                setInterval(window.location.reload, 5000);
-            },
-            error: function(err) {
-                showError("terjadi kesalahan dalam menyimpan data anda, " +
-                    "silahkan menunggu beberapa saat. Terima kasih");
-            }
-        })
-    }
+
 
     function formatNumber(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");

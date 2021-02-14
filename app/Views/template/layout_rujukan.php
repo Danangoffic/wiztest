@@ -33,7 +33,7 @@
 
     <!-- <script src="https://cdn.jsdelivr.net/npm/promise-polyfill"></script> -->
 
-    <title>REGISTRASI TEST ID <?= $title; ?></title>
+    <title>REGISTRASI TEST ID - <?= $title; ?></title>
 </head>
 
 <body>

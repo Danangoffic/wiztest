@@ -84,7 +84,7 @@ class CustomerModel extends Model
     public function getCustomerAvailableByDate($jenis_test, $faskes_asal = '3', $tgl_kunjungan, $jam_kunjungan = null)
     {
         $query = db_connect()
-            ->table('customers')
+            ->table($this->table)
             ->where([
                 'jenis_test' => $jenis_test,
                 'faskes_asal' => $faskes_asal,
@@ -94,6 +94,19 @@ class CustomerModel extends Model
             ->whereIn('kehadiran', [22, 23])
             ->orderBy('id', 'DESC');
         return $query->get();
+    }
+
+    public function get_no_antrian($jenis_test, $faskes_asal = '3', $tgl_kunjungan, $jam_kunjungan)
+    {
+        $builder = db_connect()->table($this->table)->select('no_antrian')
+            ->where('jenis_test', $jenis_test)
+            ->where('faskes_asal', $faskes_asal)
+            ->where('tgl_kunjungan', $tgl_kunjungan)
+            ->where('jam_kunjungan', $jam_kunjungan)
+            ->whereIn('kehadiran', array(22, 23))
+            ->orderBy('id', 'DESC')
+            ->get();
+        return $builder;
     }
 
     public function getByInvoiceNumber($invoiceNumber)
