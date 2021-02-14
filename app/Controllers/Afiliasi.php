@@ -325,13 +325,9 @@ class Afiliasi extends ResourceController
     {
         $peserta_hs     =   $this->request->getVar("peserta");
         $total_peserta  =   count($peserta_hs);
-        if ($total_peserta < 5) {
-            $this->session->setFlashdata('error', "Total peserta home service minimal adalah 5 orang, 
-                silahkan isi ulang hingga minimal 5 orang peserta.");
-            return redirect()->back();
-        }
 
-        $id_instansi    = 1;
+
+        $id_instansi    = 3;
         $id_marketing   = $this->request->getVar("id_marketing");
 
         $tgl_kunjungan  = $this->request->getVar("tgl_kunjungan");

@@ -225,7 +225,7 @@ class CustomerModel extends Model
         if ($tipe == "antrian") {
             $builder->where('kehadiran', '23');
         }
-        $builder->where('is_printed', 0);
+        $builder->where('is_printed', 0)->orWhere('is_printed', null);
         $builder->orderBy('no_antrian', 'ASC');
         return $builder->get();
     }
