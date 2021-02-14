@@ -11,6 +11,7 @@ use App\Models\AlatModel;
 use App\Models\CustomerCorporateModel;
 use App\Models\CustomerHomeServiceModel;
 use App\Models\CustomerModel;
+use App\Models\DataFileCorporateModel;
 use App\Models\DokterModel;
 use App\Models\HasilLaboratoriumModel;
 use App\Models\InstansiModel;
@@ -209,13 +210,14 @@ class Afiliasi extends ResourceController
                 $dataMarketing = $this->marketing_model->find($id_marketing);
                 $dataLayanan = $this->layananModel->find($jenis_layanan);
 
-                if ($jenis_test == 2 || $jenis_test == "2") {
-                    $nomor_bilik = 1;
-                } else if ($jenis_test == 3 || $jenis_test == "3") {
-                    $nomor_bilik = 2;
+                if ($id_test == 2 || $id_test == "2" || $id_test == 3 || $id_test == "3") {
+                    $nomor_bilik = 3;
                 } else {
-                    $hitung_bilik = 6 % $no_urutan;
-                    $nomor_bilik = $hitung_bilik + 2;
+                    $hitung_bilik = $no_urutan % 7;
+                    if ($hitung_bilik == 0 || $hitung_bilik == 3) {
+                        $hitung_bilik++;
+                    }
+                    $nomor_bilik = $hitung_bilik;
                 }
 
                 if ($idx == 2) {
@@ -313,6 +315,17 @@ class Afiliasi extends ResourceController
                 $this->send_email_customer_afiliasi($insert_id);
                 $this->send_whatsapp_customer_afiliasi($insert_id);
             }
+            $fileexcel->move("/assets/corporate/", $new_name_file);
+            $data_file_corporate_model = new DataFileCorporateModel();
+            $array_insert = [
+                'nama_file' => $new_name_file,
+                'id_instansi' => $id_instansi,
+                'id_cust_corporate' => $id_inserted,
+                'created_by' => '999',
+                'updated_by' => '999'
+            ];
+            $data_file_corporate_model->insert($array_insert);
+            // $data_file_corporate_model->getInsertID()
             $this->session->setFlashdata('succcess', "Berhasil Submit Data Peserta Pada Kami");
             return redirect()->to('/afiliasi/corporate/' . $id_instansi);
         } else {
