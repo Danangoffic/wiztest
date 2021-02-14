@@ -45,7 +45,9 @@ class CustomerModel extends Model
         'is_hs',
         'id_hs',
         'is_corporate',
-        'id_cust_corporate'
+        'id_cust_corporate',
+        'is_rujukan',
+        'id_cust_rujukan'
     ];
 
     public function customer()
