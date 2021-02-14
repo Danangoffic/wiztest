@@ -87,11 +87,11 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
+
         $this->layananTestModel = new LayananTestModel();
         $this->instansiModel = new InstansiModel();
         $this->marketingModel = new MarketingModel();
@@ -152,11 +152,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
 
         $this->instansiModel = new InstansiModel();
         $this->marketingModel = new MarketingModel();
@@ -201,11 +200,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
         // $validation =  \Config\Services::validation();
         $this->validasi_peserta();
 
@@ -396,11 +394,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
 
         $this->statusHadir = new StatusHasilModel();
         $this->customer_overload = new CustomerOverloadModel();
@@ -462,12 +459,8 @@ class Peserta extends BaseController
             $this->session->setFlashData("error", "Anda harus login");
             return redirect()->to("/backoffice/login");
         }
-        $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
-            $this->session->setFlashData("error", "Anda tidak memiliki akses");
-            return redirect()->to("/backoffice/login");
-        }
+
+
 
         $this->instansiModel = new InstansiModel();
         $this->marketingModel = new MarketingModel();
@@ -542,11 +535,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
 
 
         $this->instansiModel = new InstansiModel();
@@ -598,11 +590,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
 
         $this->validasi_peserta();
 
@@ -726,11 +717,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
         // var_dump($user_level);
         // exit();
 
@@ -757,11 +747,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
 
         $id_customer = base64_decode($this->request->getPost("id_customer"));
 

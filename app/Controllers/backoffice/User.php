@@ -156,7 +156,7 @@ class User extends ResourceController
                 } else if ($user_level == 2) {
                     return redirect()->to('/backoffice/frontoffice/walkin');
                 } else if ($user_level == 4 || $user_level == 6) {
-                    return redirect()->to('/backoffice/reception');
+                    return redirect()->to('/backoffice');
                 } else if ($user_level == 7) {
                     return redirect()->to('/backoffice/dokter');
                 }
