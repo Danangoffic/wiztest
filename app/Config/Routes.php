@@ -205,6 +205,9 @@ $routes->get("/backoffice/reporting/(:segment)", "backoffice\Reporting::$1");
  */
 $routes->get("/afiliasi-hs/(:num)", "Afiliasi::home_service/$1");
 $routes->get("/corporate/(:num)", "Afiliasi::corporate/$1");
+
+$routes->get("/rujukan/(:num)", "Rujukan::indexv2/$1");
+$routes->add("/rujukan/(:segment)", "Rujukan::$1");
 // $routes->post("/afiliasi-corporate/save", "Afiliasi::save_corporate");
 /**
  * --------------------------------------------------------------------
