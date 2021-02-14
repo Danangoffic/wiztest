@@ -108,7 +108,7 @@ class Finance extends BaseController
         $data = array(
             'title' => "Data Instansi",
             'page' => "finance_instansi",
-            'session' => session(),
+            'session' => $this->session,
             'data' => $DataInstansi
         );
         return view("backoffice/finance/instansi", $data);

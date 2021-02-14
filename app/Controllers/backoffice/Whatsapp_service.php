@@ -73,9 +73,10 @@ class Whatsapp_service extends ResourceController
         // MAKE SURE PHONE NUMBER USING REGION CODE
         // $APIkey = $api_key_wasap;
         // $phone = $new_phone;
-        $message = "Terima kasih kepada Bpk/Ibu {$cek_customer['nama']}, \n" .
-            "telah melakukan pembayaran pada kami untuk mengikuti Test *{$nama_test}* pada tanggal *{$tgl_kunjungan}*." .
-            "Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.";
+        $message = "Terima kasih kepada Bpk/Ibu {$cek_customer['nama']}, \n
+            telah melakukan pembayaran pada kami untuk mengikuti Test *{$nama_test}* pada tanggal *{$tgl_kunjungan}*.
+            Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.\n\n
+            *Note*: Jika QR Code tidak ada pada email masuk, silahkan cek pada Spam Email Anda.";
         // $message = 'Terima kasih kepada Bpk/Ibu ' . $cek_customer['nama'] .
         //     " yang telah melakukan pembayaran pada kami untuk mengikuti test *{$nama_test}* pada tanggal *{$tgl_kunjungan}*. \n
         //     Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.";

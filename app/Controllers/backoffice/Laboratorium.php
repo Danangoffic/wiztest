@@ -176,11 +176,23 @@ class Laboratorium extends ResourceController
             $date1 = ($this->request->getPost("date1")) ? $this->request->getPost("date1") : false;
             $date2 = ($this->request->getPost("date2")) ? $this->request->getPost("date2") : false;
         } else {
-            $date1 = false;
+            $date1 = date("Y-m-d");
             $date2 = false;
         }
-        $data_list_peserta_antigen = $this->laboratoriumModel->customers_by_test(3, "no", $date1, $date2);
+        $data_layanan = $this->layananTestModel->where(['id_test' => 3])->get()->getResultArray();
+        $ids_jenis_test = array();
+        foreach ($data_layanan as $dataL => $val) {
+            $ids_jenis_test[] = $val['id'];
+        }
+        $peserta = array();
+        $filter_tgl = ($date2) ? "and customers.tgl_kunjungan between '{$date1}' and '{$date2}'" : "and customers.tgl_kunjungan = '{$date1}'";
+        $data_list_peserta_antigen = db_connect()->query("SELECT customers.* FROM `hasil_laboratorium` 
+        join customers on customers.id = hasil_laboratorium.id_customer 
+        where hasil_laboratorium.valid = 'no' 
+        and customers.jenis_test IN (SELECT id from data_layanan_test where id_test = 3) {$filter_tgl}")->getResultArray();
+        echo db_connect()->showLastQuery();
 
+        // dd(db_connect()->showLastQuery());
         $data = array(
             'title' => "Peserta Antigen",
             'page' => "lab",
@@ -204,16 +216,39 @@ class Laboratorium extends ResourceController
             $date1 = ($this->request->getPost("date1")) ? $this->request->getPost("date1") : false;
             $date2 = ($this->request->getPost("date2")) ? $this->request->getPost("date2") : false;
         } else {
-            $date1 = false;
+            $date1 = date("Y-m-d");
             $date2 = false;
         }
-        $data_list_peserta_rapid = $this->laboratoriumModel->customers_by_test(2, "no", $date1, $date2);
+
+        $data_layanan = $this->layananTestModel->where(['id_test' => 2])->get()->getResultArray();
+        $ids_jenis_test = array();
+        foreach ($data_layanan as $dataL => $val) {
+            $ids_jenis_test[] = $val['id'];
+        }
+        $peserta = array();
+        $filter_tgl = ($date2) ? "a.tgl_kunjungan between {$date1} and {$date2}" : $date1;
+        $data_list_peserta_antigen = $this->customer->deep_detail_by_id(null, ['jenis_test' => $ids_jenis_test, 'tgl_kunjungan' => $filter_tgl])->getResultArray();
+        // dd(db_connect()->showLastQuery());
+        foreach ($data_list_peserta_antigen as $key => $v) {
+            $data_lab = $this->laboratoriumModel->where(['id_customer' => $v['id'], 'valid' => "no"])->get()->getRowArray();
+            if ($data_lab != null) {
+                $peserta[] = array(
+                    'id' => $v['id'],
+                    'tgl_kunjungan' => $v['tgl_kunjungan'],
+                    'customer_unique' => $v['customer_unique'],
+                    'nik' => $v['nik'],
+                    'nama' => $v['nama'],
+                    'created_at' => $v['created_at']
+                );
+            }
+        }
+
 
         $data = array(
             'title' => "Peserta Rapid Test",
             'page' => "lab",
             'session' => $this->session,
-            'data_peserta_antigen' => $data_list_peserta_rapid,
+            'data_peserta_antigen' => $peserta,
             'layanan_test_model' => $this->layananTestModel,
             'layanan_model' => $this->layananModel,
             'test_model' => $this->testModel,

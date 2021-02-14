@@ -321,7 +321,6 @@ class Afiliasi extends ResourceController
         }
     }
 
-
     public function afiliasi_invoice($id, $tipe)
     {
         switch ($tipe) {
