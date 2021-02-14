@@ -215,20 +215,28 @@ class Midtrans_handlers extends ResourceController
         $invoice_number = $CustomerDetail['invoice_number'];
 
         $PaymentDetail = $this->PembayaranModel->pembayaran_by_customer($id_customer);
-        $qr_image = $Layanan->getUrlQRCode(base_url('api/hadir/' . $id_customer));
+
 
         // $img = file_get_contents($attachment);
         // $file_img = basename($img);
         // write_file("assets/qr_code/" . $file_img, $img);
         // $img_QR_att =
         // $attachment_name = $file_img;
-        $pdf_file = base_url('api/print_invoice/no-ttd/' . $invoice_number . "?attachment=1");
+        $pdf_url = base_url('api/print_invoice/no-ttd/' . $invoice_number . "?attachment=1");
+        $layanan = new Layanan;
+        $pdf_name = "Invoice-" . $CustomerDetail['nama'] . "-{$invoice_number}";
+        $qr_name = "qr_code_" . $CustomerDetail['nama'] . "_" . $CustomerDetail['id'];
+        $encode_id = base64_encode($CustomerDetail['id']);
+        $put_pdf = $layanan->put_content_pdf($pdf_url, $pdf_name);
+        $put_qr = $layanan->put_content_qr_code($encode_id, $qr_name);
+        $pdf_file = base_url('assets/pdf/' . $pdf_name . ".pdf");
+        $qr_image = base_url('assets/qr/' . $qr_name . ".png");
         $data_email = array(
             'detail_pembayaran' => $PaymentDetail,
             'detail_customer' => $CustomerDetail,
             'notif' => $notif_modtrans,
             'title' => 'Informasi Pembayaran dan Pendaftaran',
-            'qr_image' => $qr_image,
+            'qr_image' => $qr_name,
             'pdf_file' => $pdf_file
         );
 
@@ -240,11 +248,11 @@ class Midtrans_handlers extends ResourceController
         $Email->setFrom('pendaftaran@quicktest.id', 'Pendaftaran QuickTest.id');
         $Email->setSubject("Informasi Pembayaran dan Pendaftaran Quictest.id");
         $Email->setMessage($emailMessage);
-        $Email->attach($qr_image, 'inline', "qr_code_quictest.png", "image/png");
+        $Email->attach($qr_image, 'inline', "{$qr_name}.png", "image/png");
         $Email->attach(
             $pdf_file,
             'inline',
-            "Invoice " . $CustomerDetail['nama'] . " - {$invoice_number}.pdf",
+            "{$pdf_name}.pdf",
             "application/pdf"
         );
         if ($Email->send()) {

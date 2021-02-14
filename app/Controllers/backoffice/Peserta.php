@@ -239,7 +239,7 @@ class Peserta extends BaseController
         // jenis_layanan
         $layanan_test = $this->request->getPost('test_layanan');
         $explode_layanan = explode(" ", $layanan_test);
-        $id_test = $explode_layanan[0];
+        $id_test = intval($explode_layanan[0]);
         $id_layanan = $explode_layanan[1];
         $faskes_asal = $this->request->getPost('faskes_asal');
         $instansi = $this->request->getPost('instansi');
@@ -258,14 +258,14 @@ class Peserta extends BaseController
             $customer_UNIQUE = $this->customerPublic->getOrderId($id_layanan_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
 
             $no_urutan = $this->customerPublic->getUrutan($id_layanan_test, $tgl_kunjungan, $id_pemeriksaan, $jenis_layanan, $jam_kunjungan);
+            // dd(db_connect()->showLastQuery());
 
-
-            if ($id_test == 2 || $id_test == "2" || $id_test == 3 || $id_test == "3") {
+            if ($id_test == 2 || $id_test == 3) {
                 $nomor_bilik = 3;
             } else {
-                $hitung_bilik = $no_urutan % 7;
-                if ($hitung_bilik == 0 || $hitung_bilik == 3) {
-                    $hitung_bilik++;
+                $hitung_bilik = ($no_urutan % 7);
+                if ($hitung_bilik == 0 || $hitung_bilik >= 3) {
+                    $hitung_bilik += 1;
                 }
                 $nomor_bilik = $hitung_bilik;
             }
@@ -298,7 +298,7 @@ class Peserta extends BaseController
                 'alamat' => $alamat,
                 'id_marketing' => $id_marketing,
                 'instansi' => $instansi,
-                'status_test' => '',
+                'status_test' => 'menunggu',
                 'tahap' => 1,
                 'kehadiran' => $kehadiran,
                 'no_antrian' => $no_urutan,
@@ -333,7 +333,7 @@ class Peserta extends BaseController
 
 
             $detail_test = $this->testModel->find($id_test);
-            if ($status_pembayaran == "Invoice" || $status_pembayaran == "Belum Lunas" || $status_pembayaran == "Lunas") {
+            if ($status_pembayaran == "Invoice" || $status_pembayaran == "Belum Lunas" || $status_pembayaran == "Lunas" || $status_pembayaran == "") {
                 $tipe_pembayaran = "langsung";
             } else {
                 $tipe_pembayaran = "midtrans";
