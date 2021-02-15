@@ -242,6 +242,7 @@ class CustomerModel extends Model
             $builder->where('kehadiran', '23');
         }
         $builder->where('is_printed', 0)->orWhere('is_printed', null);
+        $builder->groupBy('no_invoice');
         $builder->orderBy('no_antrian', 'ASC');
         return $builder->get();
     }
