@@ -233,7 +233,7 @@ class CustomerModel extends Model
         return $builder->getResultArray();
     }
 
-    public function antrian_swabber($tanggal = null, $jam = null, $nomor_bilik = null, $tipe = "booking")
+    public function antrian_swabber($tanggal = null, $nomor_bilik = null, $tipe = "booking")
     {
         $builder = $this->customer();
         $builder->where('tgl_kunjungan', $tanggal)->where('nomor_bilik', $nomor_bilik);
