@@ -19,6 +19,7 @@ use App\Models\PemeriksaModel;
 use App\Models\SampleModel;
 use App\Models\StatusHasilModel;
 use App\Models\TestModel;
+use App\Controllers\backoffice\Layanan;
 use CodeIgniter\RESTful\ResourceController;
 // use Dompdf\Cpdf;
 use Dompdf\Dompdf;
@@ -593,6 +594,7 @@ class Laboratorium extends ResourceController
             return false;
         }
         $id_faskes = $customer['faskes_asal'];
+        $order_id = $customer['customer_unique'];
         $faskes = $this->faskes_asal->find($id_faskes);
         // dd(db_connect()->showLastQuery());
         if ($faskes == null) {
@@ -616,7 +618,11 @@ class Laboratorium extends ResourceController
 
         $nama_paket = $nama_test . " ({$nama_layanan})";
         $nama = $customer['nama'];
-        $title = "Hasil_Test_{$nama_test}_{$nama}";
+        $title = "Hasil_Test_{$nama_test}_{$nama}_{$order_id}";
+        $layanan = new Layanan;
+        // $get_qr = $layanan->getUrlQRCode(base_url('api/get_hasil_lab/'. $id_customer));
+        $layanan->put_content_qr_code(base_url('api/get_hasil_lab/'.$id_customer), $title);
+        $qr_file_hasil = base_url("assets/qr/{$title}.png");
         $data = [
             'title' => $title,
             'page' => "invoice_customer",
@@ -625,7 +631,8 @@ class Laboratorium extends ResourceController
             'detail_hasil' => $detail_hasil,
             'city' => $city,
             'province' => $province,
-            'nama_faskes' => $nama_faskes
+            'nama_faskes' => $nama_faskes,
+            'image_qr_result' => $qr_file_hasil
         ];
         $dompdf = new Dompdf();
 
