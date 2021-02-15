@@ -19,7 +19,10 @@
         html,
         body {
             font-family: 'Calibri' !important;
-            font-size: 10pt !important;
+            font-size: 8pt !important;
+        }
+        .table,th,td,tr{
+            border: none !important;
         }
     </style>
 </head>
@@ -29,103 +32,84 @@
     <footer></footer>
     <main class="content">
         <div class="row">
-            <div class="col-md-12">
-                <table class="table table-sm">
+            <div class="col-md-6">
+                <table class="table table-borderless table-sm">
                     <tr>
-                        <td>No. Reg/ Reg. No</td>
-                        <td>:</td>
-                        <td><?= $customer['customer_unique']; ?></td>
+                        <td width="25%">Pemeriksa/<i>Investigator</i></td>
+                        <td>: <?= $customer['customer_unique']; ?></td>
+                    </tr>
+                    <tr>
+                        <td >Dokter/<i>Doctor</i></td>
+                        <td>: <?= $customer['customer_unique']; ?></td>
+                    </tr>
+                    <tr>
+                        <td>No. Reg/<i>Reg. No</i></td>
+                        <td>: <?= $customer['customer_unique']; ?></td>
                     </tr>
                 </table>
             </div>
         </div>
+        <br><br>
         <div class="row">
             <div class="col-md-6">
-                <table class="table table-sm">
+                <table class="table table-borderless table-sm">
                     <tr>
-                        <td>Nama</td>
-                        <td>:</td>
-                        <td><?= $customer['nama']; ?></td>
+                        <td width="25%">Nama/<i>Name</i></td>
+                        <td width="20%">: <?= $customer['nama']; ?></td>
+                        <td width="25%">No. Passport/<i>Passport No.</i></td>
+                        <td width="30%">: </td>
                     </tr>
                     <tr>
-                        <td>NIK</td>
-                        <td>:</td>
-                        <td><?= $customer['nik']; ?></td>
+                        <td>NIK/<i>ID No.</i></td>
+                        <td>: <?= $customer['nik']; ?></td>
+                        <td>Kewarganegaraan/<i>Nationality</i></td>
+                        <td>: </td>
                     </tr>
                     <tr>
-                        <td>Tanggal Lahir/DOB</td>
-                        <td>:</td>
-                        <td><?= $customer['tanggal_lahir']; ?></td>
+                        <td>Tanggal Lahir/<i>DOB</i></td>
+                        <td>: <?= $customer['tanggal_lahir']; ?></td>
+                        <td>Alamat/<i>Address</i></td>
+                        <td>: <?= $customer['alamat']; ?></td>
                     </tr>
                     <tr>
-                        <td>Jenis Kelamin/Sex</td>
-                        <td>:</td>
-                        <td><?= $customer['jenis_kelamin']; ?></td>
-                    </tr>
-                    <tr>
-                        <td>Waktu Sampling</td>
-                        <td>:</td>
-                        <td><?= $detail_hasil['waktu_ambil_sampling']; ?></td>
-                    </tr>
-                    <tr>
-                        <td>Waktu Periksa</td>
-                        <td>:</td>
-                        <td><?= $detail_hasil['waktu_periksa_sampling']; ?></td>
-                    </tr>
-                    <tr>
-                        <td>Waktu Selesai</td>
-                        <td>:</td>
-                        <td><?= $detail_hasil['waktu_selesai_periksa']; ?></td>
-                    </tr>
-                </table>
-            </div>
-            <div class="col-md-6">
-                <table class="table table-sm">
-                    <tr>
-                        <td>No. Passport</td>
-                        <td>:</td>
+                        <td>Jenis Kelamin/<i>Sex</i></td>
+                        <td>: <?= $customer['jenis_kelamin']; ?></td>
+                        <td></td>
                         <td></td>
                     </tr>
                     <tr>
-                        <td>Kewarganegaraan</td>
-                        <td>:</td>
-                        <td></td>
+                        <td>Waktu Sampling/<i>Date Collected</i></td>
+                        <td>: <?= $detail_hasil['waktu_ambil_sampling']; ?></td>
+                        <td>Faskes Asal/<i>Health Facility</i></td>
+                        <td>: <?= $nama_faskes; ?></td>
                     </tr>
                     <tr>
-                        <td>Alamat</td>
-                        <td>:</td>
-                        <td><?= $customer['alamat']; ?></td>
+                        <td>Waktu Periksa/<i>Date Received</i></td>
+                        <td>: <?= $detail_hasil['waktu_periksa_sampling']; ?></td>
+                        <td>Kota/<i>City</i></td>
+                        <td>: <?= $city; ?></td>
                     </tr>
                     <tr>
-                        <td>Faskes</td>
-                        <td>:</td>
-                        <td><?= $nama_faskes; ?></td>
-                    </tr>
-                    <tr>
-                        <td>Kota</td>
-                        <td>:</td>
-                        <td><?= $city; ?></td>
-                    </tr>
-                    <tr>
-                        <td>Instansi</td>
-                        <td>:</td>
-                        <td><?= $customer['nama_instansi']; ?></td>
+                        <td>Waktu Selesai/<i>Date Reported</i></td>
+                        <td>: <?= $detail_hasil['waktu_selesai_periksa']; ?></td>
+                        <td>Instansi/<i>Institution</i></td>
+                        <td>: <?= $customer['nama_instansi']; ?></td>
                     </tr>
                 </table>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-bordered table-sm" id="data_customer">
+                <table class="table table-borderless table-sm" id="data_customer">
                     <thead>
-                        <tr class="bg-primary">
-                            <th>PEMERIKSAAN/TEST</th>
-                            <th>HASIL/RESULT</th>
-                            <th>BATAS NORMAL/NORMAL RANGE</th>
-                            <th>METODE/METHOD</th>
+                        <tr class="text-center" style="background-color: darkblue; color: white">
+                            <th>PEMERIKSAAN/<i>TEST</i></th>
+                            <th>HASIL/<i>RESULT</i></th>
+                            <th>BATAS NORMAL/<i>NORMAL RANGE</i></th>
+                            <th>METODE/<i>METHOD</i></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody style="background-color: #b3d9ff">
                         <tr>
                             <td><strong>SARS-Cov-2</strong></td>
                             <td></td>
@@ -152,7 +136,7 @@
                             <td><?= $detail_hasil['status_orf']; ?> (Cut off CT Value : <?= $detail_hasil['value_orf']; ?>)</td>
                             <td>RT-PCR</td>
                         </tr>
-                        <tr>
+                        <tr class="bg-light">
                             <td>Interpretasi</td>
                             <td colspan="3">Result RT-PCR SARS-CoV-2: <?= $detail_hasil['status_cov']; ?></td>
                         </tr>
@@ -175,7 +159,7 @@
             <li>Hasil PCR tidak dapat diandingkan antar satu laboratorium dengan laboratorium lain, karena perbedaan alat dan target gen yang digunakan.</li>
             <li>Surat ini dikirim dan ditandatangani secara elektronik.</li>
         </ol>
-        note:
+        <i>Note:</i>
         <ol>
             <li>The above examination results were carried out using the RT-PCR method and only described the conditions at the time of specimen collection.</li>
             <li>A negative PCR result does not necessarily mean that the patient is not infected with the pathogen, but only indicates that pathogenic genetic material is not present
@@ -185,30 +169,22 @@
             <li>This letter is sent and signed electronically</li>
         </ol>
         <div class="row">
-            <div class="col-md-6">
-                <table class="table">
+            <div class="col-md-12">
+                <table class="table table-borderless">
                     <tr>
-                        <td><i>QRCODE RESULT</i></td>
+                        <td class="text-center"><i>QRCODE RESULT</i></td>
+                        <td class="text-center">South Jakarta, <br>
+                        
+                        Dokter Pemeriksa/<i>Physician Examiner</i></td>
                     </tr>
                     <tr>
-                        <td></td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="col-md-6">
-                <table class="table">
-                    <tr>
-                        <td>South Jakarta, </td>
-                    </tr>
-                    <tr>
-                        <td><i>Dokter Pemeriksa/Physician Examiner</i></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
+                        <td>
+                            <img src="<?=$image_qr_result?>" alt="">
+                        </td>
+                        <td>
+                        
+                        <br>
+                        </td>
                     </tr>
                 </table>
             </div>
