@@ -11,6 +11,7 @@ use App\Models\AlatModel;
 use App\Models\CustomerCorporateModel;
 use App\Models\CustomerHomeServiceModel;
 use App\Models\CustomerModel;
+use App\Models\DataFileCorporateModel;
 use App\Models\DokterModel;
 use App\Models\HasilLaboratoriumModel;
 use App\Models\InstansiModel;
@@ -27,6 +28,7 @@ use App\Models\TestModel;
 use CodeIgniter\RESTful\ResourceController;
 use PHPExcel;
 use PHPExcel_IOFactory;
+use PHPExcel_Style_NumberFormat;
 
 class Afiliasi extends ResourceController
 {
@@ -162,14 +164,14 @@ class Afiliasi extends ResourceController
             $id_instansi = $this->request->getPost('id_instansi');
             $id_marketing = $this->request->getPost("id_marketing");
             $tgl_kunjungan = $this->request->getPost("tgl_kunjungan");
-            $jam_kunjungan = $this->request->getPost("jam_kunjungan");
+            $jam_kunjungan = $this->request->getPost("jam_kunjungan") . ":00:00";
             $id_layanan_test = $this->request->getPost("id_layanan");
             $faskes_asal = 3;
 
             $detail_layanan_test = $this->layananTestModel->find($id_layanan_test);
 
             $jenis_test = $detail_layanan_test['id'];
-            $id_test = $detail_layanan_test['id_test'];
+            $id_test = intval($detail_layanan_test['id_test']);
             $jenis_layanan = $detail_layanan_test['id_layanan'];
             $jenis_pemeriksaan = $detail_layanan_test['id_pemeriksaan'];
             $biaya_test = $detail_layanan_test['biaya'];
@@ -177,7 +179,7 @@ class Afiliasi extends ResourceController
             $detail_instansi = $this->instansi_model->detail_instansi($id_instansi);
 
             $nama_instansi = $detail_instansi['nama'];
-
+            $id_customers = array();
             $Layanan = new Layanan();
 
             $new_name_file = $nama_instansi . "-" . date('dmYHis') . "{$id_instansi}-" . $fileexcel->getRandomName();
@@ -188,6 +190,8 @@ class Afiliasi extends ResourceController
             $objPHPExcel = PHPExcel_IOFactory::load($fileLocation);
             //ambil sheet active
             $sheet    = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+            $id_customer_corporate = null;
+
             foreach ($sheet as $idx => $data) {
                 if ($idx == 1) {
                     continue;
@@ -197,8 +201,10 @@ class Afiliasi extends ResourceController
                 $email = $data['C'];
                 $jenis_kelamin = $data['D'];
                 $phone = $data['E'];
+                $phone = str_replace('`', '', $phone);
                 $tempat_lahir = $data['F'];
                 $tgl_lahir = $data['G'];
+                $tgl_lahir = PHPExcel_Style_NumberFormat::toFormattedString($tgl_lahir, 'YYYY-MM-DD');
                 $alamat = $data['H'];
                 if ($nama == "" || $nama == null) {
                     break;
@@ -206,16 +212,15 @@ class Afiliasi extends ResourceController
                 $customer_UNIQUE = $this->customers_controller->getOrderId($id_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
                 $no_urutan = $this->customers_controller->getUrutan($id_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan);
 
-                $dataMarketing = $this->marketing_model->find($id_marketing);
-                $dataLayanan = $this->layananModel->find($jenis_layanan);
 
-                if ($jenis_test == 2 || $jenis_test == "2") {
-                    $nomor_bilik = 1;
-                } else if ($jenis_test == 3 || $jenis_test == "3") {
-                    $nomor_bilik = 2;
+                if ($id_test == 2 || $id_test == 3) {
+                    $nomor_bilik = 3;
                 } else {
-                    $hitung_bilik = 6 % $no_urutan;
-                    $nomor_bilik = $hitung_bilik + 2;
+                    $hitung_bilik = $no_urutan % 7;
+                    if ($hitung_bilik == 0 || $hitung_bilik >= 3) {
+                        $hitung_bilik += 1;
+                    }
+                    $nomor_bilik = $hitung_bilik;
                 }
 
                 if ($idx == 2) {
@@ -242,7 +247,7 @@ class Afiliasi extends ResourceController
                         'nomor_bilik' => $nomor_bilik,
                         'jam_kunjungan' => $jam_kunjungan,
                         'tgl_kunjungan' => $tgl_kunjungan,
-                        'status_pembayaran' => 'invoice',
+                        'status_pembayaran' => 'Invoice',
                         'status_peserta' => "20",
                     ];
                     $insert_corporate = $this->customer_corporate->insert($data_insert_corporate);
@@ -251,11 +256,11 @@ class Afiliasi extends ResourceController
                         return redirect()->back();
                         // return $this->failValidationError();
                     }
-                    $id_inserted = $this->customer_corporate->getInsertID();
+                    $id_customer_corporate = $this->customer_corporate->getInsertID();
 
-                    $invoice_corporate = $this->afiliasi_invoice($id_inserted, "corporate");
+                    $invoice_corporate = $this->afiliasi_invoice($id_customer_corporate, "corporate");
                     $arr_invoice_corporate = ['invoice_number' => $invoice_corporate];
-                    $this->customer_corporate->update($id_inserted, $arr_invoice_corporate);
+                    $this->customer_corporate->update($id_customer_corporate, $arr_invoice_corporate);
                 }
 
                 $DataInsertCustomer = [
@@ -284,7 +289,7 @@ class Afiliasi extends ResourceController
                     'status_pembayaran' => 'Invoice',
                     'status_peserta' => "20",
                     'is_corporate' => "yes",
-                    'id_corporate' => $id_inserted
+                    'id_cust_corporate' => $id_customer_corporate
                 ];
                 $insert_customer = $this->customerModel->insert($DataInsertCustomer);
 
@@ -310,119 +315,29 @@ class Afiliasi extends ResourceController
                     $this->session->setFlashdata('error', "Gagal tambahkan data peserta corporate tahap 2");
                     return redirect()->back();
                 }
-                $this->send_email_customer_afiliasi($insert_id);
-                $this->send_whatsapp_customer_afiliasi($insert_id);
+                $id_customers[] = $insert_id;
             }
-            $this->session->setFlashdata('succcess', "Berhasil Submit Data Peserta Pada Kami");
+            $fileexcel->move('assets/corporate', $new_name_file);
+            $data_file_corporate_model = new DataFileCorporateModel();
+            $array_insert = [
+                'nama_file' => $new_name_file,
+                'id_instansi' => $id_instansi,
+                'id_cust_corporate' => $id_customer_corporate,
+                'created_by' => '999',
+                'updated_by' => '999'
+            ];
+            $data_file_corporate_model->insert($array_insert);
+            foreach ($id_customers as $cust => $val) {
+                $this->send_email_customer_afiliasi($val);
+                $this->send_whatsapp_customer_afiliasi($val);
+            }
+            // $data_file_corporate_model->getInsertID()
+            $this->session->setFlashdata('success', "Berhasil Submit Data Peserta Pada Kami");
             return redirect()->to('/afiliasi/corporate/' . $id_instansi);
         } else {
             $this->session->setFlashdata('error', "Gagal Submit Data Peserta Pada Kami");
             return redirect()->back();
         }
-    }
-
-    public function save_rujukan()
-    {
-        $peserta_hs     =   $this->request->getVar("peserta");
-        $total_peserta  =   count($peserta_hs);
-        if ($total_peserta < 5) {
-            $this->session->setFlashdata('error', "Total peserta home service minimal adalah 5 orang, 
-                silahkan isi ulang hingga minimal 5 orang peserta.");
-            return redirect()->back();
-        }
-
-        $id_instansi    = 1;
-        $id_marketing   = $this->request->getVar("id_marketing");
-
-        $tgl_kunjungan  = $this->request->getVar("tgl_kunjungan");
-        $jam_kunjungan  = $this->request->getVar("jam_kunjungan");
-        $faskes_asal    = 1;
-
-        $nama           =   $this->request->getPost('nama');
-        $email          =   $this->request->getPost('email');
-        $phone          =   $this->request->getPost('phone');
-        $nik            =   $this->request->getPost('nik');
-        $jenis_kelamin  =   $this->request->getPost('jenis_kelamin');
-        $tempat_lahir   =   $this->request->getPost('tempat_lahir');
-        $tgl_lahir      =   $this->request->getPost('tgl_lahir');
-        $alamat         =   $this->request->getPost('alamat');
-
-        $id_layanan_test = $this->request->getPost("id_layanan");
-        $detail_layanan_test = $this->layananTestModel->find($id_layanan_test);
-
-        $jenis_test = $detail_layanan_test['id'];
-        $id_test = $detail_layanan_test['id_test'];
-        $jenis_layanan = $detail_layanan_test['id_layanan'];
-        $jenis_pemeriksaan = $detail_layanan_test['id_pemeriksaan'];
-        $biaya_test = $detail_layanan_test['biaya'];
-
-        $customer_UNIQUE = $this->customers_controller->getOrderId($id_test, $jenis_pemeriksaan, $tgl_kunjungan, $jenis_layanan, $jam_kunjungan);
-        $no_urutan = $this->customers_controller->getUrutan($id_test, $tgl_kunjungan, $jenis_pemeriksaan, $jenis_layanan, $jam_kunjungan);
-
-        $dataMarketing = $this->marketing_model->find($id_marketing);
-        $dataLayanan = $this->layananModel->find($jenis_layanan);
-
-        if ($jenis_test == 2 || $jenis_test == "2") {
-            $nomor_bilik = 1;
-        } else if ($jenis_test == 3 || $jenis_test == "3") {
-            $nomor_bilik = 2;
-        } else {
-            $hitung_bilik = 6 % $no_urutan;
-            $nomor_bilik = $hitung_bilik + 2;
-        }
-
-        $DataInsertCustomer = [
-            'nama' => $nama,
-            'email' => $email,
-            'nik' => $nik,
-            'phone' => $phone,
-            'jenis_test' => $jenis_test,
-            'jenis_pemeriksaan' => $jenis_pemeriksaan,
-            'jenis_layanan' => $jenis_layanan,
-            'faskes_asal' => $faskes_asal,
-            'customer_unique' => $customer_UNIQUE,
-            'jenis_kelamin' => $jenis_kelamin,
-            'tempat_lahir' => $tempat_lahir,
-            'tanggal_lahir' => $tgl_lahir,
-            'alamat' => $alamat,
-            'id_marketing' => $id_marketing,
-            'instansi' => $id_instansi,
-            'status_test' => 'menunggu',
-            'tahap' => 1,
-            'kehadiran' => '22',
-            'no_antrian' => $no_urutan,
-            'nomor_bilik' => $nomor_bilik,
-            'jam_kunjungan' => $jam_kunjungan,
-            'tgl_kunjungan' => $tgl_kunjungan,
-            'status_pembayaran' => 'invoice',
-            'status_peserta' => "20",
-        ];
-        $insert_customer = $this->customerModel->insert($DataInsertCustomer);
-
-        if ($insert_customer) {
-            $insert_id = $this->customerModel->getInsertID();
-        } else {
-            $this->session->setFlashdata('error', "Gagal tambahkan data peserta home service tahap 2");
-            return redirect()->back();
-        }
-        $InvoiceCustomer = $this->afiliasi_invoice($insert_id, "rujukan");
-        $arr_invoice = ['invoice_number' => $InvoiceCustomer];
-        $this->customerModel->update($insert_id, $arr_invoice);
-
-        $data_pembayaran = [
-            'id_customer' => $insert_id,
-            'tipe_pembayaran' => "langsung",
-            'amount' => $biaya_test,
-            'jenis_pembayaran' => "Invoice",
-            'status_pembayaran' => "Invoice"
-        ];
-        $insert_pembayaran = $this->PembayaranModel->insert($data_pembayaran);
-        if (!$insert_pembayaran) {
-            $this->session->setFlashdata('error', "Gagal tambahkan data peserta home service tahap 2");
-            return redirect()->back();
-        }
-        $this->send_email_customer_afiliasi($insert_id);
-        $this->send_whatsapp_customer_afiliasi($insert_id);
     }
 
     public function afiliasi_invoice($id, $tipe)
@@ -451,6 +366,7 @@ class Afiliasi extends ResourceController
                 break;
             default:
                 # code...
+                return "";
                 break;
         }
     }
@@ -486,7 +402,7 @@ class Afiliasi extends ResourceController
             'title' => $title,
             'qr_image' => $qr_image,
             'pdf_file' => $pdf_file,
-            'informasi' => "Terima kasih telah melakukan pembayaran pada kami, berikut kami berikan gambar QR Code untuk anda 
+            'informasi' => "Terima kasih telah melakukan pemesanan pada kami, berikut kami berikan gambar QR Code untuk anda 
                                     hadir pada tempat kami saat melakukan konfirmasi kedatangan 
                                     pada tanggal {$tgl_kunjungan} 
                                     pukul {$jam_kunjungan}."
@@ -513,7 +429,7 @@ class Afiliasi extends ResourceController
         }
     }
 
-    protected function send_whatsapp_customer_afiliasi($id_customer = null)
+    public function send_whatsapp_customer_afiliasi($id_customer = null)
     {
         if ($id_customer != null) {
             $whatsapp_service = new Whatsapp_service;

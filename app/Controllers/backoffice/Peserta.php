@@ -87,11 +87,11 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
+
         $this->layananTestModel = new LayananTestModel();
         $this->instansiModel = new InstansiModel();
         $this->marketingModel = new MarketingModel();
@@ -152,11 +152,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
 
         $this->instansiModel = new InstansiModel();
         $this->marketingModel = new MarketingModel();
@@ -201,11 +200,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
         // $validation =  \Config\Services::validation();
         $this->validasi_peserta();
 
@@ -239,7 +237,7 @@ class Peserta extends BaseController
         // jenis_layanan
         $layanan_test = $this->request->getPost('test_layanan');
         $explode_layanan = explode(" ", $layanan_test);
-        $id_test = $explode_layanan[0];
+        $id_test = intval($explode_layanan[0]);
         $id_layanan = $explode_layanan[1];
         $faskes_asal = $this->request->getPost('faskes_asal');
         $instansi = $this->request->getPost('instansi');
@@ -258,14 +256,14 @@ class Peserta extends BaseController
             $customer_UNIQUE = $this->customerPublic->getOrderId($id_layanan_test, $id_pemeriksaan, $tgl_kunjungan, $id_layanan, $jam_kunjungan);
 
             $no_urutan = $this->customerPublic->getUrutan($id_layanan_test, $tgl_kunjungan, $id_pemeriksaan, $jenis_layanan, $jam_kunjungan);
+            // dd(db_connect()->showLastQuery());
 
-
-            if ($id_test == 2 || $id_test == "2" || $id_test == 3 || $id_test == "3") {
+            if ($id_test == 2 || $id_test == 3) {
                 $nomor_bilik = 3;
             } else {
-                $hitung_bilik = $no_urutan % 7;
-                if ($hitung_bilik == 0 || $hitung_bilik == 3) {
-                    $hitung_bilik++;
+                $hitung_bilik = ($no_urutan % 7);
+                if ($hitung_bilik == 0 || $hitung_bilik >= 3) {
+                    $hitung_bilik += 1;
                 }
                 $nomor_bilik = $hitung_bilik;
             }
@@ -298,7 +296,7 @@ class Peserta extends BaseController
                 'alamat' => $alamat,
                 'id_marketing' => $id_marketing,
                 'instansi' => $instansi,
-                'status_test' => '',
+                'status_test' => 'menunggu',
                 'tahap' => 1,
                 'kehadiran' => $kehadiran,
                 'no_antrian' => $no_urutan,
@@ -333,7 +331,7 @@ class Peserta extends BaseController
 
 
             $detail_test = $this->testModel->find($id_test);
-            if ($status_pembayaran == "Invoice" || $status_pembayaran == "Belum Lunas" || $status_pembayaran == "Lunas") {
+            if ($status_pembayaran == "Invoice" || $status_pembayaran == "Belum Lunas" || $status_pembayaran == "Lunas" || $status_pembayaran == "") {
                 $tipe_pembayaran = "langsung";
             } else {
                 $tipe_pembayaran = "midtrans";
@@ -396,11 +394,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
 
         $this->statusHadir = new StatusHasilModel();
         $this->customer_overload = new CustomerOverloadModel();
@@ -462,12 +459,8 @@ class Peserta extends BaseController
             $this->session->setFlashData("error", "Anda harus login");
             return redirect()->to("/backoffice/login");
         }
-        $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
-            $this->session->setFlashData("error", "Anda tidak memiliki akses");
-            return redirect()->to("/backoffice/login");
-        }
+
+
 
         $this->instansiModel = new InstansiModel();
         $this->marketingModel = new MarketingModel();
@@ -542,11 +535,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
 
 
         $this->instansiModel = new InstansiModel();
@@ -598,11 +590,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 4, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
 
         $this->validasi_peserta();
 
@@ -726,11 +717,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
         // var_dump($user_level);
         // exit();
 
@@ -757,11 +747,10 @@ class Peserta extends BaseController
             return redirect()->to("/backoffice/login");
         }
         $user_level = intval($this->session->get("user_level"));
-        if ($user_level == 1 || $user_level == 100) {
-        } else {
+        if (!in_array($user_level, array(1, 2, 99, 103))) :
             $this->session->setFlashData("error", "Anda tidak memiliki akses");
             return redirect()->to("/backoffice/login");
-        }
+        endif;
 
         $id_customer = base64_decode($this->request->getPost("id_customer"));
 

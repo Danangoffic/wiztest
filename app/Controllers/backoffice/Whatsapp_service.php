@@ -57,13 +57,7 @@ class Whatsapp_service extends ResourceController
         }
         $new_phone = $this->new_phone_number($phone);
         // $get_0 = substr($phone, 0, 1);
-        // if ($get_0 == "0" || $get_0 == 0) {
-        //     $new_0_to_region = str_replace("0", "62", $get_0);
-        //     $new_phone = (int)$phone;
-        //     $new_phone = $new_0_to_region . $new_phone;
-        // } else {
-        //     $new_phone = $phone;
-        // }
+
         $tgl_kunjungan = $cek_customer['tgl_kunjungan'];
         $nama_layanan = $cek_customer['nama_layanan'];
         $nama_test = $cek_customer['nama_test'];
@@ -73,21 +67,18 @@ class Whatsapp_service extends ResourceController
         // MAKE SURE PHONE NUMBER USING REGION CODE
         // $APIkey = $api_key_wasap;
         // $phone = $new_phone;
-        $message = "Terima kasih kepada Bpk/Ibu {$cek_customer['nama']}, \n" .
-            "telah melakukan pembayaran pada kami untuk mengikuti Test *{$nama_test}* pada tanggal *{$tgl_kunjungan}*." .
-            "Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.";
-        // $message = 'Terima kasih kepada Bpk/Ibu ' . $cek_customer['nama'] .
-        //     " yang telah melakukan pembayaran pada kami untuk mengikuti test *{$nama_test}* pada tanggal *{$tgl_kunjungan}*. \n
-        //     Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.";
-        $str = base_url("/api/hadir/" . $id_customer);
-        $url_img = $this->layanan_bo->getUrlQRCode($str);
-        // $image = "<img download src=data:image/png;base64," . base64_encode($url_img) . ">";
+        $message = "Terima kasih kepada Bpk/Ibu {$cek_customer['nama']}, \n
+            telah melakukan pembayaran pada kami untuk mengikuti Test *{$nama_test}* pada tanggal *{$tgl_kunjungan}*.
+            Berikut kami lampirkan QR Code yang diperlukan saat anda hadir pada klinik kami.\n\n
+            *Note*: Jika QR Code tidak ada pada email masuk, silahkan cek pada Spam Email Anda.";
+
+
         $url = $this->url_send_txt_img;
         $data = array(
             'APIKey'     => $this->api_key,
             'phoneNumber'  => $new_phone,
             'message' => $message,
-            'urlDownloadImage' => $url_img,
+            'urlDownloadImage' => base_url('assets/qr/qr_code_' . $cek_customer['nama'] . "_"  . $cek_customer['id'] . ".png"),
         );
 
         $result = $this->send_curl($url, $data);
@@ -142,9 +133,12 @@ class Whatsapp_service extends ResourceController
         // MAKE SURE PHONE NUMBER USING REGION CODE
         // $APIkey = $api_key_wasap;
         // $phone = $new_phone;
+        $url_invoice =  base_url("assets/pdf/Invoice-{$nama}-{$no_invoice}.pdf");
         $message = "Terima kasih kepada Bpk/Ibu {$nama}, \n" .
             "telah melakukan pembayaran pada kami untuk mengikuti Test *{$nama_test}* pada tanggal *{$tgl_kunjungan}*." .
-            "Berikut kami lampirkan link untuk Invoice pembayaran anda.\n" . base_url('/api/print_invoice/no-ttd/' . $no_invoice);
+            "Berikut kami lampirkan link untuk Invoice pembayaran anda.\n" . base_url('/api/print_invoice/no-ttd/' . $no_invoice) . "\n
+            Atau bisa melalui <a download href=" . $url_invoice . "> " . $url_invoice . "</a>
+            ";
 
         $url = $this->url_send_txt;
         $data = array(

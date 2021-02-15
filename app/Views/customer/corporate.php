@@ -39,8 +39,7 @@
                 </div>
             <?php endif; ?>
 
-        </div>
-        <div class="col-md-12">
+
             <div class="card">
                 <h4 class="card-header bg-primary text-white">
                     Form Peserta <?= $data_instansi['nama']; ?>
@@ -121,7 +120,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <button type="submit" class="btn btn-primary btn-block" id="btn-submit">Submit Peserta</button>
+                                <button type="submit" class="btn btn-primary btn-block" onclick="btn_submit()" id="btn_submit">Submit Peserta</button>
                             </div>
                         </div>
 
@@ -143,13 +142,18 @@
     $(document).ready(function() {
         $("#loading_jam").hide();
         $("#loading").hide();
-        // document.getElementById("add_peserta").addEventListener("click")
     });
 
     function selectMenu(id_jenis_test) {
         // $(".btn-test").removeClass("btn-primary active");
         // $("#test" + id_jenis_test).addClass("btn-primary active");
         return get_selected_test(id_jenis_test);
+    }
+
+    function btn_submit() {
+        document.getElementById("btn_submit").disabled = true;
+        $("#btn_submit").html("Loading...");
+        document.getElementById("form_corporate").disabled = true;
     }
 
     function get_selected_test(id_jenis_test) {

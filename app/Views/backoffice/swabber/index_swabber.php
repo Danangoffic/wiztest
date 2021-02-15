@@ -108,7 +108,17 @@
                 if ($data_bilik != null) :
                     foreach ($data_bilik as $key => $bilik_swabber) {
                         $swabber = $detail_user->find($bilik_swabber['assigned_to']);
+                        $nomor_bilik = $bilik_swabber['nomor_bilik'];
+                        if ($nomor_bilik == 3) :
                 ?>
+                            <div class="col-md-12">
+
+                                <a href="/backoffice/laboratorium/data_peserta_antigen" class="btn btn-primary btn-sm mb-3">Validasi Peserta Antigen</a>
+                                <a href="/backoffice/laboratorium/data_peserta_antigen" class="btn btn-primary btn-sm mb-3">Validasi Peserta Rapidtest</a>
+                            </div>
+                        <?php
+                        endif;
+                        ?>
                         <div class="col-md-6">
                             <div class="card card-primary">
                                 <div class="card-header">
