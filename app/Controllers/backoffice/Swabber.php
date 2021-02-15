@@ -123,7 +123,7 @@ class Swabber extends ResourceController
         if (!$requested_by || $requested_by == "" || $requested_by == null) {
             return $this->failUnauthorized();
         }
-        $jam = date("H") . ':00:00';
+        // $jam = date("H") . ':00:00';
         // $detail_layanan_test = $this->layananTestModel->where(['id_layanan' => $id_layanan])->first();
 
         // $id_jenis_test = $detail_layanan_test['id'];
@@ -135,11 +135,11 @@ class Swabber extends ResourceController
         // if (!in_array($user_level, $array_user_bilik)) {
         //     return null;
         // }
-        $antrian_swabber = $this->customer_model->antrian_swabber($tanggal, $jam, $nomor_bilik, "antrian")->getResultArray();
+        $antrian_swabber = $this->customer_model->antrian_swabber($tanggal, $nomor_bilik, "antrian")->getResultArray();
 
 
         // echo db_connect()->showLastQuery() . "<br>";
-        $booking_antrian = $this->customer_model->antrian_swabber($tanggal, $jam, $nomor_bilik)->getResultArray();
+        $booking_antrian = $this->customer_model->antrian_swabber($tanggal, $nomor_bilik)->getResultArray();
         // echo db_connect()->showLastQuery() . "<br>";
         $data = array('antrian_swabber' => $antrian_swabber, 'booking_antrian' => $booking_antrian);
         return $this->respond($data, 200, 'success');
