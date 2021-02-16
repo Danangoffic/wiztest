@@ -23,10 +23,10 @@
 
         /** Define now the real margins of every page in the PDF **/
         body {
-            margin-top: 3cm;
+            margin-top: .5cm;
             margin-left: 0cm;
             margin-right: 0cm;
-            margin-bottom: 2cm;
+            margin-bottom: .5cm;
         }
 
         /** Define the header rules **/
@@ -154,7 +154,7 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <table class="table table-borderless table-sm" id="data_customer" style="border: 2px solid #333 !important">
+                    <table class="table table-borderless table-sm" id="data_customer" style="border: 1px solid #333 !important">
                         <thead>
                             <tr class="text-center" style="background-color: #1a428a; color: white">
                                 <th>PEMERIKSAAN/<i>TEST</i></th>
