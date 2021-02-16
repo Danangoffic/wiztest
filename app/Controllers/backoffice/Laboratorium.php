@@ -671,9 +671,8 @@ class Laboratorium extends ResourceController
         $dompdf->setPaper('A4', 'portrait');
         // $dompdf->output();
         $dompdf->render();
-
+        $this->response->setHeader('Content-type', "application/pdf");
         $dompdf->stream($title . ".pdf", ['Attachment' => 0]);
-        // $this->response->setHeader('Content-type', "application/pdf");
     }
 
     public function send_hasil_peserta($id_customer = null)
