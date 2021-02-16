@@ -166,9 +166,9 @@
                                 <td><?= $detail_hasil['status_cov']; ?></td>
                                 <td></td>
                             </tr>
-                            <tr>
+                            <tr class="bg-light">
                                 <td>Interpretasi</td>
-                                <td colspan="3">Result RT-PCR SARS-CoV-2: <?= $detail_hasil['status_cov']; ?></td>
+                                <td colspan="3">Result Anti SARS-CoV-2: <?= $detail_hasil['status_cov']; ?></td>
                             </tr>
                             <tr>
                                 <td>Rekomendasi</td>
