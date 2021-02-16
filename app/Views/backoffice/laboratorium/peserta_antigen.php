@@ -63,31 +63,31 @@
                             <table class="table table-bordered table-sm table-condensed" id="data_laboratorium">
                                 <thead class="text-center text-justify">
                                     <tr>
-                                        <th>No</th>
-                                        <th>Tanggal Kunjungan</th>
-                                        <th>Registrasi</th>
-                                        <th>NIK</th>
-                                        <th>Nama</th>
-                                        <th>Aksi</th>
+                                        <th class="text-center">No</th>
+                                        <th class="text-center">Tanggal Kunjungan</th>
+                                        <th class="text-center">Registrasi</th>
+                                        <th class="text-center">NIK</th>
+                                        <th class="text-center">Nama</th>
+                                        <th class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="result">
                                     <?php
                                     $no = 1;
                                     foreach ($data_peserta_antigen as $key => $peserta) {
-                                        $tgl_kunjungan = $peserta['tgl_kunjungan'];
-                                        $registrasi = $peserta['created_at'];
+                                        $tgl_kunjungan = date("d F Y", strtotime($peserta['tgl_kunjungan']));
+                                        $registrasi = date("d F Y, H:i", strtotime($peserta['created_at']));
                                         $nik = $peserta['nik'];
                                         $nama = $peserta['nama'];
                                         $id = $peserta['id'];
                                     ?>
                                         <tr>
-                                            <td><?= $no++; ?></td>
+                                            <td class="text-center"><?= $no++; ?></td>
                                             <td><?= $tgl_kunjungan; ?></td>
                                             <td><?= $registrasi; ?></td>
                                             <td><?= $nik; ?></td>
                                             <td><?= $nama; ?></td>
-                                            <td>
+                                            <td class="text-center">
                                                 <a href="verifikasi_peserta/<?= $id; ?>" target="_blank" class="btn btn-info btn-sm">Verifikasi</a>
                                             </td>
                                         </tr>

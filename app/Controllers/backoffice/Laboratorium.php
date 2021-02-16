@@ -176,17 +176,16 @@ class Laboratorium extends ResourceController
         $this->layananModel = new LayananModel();
         $this->testModel = new TestModel();
         $this->layananTestModel = new LayananTestModel();
-        $data_layanan = $this->layananTestModel->where(['id_test' => 3])->get()->getResultArray();
-        $ids_jenis_test = array();
-        foreach ($data_layanan as $dataL => $val) {
-            $ids_jenis_test[] = $val['id'];
-        }
-        $peserta = array();
+
         $filter_tgl = ($date2) ? "and customers.tgl_kunjungan between '{$date1}' and '{$date2}'" : "and customers.tgl_kunjungan = '{$date1}'";
-        $data_list_peserta_antigen = db_connect()->query("SELECT customers.* FROM `hasil_laboratorium` 
+        $query = "SELECT customers.* FROM `hasil_laboratorium` 
         join customers on customers.id = hasil_laboratorium.id_customer 
         where hasil_laboratorium.valid = 'no' 
-        and customers.jenis_test IN (SELECT id from data_layanan_test where id_test = 3) {$filter_tgl}")->getResultArray();
+        and customers.jenis_test IN (SELECT id from data_layanan_test where id_test = 3) 
+        {$filter_tgl} 
+        GROUP BY customers.customer_unique 
+        ORDER BY customers.id DESC";
+        $data_list_peserta_antigen = db_connect()->query($query)->getResultArray();
         // echo db_connect()->showLastQuery();
 
         // dd(db_connect()->showLastQuery());
@@ -219,15 +218,17 @@ class Laboratorium extends ResourceController
             $date2 = false;
         }
 
-        $data_layanan = $this->layananTestModel->where(['id_test' => 2])->get()->getResultArray();
-        $ids_jenis_test = array();
-        foreach ($data_layanan as $dataL => $val) {
-            $ids_jenis_test[] = $val['id'];
-        }
-        $peserta = array();
-        $filter_tgl = ($date2) ? "a.tgl_kunjungan between {$date1} and {$date2}" : $date1;
-        $data_list_peserta_antigen = $this->customer->deep_detail_by_id(null, ['jenis_test' => $ids_jenis_test, 'tgl_kunjungan' => $filter_tgl])->getResultArray();
+        $filter_tgl = ($date2) ? "and customers.tgl_kunjungan between '{$date1}' and '{$date2}'" : "and customers.tgl_kunjungan = '{$date1}'";
+        $query = "SELECT customers.* FROM `hasil_laboratorium` 
+        join customers on customers.id = hasil_laboratorium.id_customer 
+        where hasil_laboratorium.valid = 'no' 
+        and customers.jenis_test IN (SELECT id from data_layanan_test where id_test = 2) 
+        {$filter_tgl} 
+        GROUP BY customers.customer_unique 
+        ORDER BY customers.id DESC";
+        $data_list_peserta_antigen = db_connect()->query($query)->getResultArray();
         // dd(db_connect()->showLastQuery());
+        $peserta = array();
         foreach ($data_list_peserta_antigen as $key => $v) {
             $data_lab = $this->laboratoriumModel->where(['id_customer' => $v['id'], 'valid' => "no"])->get()->getRowArray();
             if ($data_lab != null) {
@@ -241,7 +242,6 @@ class Laboratorium extends ResourceController
                 );
             }
         }
-
 
         $data = array(
             'title' => "Peserta Rapid Test",
@@ -268,7 +268,7 @@ class Laboratorium extends ResourceController
         $this->testModel = new TestModel();
         $this->layananTestModel = new LayananTestModel();
         $detail_hasil_lab = $this->laboratoriumModel->by_id_customer($id_customer);
-        dd(db_connect()->showLastQuery());
+        // dd(db_connect()->showLastQuery());
         if ($detail_hasil_lab == null) {
             $detail_customer = $this->customer->detail_customer($id_customer);
             if ($detail_customer) {
@@ -303,7 +303,20 @@ class Laboratorium extends ResourceController
             'status_orf' => ['val' => 'Negative', 'val' => 'Positive'],
             'status_gene_n' => ['val' => 'Negative', 'val' => 'Positive'],
         );
-        return view("backoffice/laboratorium/verifikasi_peserta", $data);
+        switch ($id_test) {
+            case 1:
+                return view("backoffice/laboratorium/verifikasi_peserta", $data);
+                break;
+            case 2:
+                return view("backoffice/laboratorium/insert_rapid", $data);
+                break;
+            case 3:
+                return view("backoffice/laboratorium/insert_antigen", $data);
+                break;
+            default:
+                # code...
+                break;
+        }
     }
 
     public function save_verifikasi()
@@ -356,6 +369,7 @@ class Laboratorium extends ResourceController
             return redirect()->to("/backoffice/login");
         }
         $this->fileLabModel = new FileLabModel();
+        $this->layananTestModel = new LayananTestModel();
         $type = $this->request->getPost("type");
         try {
             if ($type == "import_excel") {
@@ -409,6 +423,10 @@ class Laboratorium extends ResourceController
                                 $status_ins = true;
                             }
                             if ($status_ins) {
+                                $id_layanan_test = $customer['jenis_test'];
+                                $detail_layanan_test = $this->layananTestModel->find($id_layanan_test);
+                                $id_test = $detail_layanan_test['id_test'];
+
                                 $created_by = $this->session->get('id_user');
                                 $updated_by = $this->session->get("id_user");
                                 $id_customer = $customer['id'];
@@ -434,6 +452,11 @@ class Laboratorium extends ResourceController
                                     'waktu_periksa_sampling' => $SubmittingDate,
                                     'waktu_selesai_periksa' => $ReportingDate,
                                 );
+                                if (in_array($id_test, array(2, 3))) {
+                                    $array_insert['status_cov'] = ($statusCov == "Positive") ? "Reactive" : "Non-Reactive";
+                                    $array_insert['status_igg'] = ($statusCov == "Positive") ? "Reactive" : "Non-Reactive";
+                                    $array_insert['status_igm'] = ($statusCov == "Positive") ? "Reactive" : "Non-Reactive";
+                                }
                                 // print_r($array_insert);
                                 // dd($array_insert);
                                 $this->laboratoriumModel->insert($array_insert);
