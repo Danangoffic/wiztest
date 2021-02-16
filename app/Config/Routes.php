@@ -32,7 +32,7 @@ $routes->setAutoRoute(true);
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 
-$routes->get('/', 'Customer::index');
+$routes->get('/', 'backoffice\Home::index');
 $routes->add('/backoffice', 'backoffice\Home::index');
 $routes->get('/backoffice/login', 'backoffice\User::login');
 $routes->post('/backoffice/doLogin', 'backoffice\User::doLogin');
