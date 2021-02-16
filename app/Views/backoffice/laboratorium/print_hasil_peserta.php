@@ -23,10 +23,10 @@
 
         /** Define now the real margins of every page in the PDF **/
         body {
-            margin-top: 2cm;
+            margin-top: 3cm;
             margin-left: 0cm;
             margin-right: 0cm;
-            margin-bottom: .5cm;
+            margin-bottom: 0cm;
         }
 
         /** Define the header rules **/
@@ -226,17 +226,12 @@
                 <div class="col-md-12">
                     <table class="table table-borderless">
                         <tr>
-                            <td class="text-center"><i>QRCODE RESULT</i></td>
-                            <td class="text-center"><?= $city; ?>, <?= $sign_waktu; ?><br>
-
-                                Dokter Pemeriksa/<i>Physician Examiner</i></td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">
+                            <td class="text-center"><i>QRCODE RESULT</i><br>
                                 <img src="<?= $image_qr_result ?>" alt="">
                             </td>
-                            <td class="text-center">
+                            <td class="text-center"><?= $city; ?>, <?= $sign_waktu; ?><br>
 
+                                Dokter Pemeriksa/<i>Physician Examiner</i>
                                 <br>
                                 <?= $doctor_name; ?>
                             </td>
