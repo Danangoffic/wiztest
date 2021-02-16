@@ -226,7 +226,7 @@
                 <div class="col-md-12">
                     <table class="table table-borderless">
                         <tr>
-                            <td class="text-center"><i>QRCODE RESULT</i><br>
+                            <td class="text-center">QRCODE RESULT<br><br>
                                 <img src="<?= $image_qr_result ?>" alt="">
                             </td>
                             <td class="text-center"><?= $city; ?>, <?= $sign_waktu; ?><br>
