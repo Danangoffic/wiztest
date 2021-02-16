@@ -29,6 +29,7 @@ class Whatsapp_service extends ResourceController
     protected $url_send_txt;
     protected $url_send_txt_img;
     protected $curl;
+    protected $send_on;
     public function __construct()
     {
         $this->customer_model = new CustomerModel();
@@ -144,7 +145,8 @@ class Whatsapp_service extends ResourceController
         $data = array(
             'APIKey'     => $this->api_key,
             'phoneNumber'  => $new_phone,
-            'message' => $message
+            'message' => $message,
+            'send_on' => $this->get_send_on()
         );
 
 
@@ -168,6 +170,7 @@ class Whatsapp_service extends ResourceController
         $new_phone = $this->new_phone_number($phone);
 
         $tgl_kunjungan = $customer['tgl_kunjungan'];
+        $new_tgl_kunjungan = date("d F Y", strtotime($tgl_kunjungan));
         $nama = $customer['nama'];
         $nama_layanan = $customer['nama_layanan'];
         $nama_test = $customer['nama_test'];
@@ -175,15 +178,56 @@ class Whatsapp_service extends ResourceController
         // MAKE SURE PHONE NUMBER USING REGION CODE
         // $APIkey = $api_key_wasap;
         // $phone = $new_phone;
+        $send_on = date("Y-m-d H:i:s");
         $message = "Terima kasih kepada Bpk/Ibu {$nama} \n" .
-            " telah melakukan Test *{$nama_test}* pada klinik kami pada tanggal *{$tgl_kunjungan}*." .
+            " telah melakukan Test *{$nama_test}* pada klinik kami pada tanggal *{$new_tgl_kunjungan}*." .
             "Berikut kami lampirkan link untuk hasil test anda.\n" . base_url('/api/get_hasil_lab/' . $customer['id']);
 
         $url = $this->url_send_txt;
         $data = array(
             'APIKey'     => $this->api_key,
             'phoneNumber'  => $new_phone,
-            'message' => $message
+            'message' => $message,
+            'send_on' => $this->get_send_on()
+        );
+
+
+        $result = $this->send_curl($url, $data);
+        if (!$result) {
+            return false;
+        }
+        curl_close($this->curl);
+        return true;
+    }
+
+    public function send_qr_hasil($customer)
+    {
+        $phone = $customer['phone'];
+        if ($phone == "" || $phone == null) {
+            return $this->fail("mobile phone is not recognised", 400, 'Failed');
+        }
+        $new_phone = $this->new_phone_number($phone);
+        $order_id = $customer['customer_unique'];
+        $tgl_kunjungan = $customer['tgl_kunjungan'];
+        $new_tgl_kunjungan = date("d F Y", strtotime($tgl_kunjungan));
+        $nama = $customer['nama'];
+        $nama_layanan = $customer['nama_layanan'];
+        $nama_test = $customer['nama_test'];
+
+        // MAKE SURE PHONE NUMBER USING REGION CODE
+        // $APIkey = $api_key_wasap;
+        // $phone = $new_phone;
+        $message = "Berikut kami lampirkan bukti QR Code sebagai hasil test anda\n";
+
+        $url = $this->url_send_txt_img;
+        $size = "150x150";
+        $title = "Hasil_Test_{$nama_test}_{$nama}_{$order_id}";
+        $url_qr_code = base_url("assets/qr/{$title}{$size}.png");
+        $data = array(
+            'APIKey'     => $this->api_key,
+            'phoneNumber'  => $new_phone,
+            'message' => $message,
+            'urlDownloadImage' => $url_qr_code
         );
 
 
@@ -258,5 +302,11 @@ class Whatsapp_service extends ResourceController
         }
         curl_close($this->curl);
         return $this->respond($result, 200, 'success');
+    }
+
+    public function get_send_on()
+    {
+        $this->send_on = date("Y-m-d H:i:s");
+        return $this->send_on;
     }
 }

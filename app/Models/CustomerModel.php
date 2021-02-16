@@ -233,7 +233,7 @@ class CustomerModel extends Model
         return $builder->getResultArray();
     }
 
-    public function antrian_swabber($tanggal = null, $jam = null, $nomor_bilik = null, $tipe = "booking")
+    public function antrian_swabber($tanggal = null, $nomor_bilik = null, $tipe = "booking")
     {
         $builder = $this->customer();
         $builder->where('tgl_kunjungan', $tanggal)->where('nomor_bilik', $nomor_bilik);
@@ -242,6 +242,7 @@ class CustomerModel extends Model
             $builder->where('kehadiran', '23');
         }
         $builder->where('is_printed', 0)->orWhere('is_printed', null);
+        $builder->groupBy('invoice_number');
         $builder->orderBy('no_antrian', 'ASC');
         return $builder->get();
     }
