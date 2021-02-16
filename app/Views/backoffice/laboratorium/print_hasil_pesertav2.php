@@ -166,15 +166,12 @@
                                 <td><?= $detail_hasil['status_igg']; ?></td>
                                 <td></td>
                             </tr>
-<<<<<<< HEAD
                             <tr>
                                 <td>Anti SARS-CoV-2 IgG</td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
                             </tr>
-=======
->>>>>>> 9b838b41ea9ab9a5e747338ff150084b6e5feada
                             <tr class="bg-light">
                                 <td>Interpretasi</td>
                                 <td colspan="3">Result Anti SARS-CoV-2: <?= $detail_hasil['status_cov']; ?></td>
