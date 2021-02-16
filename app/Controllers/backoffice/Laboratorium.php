@@ -664,8 +664,8 @@ class Laboratorium extends ResourceController
             // return view('backoffice/laboratorium/print_hasil_peserta', $data);
             $dompdf->loadHtml(view('backoffice/laboratorium/print_hasil_peserta', $data));
         } else {
-            return view('backoffice/laboratorium/print_hasil_pesertav2', $data);
-            // $dompdf->loadHtml(view('backoffice/laboratorium/print_hasil_pesertav2', $data));
+            // return view('backoffice/laboratorium/print_hasil_pesertav2', $data);
+            $dompdf->loadHtml(view('backoffice/laboratorium/print_hasil_pesertav2', $data));
         }
 
         $dompdf->setPaper('A4', 'portrait');
