@@ -161,14 +161,20 @@
                         </thead>
                         <tbody style="background-color: #b8d8eb">
                             <tr>
-                                <td><strong>Antigen SARS-Cov-2</strong></td>
+                                <td><strong>Anti SARS-CoV-2 IgM</strong></td>
                                 <td></td>
-                                <td><?= $detail_hasil['status_cov']; ?></td>
+                                <td><?= $detail_hasil['status_igg']; ?></td>
                                 <td></td>
                             </tr>
                             <tr>
+                                <td>Anti SARS-CoV-2 IgG</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr class="bg-light">
                                 <td>Interpretasi</td>
-                                <td colspan="3">Result RT-PCR SARS-CoV-2: <?= $detail_hasil['status_cov']; ?></td>
+                                <td colspan="3">Result Anti SARS-CoV-2: <?= $detail_hasil['status_cov']; ?></td>
                             </tr>
                             <tr>
                                 <td>Rekomendasi</td>
