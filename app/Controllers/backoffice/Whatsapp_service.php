@@ -220,7 +220,7 @@ class Whatsapp_service extends ResourceController
         $message = "Berikut kami lampirkan bukti QR Code sebagai hasil test anda\n";
 
         $url = $this->url_send_txt_img;
-        $size = "150x150";
+        $size = "100x100";
         $title = "Hasil_Test_{$nama_test}_{$nama}_{$order_id}";
         $url_qr_code = base_url("assets/qr/{$title}{$size}.png");
         $data = array(

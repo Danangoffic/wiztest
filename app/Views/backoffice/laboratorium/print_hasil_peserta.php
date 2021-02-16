@@ -26,7 +26,7 @@
             margin-top: 3cm;
             margin-left: 0cm;
             margin-right: 0cm;
-            margin-bottom: 2cm;
+            margin-bottom: 0cm;
         }
 
         /** Define the header rules **/
@@ -123,13 +123,13 @@
                             <td>Tanggal Lahir/<i>DOB</i></td>
                             <td>: <?= $customer['tanggal_lahir']; ?></td>
                             <td>Alamat/<i>Address</i></td>
-                            <td>: <?= $customer['alamat']; ?></td>
+                            <td rowspan="2">: <?= $customer['alamat']; ?></td>
                         </tr>
                         <tr>
                             <td>Jenis Kelamin/<i>Sex</i></td>
                             <td>: <?= ucwords($customer['jenis_kelamin']); ?></td>
                             <td></td>
-                            <td></td>
+
                         </tr>
                         <tr>
                             <td>Waktu Sampling/<i>Date Collected</i></td>
@@ -154,7 +154,7 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <table class="table table-borderless table-sm" id="data_customer" style="border: 2px solid #333 !important">
+                    <table class="table table-borderless table-sm" id="data_customer" style="border: 1px solid #333 !important">
                         <thead>
                             <tr class="text-center" style="background-color: #1a428a; color: white">
                                 <th>PEMERIKSAAN/<i>TEST</i></th>
@@ -226,17 +226,12 @@
                 <div class="col-md-12">
                     <table class="table table-borderless">
                         <tr>
-                            <td class="text-center"><i>QRCODE RESULT</i></td>
-                            <td class="text-center"><?= $city; ?>, <?= $sign_waktu; ?><br>
-
-                                Dokter Pemeriksa/<i>Physician Examiner</i></td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">
+                            <td class="text-center">QRCODE RESULT<br>
                                 <img src="<?= $image_qr_result ?>" alt="">
                             </td>
-                            <td class="text-center">
+                            <td class="text-center"><?= $city; ?>, <?= $sign_waktu; ?><br>
 
+                                Dokter Pemeriksa/<i>Physician Examiner</i>
                                 <br>
                                 <?= $doctor_name; ?>
                             </td>
