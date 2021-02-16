@@ -608,7 +608,7 @@ class Laboratorium extends ResourceController
         $title = "Hasil_Test_{$nama_test}_{$nama}_{$order_id}";
         $layanan = new Layanan;
         // $get_qr = $layanan->getUrlQRCode(base_url('api/get_hasil_lab/'. $id_customer));
-        $size = "150x150";
+        $size = "50x50";
         $layanan->put_content_qr_code(base_url('api/get_hasil_lab/' . $id_customer), $title, $size);
 
         $url_qr_code = base_url("assets/qr/{$title}{$size}.png");
