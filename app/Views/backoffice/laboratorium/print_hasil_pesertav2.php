@@ -152,14 +152,14 @@
                 <div class="col-md-12">
                     <table class="table table-borderless table-sm" style="border: 1pt solid #333;" id="data_customer">
                         <thead>
-                            <tr class="bg-primary">
+                            <tr class="text-center" style="background-color: #1a428a; color: white">
                                 <th>PEMERIKSAAN/TEST</th>
                                 <th>HASIL/RESULT</th>
                                 <th>BATAS NORMAL/NORMAL RANGE</th>
                                 <th>METODE/METHOD</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="background-color: #b8d8eb">
                             <tr>
                                 <td><strong>Antigen SARS-Cov-2</strong></td>
                                 <td></td>
