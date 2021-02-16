@@ -123,13 +123,13 @@
                             <td>Tanggal Lahir/<i>DOB</i></td>
                             <td>: <?= $customer['tanggal_lahir']; ?></td>
                             <td>Alamat/<i>Address</i></td>
-                            <td>: <?= $customer['alamat']; ?></td>
+                            <td rowspan="2">: <?= $customer['alamat']; ?></td>
                         </tr>
                         <tr>
                             <td>Jenis Kelamin/<i>Sex</i></td>
                             <td>: <?= ucwords($customer['jenis_kelamin']); ?></td>
                             <td></td>
-                            <td></td>
+
                         </tr>
                         <tr>
                             <td>Waktu Sampling/<i>Date Collected</i></td>
@@ -226,7 +226,7 @@
                 <div class="col-md-12">
                     <table class="table table-borderless">
                         <tr>
-                            <td class="text-center">QRCODE RESULT<br><br>
+                            <td class="text-center">QRCODE RESULT<br>
                                 <img src="<?= $image_qr_result ?>" alt="">
                             </td>
                             <td class="text-center"><?= $city; ?>, <?= $sign_waktu; ?><br>

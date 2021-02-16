@@ -50,9 +50,40 @@
 </head>
 
 <body>
-    <header></header>
-    <footer></footer>
-    <main class="content">
+    <header>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-borderless table-sm">
+                        <tr>
+                            <td class="pb-4">
+                                <img src="<?= base_url('assets/images/logo-warna.png') ?>" alt="" width="350">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong><i>PT. QUICKTEST LABORATORIUM INDONESIA</i></strong>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </header>
+    <footer>
+        <table class="table table-borderless table-sm text-primary">
+            <tr>
+                <td><img src="<?= base_url('assets/icons/icon reg.quicktest.id_Mail.svg'); ?>" alt="mail"> info@quicktest.id</td>
+            </tr>
+            <tr>
+                <td><img src="<?= base_url('assets/icons/icon reg.quicktest.id_Call.png'); ?>" alt="phone"> 021-2138999 (for result)</td>
+            </tr>
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+    </footer>
+    <main class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <table class="table table-sm">
@@ -65,83 +96,52 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <table class="table table-sm">
                     <tr>
                         <td>Nama</td>
-                        <td>:</td>
-                        <td><?= $customer['nama']; ?></td>
+                        <td>: <?= $customer['nama']; ?></td>
+                        <td>Kewarganegaraan</td>
+                        <td>: </td>
                     </tr>
                     <tr>
                         <td>NIK</td>
-                        <td>:</td>
-                        <td><?= $customer['nik']; ?></td>
+                        <td>: <?= $customer['nik']; ?></td>
+                        <td>Alamat</td>
+                        <td rowspan="3">: <?= $customer['alamat']; ?></td>
                     </tr>
                     <tr>
                         <td>Tanggal Lahir/DOB</td>
-                        <td>:</td>
-                        <td><?= $customer['tanggal_lahir']; ?></td>
+                        <td>: <?= date("F, d Y", strtotime($customer['tanggal_lahir'])); ?></td>
                     </tr>
                     <tr>
                         <td>Jenis Kelamin/Sex</td>
-                        <td>:</td>
-                        <td><?= $customer['jenis_kelamin']; ?></td>
+                        <td>: <?= ucwords($customer['jenis_kelamin']); ?></td>
                     </tr>
                     <tr>
                         <td>Waktu Sampling</td>
-                        <td>:</td>
-                        <td><?= $detail_hasil['waktu_ambil_sampling']; ?></td>
+                        <td>: <?= date("F,d Y", strtotime($detail_hasil['waktu_ambil_sampling'])); ?></td>
+                        <td>Faskes</td>
+                        <td>: <?= $nama_faskes; ?></td>
                     </tr>
                     <tr>
                         <td>Waktu Periksa</td>
-                        <td>:</td>
-                        <td><?= $detail_hasil['waktu_periksa_sampling']; ?></td>
+                        <td>: <?= date("F, d Y", strtotime($detail_hasil['waktu_periksa_sampling'])); ?></td>
+                        <td>Kota/<i>City</i></td>
+                        <td>: <?= $city; ?></td>
                     </tr>
                     <tr>
                         <td>Waktu Selesai</td>
-                        <td>:</td>
-                        <td><?= $detail_hasil['waktu_selesai_periksa']; ?></td>
-                    </tr>
-                </table>
-            </div>
-            <div class="col-md-6">
-                <table class="table table-sm">
-                    <tr>
-                        <td>No. Passport</td>
-                        <td>:</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Kewarganegaraan</td>
-                        <td>:</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Alamat</td>
-                        <td>:</td>
-                        <td><?= $customer['alamat']; ?></td>
-                    </tr>
-                    <tr>
-                        <td>Faskes</td>
-                        <td>:</td>
-                        <td><?= $nama_faskes; ?></td>
-                    </tr>
-                    <tr>
-                        <td>Kota</td>
-                        <td>:</td>
-                        <td><?= $city; ?></td>
-                    </tr>
-                    <tr>
+                        <td>: <?= date("F, d Y", strtotime($detail_hasil['waktu_selesai_periksa'])); ?></td>
                         <td>Instansi</td>
-                        <td>:</td>
-                        <td><?= $customer['nama_instansi']; ?></td>
+                        <td>: <?= ucwords($customer['nama_instansi']); ?></td>
                     </tr>
                 </table>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <table class="table table-bordered table-sm" id="data_customer">
+                <table class="table table-borderless table-sm" id="data_customer">
                     <thead>
                         <tr class="bg-primary">
                             <th>PEMERIKSAAN/TEST</th>
@@ -190,30 +190,18 @@
             <li>This letter is sent and signed electronically</li>
         </ol>
         <div class="row">
-            <div class="col-md-6">
-                <table class="table">
+            <div class="col-md-12">
+                <table class="table table-borderless">
                     <tr>
-                        <td><i>QRCODE RESULT</i></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
-                </table>
-            </div>
+                        <td class="text-center">QRCODE RESULT<br>
+                            <img src="<?= $image_qr_result ?>" alt="">
+                        </td>
+                        <td class="text-center"><?= $city; ?>, <?= $sign_waktu; ?><br>
 
-            <div class="col-md-6">
-                <table class="table">
-                    <tr>
-                        <td>South Jakarta, </td>
-                    </tr>
-                    <tr>
-                        <td><i>Dokter Pemeriksa/Physician Examiner</i></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
+                            Dokter Pemeriksa/<i>Physician Examiner</i>
+                            <br>
+                            <?= $doctor_name; ?>
+                        </td>
                     </tr>
                 </table>
             </div>
