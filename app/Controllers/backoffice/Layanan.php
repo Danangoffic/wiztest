@@ -175,18 +175,18 @@ class Layanan extends ResourceController
         return $data;
     }
 
-    protected function get_qr_code(string $value = "")
+    protected function get_qr_code(string $value = "", $size = "300x300")
     {
-        $url = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=" . $value . "&choe=UTF-8";
+        $url = "https://chart.googleapis.com/chart?chs={$size}&cht=qr&chl=" . $value . "&choe=UTF-8";
         return $url;
     }
 
-    public function put_content_qr_code($value = "", $qr_name)
+    public function put_content_qr_code($value = "", $qr_name, $size = "300x300")
     {
 
-        $qr = $this->get_qr_code($value);
+        $qr = $this->get_qr_code($value, $size);
         $get_content = file_get_contents($qr);
-        return file_put_contents("assets/qr/{$qr_name}.png", $get_content, FILE_APPEND);
+        return file_put_contents("assets/qr/{$qr_name}{$size}.png", $get_content, FILE_APPEND);
     }
 
     public function put_content_pdf($url, $name)

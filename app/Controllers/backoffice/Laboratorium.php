@@ -13,7 +13,7 @@ use App\Models\InstansiModel;
 use App\Models\KotaModel;
 use App\Models\LayananModel;
 use App\Models\LayananTestModel;
-use App\Models\PembayaranModel;
+// use App\Models\PembayaranModel;
 use App\Models\PemeriksaanModel;
 use App\Models\PemeriksaModel;
 use App\Models\SampleModel;
@@ -23,6 +23,7 @@ use App\Controllers\backoffice\Layanan;
 use CodeIgniter\RESTful\ResourceController;
 // use Dompdf\Cpdf;
 use Dompdf\Dompdf;
+use Dompdf\Options;
 use PHPExcel;
 use PHPExcel_IOFactory;
 
@@ -64,7 +65,6 @@ class Laboratorium extends ResourceController
     protected $layananTestModel;
     protected $testModel;
     protected $layananModel;
-    protected $pemeriksaanModel;
     protected $composer;
     protected $fileLabModel;
     protected $lokasi_input;
@@ -74,7 +74,7 @@ class Laboratorium extends ResourceController
     {
         $this->codeBarCode = "code128";;
         $this->session = \Config\Services::session();
-        $this->dompdf = new Dompdf();
+
         $this->customer = new CustomerModel();
         $this->laboratoriumModel = new HasilLaboratoriumModel();
         $this->customerC = new Customer;
@@ -83,14 +83,7 @@ class Laboratorium extends ResourceController
         $this->petugasModel = new PemeriksaModel();
         $this->statusHasilModel = new StatusHasilModel();
         $this->alatModel = new AlatModel();
-        $this->layananTestModel = new LayananTestModel();
-        $this->testModel = new TestModel();
-        $this->layananModel = new LayananModel();
-        $this->pemeriksaanModel = new PemeriksaanModel();
-        $this->fileLabModel = new FileLabModel();
-        $this->lokasi_input = new KotaModel();
-        $this->instansi = new InstansiModel();
-        $this->faskes_asal = new FaskesModel();
+
         helper('form');
         // $this->sampleModel;
     }
@@ -180,6 +173,9 @@ class Laboratorium extends ResourceController
             $date1 = date("Y-m-d");
             $date2 = false;
         }
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
         $data_layanan = $this->layananTestModel->where(['id_test' => 3])->get()->getResultArray();
         $ids_jenis_test = array();
         foreach ($data_layanan as $dataL => $val) {
@@ -191,7 +187,7 @@ class Laboratorium extends ResourceController
         join customers on customers.id = hasil_laboratorium.id_customer 
         where hasil_laboratorium.valid = 'no' 
         and customers.jenis_test IN (SELECT id from data_layanan_test where id_test = 3) {$filter_tgl}")->getResultArray();
-        echo db_connect()->showLastQuery();
+        // echo db_connect()->showLastQuery();
 
         // dd(db_connect()->showLastQuery());
         $data = array(
@@ -211,7 +207,9 @@ class Laboratorium extends ResourceController
         if (!$this->session->has('logged_in')) {
             return redirect()->to('/backoffice/login');
         }
-
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
         $filtering = ($this->request->getPost("filtering")) ? $this->request->getPost("filtering") : "";
         if ($filtering == "on") {
             $date1 = ($this->request->getPost("date1")) ? $this->request->getPost("date1") : false;
@@ -266,6 +264,9 @@ class Laboratorium extends ResourceController
         if (!$this->session->has('logged_in')) {
             return redirect()->to('/backoffice/login');
         }
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
         $detail_hasil_lab = $this->laboratoriumModel->by_id_customer($id_customer);
         dd(db_connect()->showLastQuery());
         if ($detail_hasil_lab == null) {
@@ -354,6 +355,7 @@ class Laboratorium extends ResourceController
             $this->session->setFlashdata("error", "Anda tidak mempunyai akses");;
             return redirect()->to("/backoffice/login");
         }
+        $this->fileLabModel = new FileLabModel();
         $type = $this->request->getPost("type");
         try {
             if ($type == "import_excel") {
@@ -366,21 +368,8 @@ class Laboratorium extends ResourceController
                     $insert = $this->fileLabModel->insert($insert_file);
                     $id_file = $this->fileLabModel->getInsertID();
 
-                    // $origin_mime_type = $fileexcel->getExtension;
-                    // $date_now = date("dmYHis");
-                    // $name = ($this->request->getPost("file_name") == null || $this->request->getPost("file_name") == "") ? $origin_file_name . "-" . $date_now . "." . $origin_mime_type : $this->request->getPost("file_name");
-                    // $new_name = $fileexcel->getRandomName();
-                    // if ($fileexcel->isValid() && !$fileexcel->hasMoved()) {
-                    //     $path = WRITEPATH . "/excels";
-                    //     if (!$fileexcel->move($path, $new_name)) {
-                    //         $this->session->setFlashdata("error", "Gagal import excel, silahkan import ulang");
-                    //         return redirect()->to("/backoffice/laboratorium/import_data");
-                    //     }
-                    // }
                     $excelReader  = new PHPExcel();
-                    //mengambil lokasi temp file
-                    //PHPExcel_Settings::setZipClass(PHPExcel_Settings::PCLZIP);
-                    //baca file
+
                     $objPHPExcel = PHPExcel_IOFactory::load($fileLocation);
                     //ambil sheet active
                     $sheet    = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
@@ -476,6 +465,9 @@ class Laboratorium extends ResourceController
             if ($data_laboratorium == null) {
                 return $this->failNotFound('Not found');
             }
+            $this->layananModel = new LayananModel();
+            $this->testModel = new TestModel();
+            $this->layananTestModel = new LayananTestModel();
             $result = array();
             foreach ($data_laboratorium as $key => $value) {
                 $detailCustomer = $this->customer->deep_detail_by_id($value['id_customer'])->getRowArray();
@@ -489,26 +481,8 @@ class Laboratorium extends ResourceController
                 $statusIgg = ($value['status_igg'] != null) ? $value['status_igg'] : "";
                 $statusIgm = ($value['status_igm'] != null) ? $value['status_igm'] : "";
                 $statusKirim = '';
-                // if ($value['status_cov'] !== null) {
-                //     $detailHasilCov = $this->statusHasilModel->find($value['status_cov']);
-                //     $statusCov = ($detailHasilCov['nama_status']) ? $detailHasilCov['nama_status'] : '';
-                // }
-                // if ($value['status_gene'] !== null) {
-                //     $detailHasilGene = $this->statusHasilModel->find($value['status_gene']);
-                //     $statusGene = ($detailHasilGene['nama_status']) ? $detailHasilGene['nama_status'] : '';
-                // }
-                // if ($value['status_orf'] !== null) {
-                //     $detailHasilOrf = $this->statusHasilModel->find($value['status_orf']);
-                //     $statusOrf = ($detailHasilOrf['nama_status']) ? $detailHasilOrf['nama_status'] : '';
-                // }
-                // if ($value['status_igg'] !== null) {
-                //     $detailHasilIgg = $this->statusHasilModel->find($value['status_igg']);
-                //     $statusIgg = ($detailHasilIgg['nama_status']) ? $detailHasilIgg['nama_status'] : '';
-                // }
-                // if ($value['status_igm'] !== null) {
-                //     $detailHasilIgm = $this->statusHasilModel->find($value['status_igm']);
-                //     $statusIgm = ($detailHasilIgm['nama_status']) ? $detailHasilIgm['nama_status'] : '';
-                // }
+
+
                 if ($value['status_kirim'] !== null) {
                     $detailHasilKirim = $this->statusHasilModel->find($value['status_kirim']);
                     $statusKirim = ($detailHasilKirim['nama_status']) ? $detailHasilKirim['nama_status'] : '';
@@ -517,11 +491,13 @@ class Laboratorium extends ResourceController
                 $catatan = ($value['catatan'] != null) ? $value['catatan'] : "";
                 $paket_pemeriksaan = $detailTest['nama_test'] . "(" . $detailLayanan['nama_layanan'] . ")";
                 $nama_sample = ($value['id_sample'] != null) ? $detailSample['nama_sample'] : '';
+                $new_date_created = date("d F, Y", strtotime(substr($detailCustomer['created_at'], 0, 10)));
+                $tgl_kunjungan = date("d F Y", strtotime($detailCustomer['tgl_kunjungan']));
                 $result[] = array(
                     'id_customer' => $value['id_customer'],
                     'id_hasil' => $value['id'],
-                    'tgl_kunjungan' => $detailCustomer['tgl_kunjungan'],
-                    'registrasi' => $detailCustomer['customer_unique'] . ' - ' . substr($detailCustomer['created_at'], 0, 10),
+                    'tgl_kunjungan' => $tgl_kunjungan,
+                    'registrasi' => $detailCustomer['customer_unique'] . '  -<br>' . $new_date_created,
                     'paket_pemeriksaan' => $paket_pemeriksaan,
                     'nama_customer' => $detailCustomer['nama'],
                     'nik' => $detailCustomer['nik'],
@@ -553,6 +529,12 @@ class Laboratorium extends ResourceController
         if ($detail_customer == null) {
             $this->session->setFlashdata("error", "customer not found");
         }
+        $this->layananModel = new LayananModel();
+        $this->testModel = new TestModel();
+        $this->layananTestModel = new LayananTestModel();
+        $this->lokasi_input = new KotaModel();
+        $this->instansi = new InstansiModel();
+        $this->faskes_asal = new FaskesModel();
         $hasil_lab = $this->laboratoriumModel->by_id_customer($id_customer);
         // dd($hasil_lab);
         $layanan_test = $this->layananTestModel->find($detail_customer['jenis_test']);
@@ -583,6 +565,10 @@ class Laboratorium extends ResourceController
 
     public function print_hasil($id_customer = null)
     {
+        $kota_model = new KotaModel();
+        $hasil_lab_model = new HasilLaboratoriumModel();
+        $this->faskes_asal = new FaskesModel();
+        $this->dompdf = new Dompdf();
         $customer = $this->customer->deep_detail_by_id($id_customer)->getRowArray();
         // dd(db_connect()->showLastQuery());
         if ($customer == null) {
@@ -602,13 +588,14 @@ class Laboratorium extends ResourceController
             return false;
         }
         $nama_faskes = $faskes['nama_faskes'];
-        $kota_model = new KotaModel();
+
         $id_kota = $faskes['kota'];
         $kota = $kota_model->find($id_kota);
         $nama_kota = $kota['nama_kota'];
         $city = $kota['city'];
         $province = $kota['province'];
-        $hasil_lab_model = new HasilLaboratoriumModel();
+
+
         $detail_hasil = $hasil_lab_model->by_id_customer($id_customer);
         // dd(db_connect()->showLastQuery());
         $id_customer = $customer['id'];
@@ -621,41 +608,83 @@ class Laboratorium extends ResourceController
         $title = "Hasil_Test_{$nama_test}_{$nama}_{$order_id}";
         $layanan = new Layanan;
         // $get_qr = $layanan->getUrlQRCode(base_url('api/get_hasil_lab/'. $id_customer));
-        $layanan->put_content_qr_code(base_url('api/get_hasil_lab/'.$id_customer), $title);
-        $qr_file_hasil = base_url("assets/qr/{$title}.png");
+        $size = "150x150";
+        $layanan->put_content_qr_code(base_url('api/get_hasil_lab/' . $id_customer), $title, $size);
+
+        $url_qr_code = base_url("assets/qr/{$title}{$size}.png");
+        // $type = pathinfo($url_qr_code, PATHINFO_EXTENSION);
+        // $file_qr = file_get_contents($url_qr_code);
+        // $qr_file_hasil = "data:image/{$type};base64," .  base64_encode($file_qr);
+
+        $waktu_selesai_periksa = $detail_hasil['waktu_selesai_periksa'];
+        $str_waktu_selesai = strtotime($waktu_selesai_periksa);
+        $sign_waktu = date("d F, Y", $str_waktu_selesai);
+        $id_dokter =  $detail_hasil['id_dokter'];
+        $dokter = $this->dokterModel->find($id_dokter);
+        $doctor_name =  $dokter['nama'];
+        $new_ambil = date("d F, Y", strtotime($detail_hasil['waktu_ambil_sampling']));
+        $new_periksa = date("d F, Y", strtotime($detail_hasil['waktu_periksa_sampling']));
+        $new_selesai = date("d F, Y", strtotime($detail_hasil['waktu_selesai_periksa']));
         $data = [
             'title' => $title,
-            'page' => "invoice_customer",
+            'page' => "laboratorium",
             'customer' => $customer,
             'nama_paket' => $nama_paket,
             'detail_hasil' => $detail_hasil,
             'city' => $city,
             'province' => $province,
             'nama_faskes' => $nama_faskes,
-            'image_qr_result' => $qr_file_hasil
+            'image_qr_result' => $url_qr_code,
+            'sign_waktu' => $sign_waktu,
+            'doctor_name' => $doctor_name,
+            'new_date_ambil' => $new_ambil,
+            'new_date_periksa' => $new_periksa,
+            'new_date_selesai' => $new_selesai
         ];
-        $dompdf = new Dompdf();
+        /**
+         * Set DOMPDF Options
+         */
+        $Option = new Options();
+        $Option->setIsRemoteEnabled(true);
+        // $Option->setIsHtml5ParserEnabled(true);
+        // $Option->setDebugCss(true);
+        // $Option->setIsJavascriptEnabled(true);
+        // $Option->setIsPhpEnabled(true);
 
+        $dompdf = new Dompdf($Option);
+        $contxt = stream_context_create([
+            'ssl' => [
+                'verify_peer' => FALSE,
+                'verify_peer_name' => FALSE,
+                'allow_self_signed' => TRUE
+            ]
+        ]);
+        $dompdf->setHttpContext($contxt);
         if ($id_test == 1) {
+            // return view('backoffice/laboratorium/print_hasil_peserta', $data);
             $dompdf->loadHtml(view('backoffice/laboratorium/print_hasil_peserta', $data));
         } else {
-            $dompdf->loadHtml(view('backoffice/laboratorium/print_hasil_pesertav2', $data));
+            return view('backoffice/laboratorium/print_hasil_pesertav2', $data);
+            // $dompdf->loadHtml(view('backoffice/laboratorium/print_hasil_pesertav2', $data));
         }
 
         $dompdf->setPaper('A4', 'portrait');
+        // $dompdf->output();
         $dompdf->render();
 
-        $this->response->appendHeader('Content-type', "application/pdf");
         $dompdf->stream($title . ".pdf", ['Attachment' => 0]);
+        // $this->response->setHeader('Content-type', "application/pdf");
     }
 
     public function send_hasil_peserta($id_customer = null)
     {
         try {
             $customer = $this->customer->deep_detail_by_id($id_customer)->getRowArray();
-            if ($customer == null) {
-                echo "Peserta Tidak Ditemukan";
-                return false;
+            if ($customer == null || $id_customer == null) {
+                $this->session->setFlashdata("error", "Peserta Tidak Ditemukan");
+                return redirect()->to("/backoffice/laboratorium/hasil");
+                // echo "Peserta Tidak Ditemukan";
+                // return false;
             }
             $send_email = $this->sendEmailCustomer($customer);
             $send_whatsapp = $this->send_whatsapp($customer);
@@ -694,7 +723,7 @@ class Laboratorium extends ResourceController
         # code...
 
         $Layanan = new Layanan;
-
+        $this->faskes_asal = new FaskesModel();
         $Email = \Config\Services::email();
 
         // $Email->initialize($config);
@@ -703,6 +732,7 @@ class Laboratorium extends ResourceController
         $id_customer = $customer['id'];
         $nama_customer = $customer['nama'];
         $invoice_number = $customer['invoice_number'];
+        $order_id = $customer['customer_unique'];
 
         $id_customer = $customer['id'];
         $invoice_number = $customer['invoice_number'];
@@ -746,6 +776,12 @@ class Laboratorium extends ResourceController
             'nama_faskes' => $nama_faskes
         ];
 
+        $Layanan = new Layanan;
+        $url_pdf = base_url("api/get_hasil/lab" . $id_customer);
+        $name_pdf = "Hasil_Test_{$nama_test}_{$nama}_{$order_id}";
+        $Layanan->put_content_pdf($url_pdf, $name_pdf);
+        $file_pdf = base_url("assets/pdf/{$name_pdf}.pdf");
+
         // file_get
         if ($id_test == 1) {
             $emailMessage = view('backoffice/laboratorium/email_hasil', $data);
@@ -759,9 +795,9 @@ class Laboratorium extends ResourceController
         $Email->setSubject($title);
         $Email->setMessage($emailMessage);
         $Email->attach(
-            base_url('api/get_hasil_lab/' . $id_customer),
+            $file_pdf,
             'inline',
-            $title . ".pdf",
+            $name_pdf . ".pdf",
             "application/pdf"
         );
         if ($Email->send()) {
