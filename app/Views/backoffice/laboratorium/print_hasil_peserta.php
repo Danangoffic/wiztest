@@ -23,7 +23,7 @@
 
         /** Define now the real margins of every page in the PDF **/
         body {
-            margin-top: .5cm;
+            margin-top: 2cm;
             margin-left: 0cm;
             margin-right: 0cm;
             margin-bottom: .5cm;

@@ -12,14 +12,39 @@
 
         /** */
         @page {
-            margin: 0;
-            padding: 0;
+            margin: 0cm 0cm;
         }
 
         html,
         body {
-            font-family: 'Calibri' !important;
-            font-size: 10pt !important;
+            font-family: 'Bergens' !important;
+            font-size: 8pt !important;
+        }
+
+        /** Define now the real margins of every page in the PDF **/
+        body {
+            margin-top: .5cm;
+            margin-left: 0cm;
+            margin-right: 0cm;
+            margin-bottom: .5cm;
+        }
+
+        /** Define the header rules **/
+        header {
+            position: fixed;
+            top: 0cm;
+            left: 0cm;
+            right: 0cm;
+            height: 3cm;
+        }
+
+        /** Define the footer rules **/
+        footer {
+            position: fixed;
+            bottom: 0cm;
+            left: 0cm;
+            right: 0cm;
+            height: 2cm;
         }
     </style>
 </head>
