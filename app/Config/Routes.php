@@ -158,6 +158,7 @@ $routes->add('/backoffice/laporan/(:segment)/(:num)', 'backoffice\Laporan::$1/$2
 
 $routes->get('/backoffice/finance', 'backoffice\Finance::index');
 $routes->add('/backoffice/finance/(:segment)', 'backoffice\Finance::$1');
+$routes->add("/backoffice/finance/instansi/(:num)", "backoffice\Finance::detail_finance_instansi/$1");
 $routes->add('/backoffice/finance/(:segment)/(:num)', 'backoffice\Finance::$1/$2');
 
 $routes->get('/backoffice/gudang', 'backoffice\Gudang::index');
@@ -196,7 +197,7 @@ $routes->get("led/(:num)", "Antrian::bilik/$1");
 $routes->get("/api/wa", "backoffice\Whatsapp_service::coba_wa");
 $routes->post("/api/save-hs", "Customer::home_service_registration");
 // $routes->post("/save-rujukan", "Afiliasi::save_rujukan");
-$routes->add("swabber", "backoffice\Swabber::index");
+$routes->add("/swabber", "backoffice\Swabber::index");
 $routes->add("/swabber/(:segment)", "backoffice\Swabber::$1");
 $routes->post("/api/print-barcode-swabber", "backoffice\Swabber::print_barcode");
 
