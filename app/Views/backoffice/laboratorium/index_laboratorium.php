@@ -66,7 +66,7 @@
                             <table class="table table-bordered table-sm table-condensed" id="data_laboratorium">
                                 <thead class="text-center text-justify">
                                     <tr>
-                                        <th rowspan="2" center="align-middle">No</th>
+                                        <th rowspan="2" width="2%" center="align-middle">No</th>
                                         <th rowspan="2">Tanggal Kunjungan</th>
                                         <th rowspan="2">Registrasi</th>
                                         <th rowspan="2">Paket Pemeriksaan</th>
