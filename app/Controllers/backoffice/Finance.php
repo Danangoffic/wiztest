@@ -7,6 +7,9 @@ use App\Models\InstansiModel;
 use App\Models\MarketingModel;
 use App\Models\PembayaranModel;
 use App\Controllers\BaseController;
+use App\Models\LayananModel;
+use App\Models\LayananTestModel;
+use App\Models\TestModel;
 use Dompdf\Dompdf;
 use TCPDF;
 
@@ -112,6 +115,160 @@ class Finance extends BaseController
             'data' => $DataInstansi
         );
         return view("backoffice/finance/instansi", $data);
+    }
+
+    public function detail_finance_instansi(int $id_instansi = null)
+    {
+        if ($id_instansi == null) {
+            $this->session->setFlashdata('error', 'Instansi tidak ditemukan');
+            return redirect()->to("/backoffice/finance/instansi");
+        }
+        $detail_instansi = $this->instansi_model->detail_instansi($id_instansi);
+        if ($detail_instansi == null) {
+            $this->session->setFlashdata('error', 'Instansi tidak ditemukan');
+            return redirect()->to("/backoffice/finance/instansi");
+        }
+        helper('form');
+        $customerModel = new CustomerModel();
+        $layanan_test_model = new LayananTestModel();
+        $layanan_model = new LayananModel();
+        $test_model = new TestModel();
+        $filtering = ($this->request->getPost('filtering')) ? $this->request->getPost('filtering') : "";
+        $filter_instansi = [
+            'instansi' => $id_instansi,
+            // 'tgl_kunjungan' => date("Y-m-d")
+        ];
+        if ($filtering == "on") {
+            $date1 = ($this->request->getPost("date1")) ? $this->request->getPost("date1") : "";
+            $date2 = ($this->request->getPost("date2")) ? $this->request->getPost("date2") : "";
+            $jenis_test  = ($this->request->getPost("jenis_test")) ? $this->request->getPost("jenis_test") : "";
+
+            if ($jenis_test != "") {
+                $filter_instansi['jenis_test'] = $jenis_test;
+            }
+            if ($date1 != "" && $date2 != "") {
+                $filter_instansi['tgl_kunjungan'] = "a.tgl_kunjungan between {$date1} AND {$date2}";
+            } elseif ($date1 == "" && $date2 != "") {
+                $filter_instansi['tgl_kunjungan'] = $date2;
+            } elseif ($date1 != "" && $date2 != "") {
+                $date_now = date("Y-m-d");
+                $filter_instansi['tgl_kunjungan'] = "a.tgl_kunjungan between {$date1} AND {$date_now}";
+            }
+        }
+        $customers = $customerModel->deep_detail_by_id(null, $filter_instansi)->getResultArray();
+        $filter_instansi['kehadiran'] = 23;
+        $kehadiran_customers = $customerModel->deep_detail_by_id(null, $filter_instansi)->getResultArray();
+        $filter_instansi['kehadiran'] = 22;
+        $ketidak_hadiran_customers = $customerModel->deep_detail_by_id(null, $filter_instansi)->getResultArray();
+
+        $total_kehadiran = count($kehadiran_customers);
+        $total_customer = count($customers);
+        $total_tidak_hadir = count($ketidak_hadiran_customers);
+        $nama_instansi = $detail_instansi['nama'];
+        $alamat = $detail_instansi['alamat'];
+        $id_marketing = $detail_instansi['pic_marketing'];
+        if ($id_marketing != null) {
+            $detail_marketing = $this->marketing_model->find($id_marketing);
+            $pic_marketing = $detail_marketing['nama_marketing'];
+        } else {
+            $pic_marketing = "";
+        }
+        $filter_test_instansi = ['id_pemeriksaan' => 1];
+        if ($id_instansi == 1) {
+            $filter_test_instansi['id_segmen'] = 1;
+        } else {
+            $filter_test_instansi['id_segmen'] = 2;
+        }
+
+        $layanan_test = $layanan_test_model->by_keys($filter_test_instansi)->get()->getResultArray();
+        $pemeriksaan = array();
+        foreach ($layanan_test as $key => $LT) {
+            $detail_layanan = $layanan_model->find($LT['id_layanan']);
+            $detail_test = $test_model->find($LT['id_test']);
+
+            $nama_layanan = $detail_layanan['nama_layanan'];
+            $nama_test = $detail_test['nama_test'];
+
+            $pemeriksaan[] = array(
+                'id' => $LT['id'],
+                'text' => $nama_test . " " . $nama_layanan
+            );
+        }
+        $data = array(
+            'title' => "Data Detail Instansi",
+            'page' => "finance_instansi",
+            'session' => session(),
+            'customers_instansi' => $customers,
+            'jumlah_customer' => $total_customer,
+            'total_kehadiran' => $total_kehadiran,
+            'total_invoice_terbit' => null,
+            'PIC' => $pic_marketing,
+            'pemeriksaan' => $pemeriksaan,
+            'nama_instansi' => $nama_instansi,
+            'total_tidak_hadir' => $total_tidak_hadir,
+            'alamat' => $alamat,
+            'id_instansi' => $id_instansi
+
+        );
+        return view("backoffice/finance/detail_instansi", $data);
+    }
+
+    public function print_instansi_invoice()
+    {
+        $id_instansi = $this->request->getPost("id_instansi");
+        if ($id_instansi == null) {
+            $this->session->setFlashdata('error', 'Instansi tidak ditemukan');
+            return redirect()->to("/backoffice/finance/instansi");
+        }
+        $detail_instansi = $this->instansi_model->detail_instansi($id_instansi);
+        if ($detail_instansi == null) {
+            $this->session->setFlashdata('error', 'Instansi tidak ditemukan');
+            return redirect()->to("/backoffice/finance/instansi");
+        }
+
+        $id_peserta_to_print = $this->request->getPost("print_invoice");
+        // dd($id_peserta_to_print);
+        if ($id_peserta_to_print == null) {
+            return $this->print_all_invoice_instansi($id_instansi);
+        } else {
+            return $this->print_invoice_peserta_instansi($detail_instansi, $id_peserta_to_print);
+        }
+    }
+
+    protected function print_all_invoice_instansi($id_instansi = null)
+    {
+        # code...
+    }
+
+    protected function print_invoice_peserta_instansi($detail_instansi = null, $id_peserta_to_print = null)
+    {
+        // $total_id = count($id_peserta_to_print);
+        $test_customers = $this->CustomerModel->select('customers.jenis_test, count(customers.jenis_test) as total_jenis, c.nama_test, d.nama_layanan, b.biaya')
+            ->join("data_layanan_test b", 'b.id = customers.jenis_test')
+            ->join("jenis_test c", "c.id = b.id_test")
+            ->join("jenis_layanan d", "d.id = b.id_layanan")
+            ->whereIn('customers.id', $id_peserta_to_print)->orderBy('jenis_test', 'ASC')->groupBy('jenis_test')->get()->getResultArray();
+        // dd(db_connect()->showLastQuery());
+        $detail_customers = $this->CustomerModel->whereIn('id', $id_peserta_to_print)->orderBy("id", "DESC")->get();
+        $first_customers = $detail_customers->getRowArray();
+        $inv_first_cust = $first_customers['invoice_number'];
+        $random = date("is");
+        $title = "Invoice_{$inv_first_cust}_{$random}";
+        $data = [
+            'title' => $title,
+            'page' => "finance",
+            'total_peserta' => $test_customers,
+            'detail_peserta' => $detail_customers->getResultArray(),
+            'detail_instansi' => $detail_instansi
+        ];
+        $PDF = new Dompdf();
+        $PDF->loadHtml(view('backoffice/finance/print_invoice_customer', $data));
+        // $PDF->paperOrientation = 'landscape';
+        $this->response->setContentType('application/pdf');
+        $PDF->render();
+        $PDF->stream("{$title}.pdf", ['attachment' => 1]);
+        //Close and output PDF document
+        $PDF->Output($title . '.pdf', 'I');
     }
 
     protected function invoice_filter()
