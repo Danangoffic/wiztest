@@ -703,8 +703,13 @@ class Laboratorium extends ResourceController
         try {
             $customer = $this->customer->deep_detail_by_id($id_customer)->getRowArray();
             if ($customer == null || $id_customer == null) {
+                $array_respond = array(
+                    'status' => "failed",
+                    'message' => "Peserta Tidak Ditemukan"
+                );
                 $this->session->setFlashdata("error", "Peserta Tidak Ditemukan");
-                return redirect()->to("/backoffice/laboratorium/hasil");
+                $this->respond($array_respond, 400, $array_respond['status']);
+                // return redirect()->to("/backoffice/laboratorium/hasil");
                 // echo "Peserta Tidak Ditemukan";
                 // return false;
             }
@@ -721,18 +726,36 @@ class Laboratorium extends ResourceController
                 ];
                 $update = $hasil->update($id_hasil, $array_update);
                 if ($update) {
+                    $array_respond = array(
+                        'status' => "success",
+                        'message' => "Berhasil Kirim hasil test kepada peserta {$customer['nama']}"
+                    );
                     $this->session->setFlashdata('success', 'Berhasil Kirim hasil test kepada peserta ' . $customer['nama']);
                 } else {
+                    $array_respond = array(
+                        'status' => "failed",
+                        'message' => "Gagal update hasil test"
+                    );
                     $this->session->setFlashdata('error', "Gagal Update hasil test");
                 }
             } else {
+                $array_respond = array(
+                    'status' => "failed",
+                    'message' => "Gagal Kirim hasil test"
+                );
                 $this->session->setFlashdata('error', "Gagal Kirim hasil test");
             }
-            return redirect()->to('/backoffice/laboratorium/input/' . $id_customer);
+            $this->respond($array_respond, 200, $array_respond['status']);
+            // return redirect()->to('/backoffice/laboratorium/input/' . $id_customer);
         } catch (\Throwable $th) {
             //throw $th;
+            $array_respond = array(
+                'status' => "failed",
+                'message' => "Gagal Kirim hasil test"
+            );
             $this->session->setFlashdata('error', "Gagal Kirim hasil test karena " . $th->getMessage());
-            return redirect()->to('/backoffice/laboratorium/input/' . $id_customer);
+            return $this->respond($array_respond, 500, "failed");
+            // return redirect()->to('/backoffice/laboratorium/input/' . $id_customer);
         }
     }
 
@@ -799,7 +822,7 @@ class Laboratorium extends ResourceController
         ];
 
         $Layanan = new Layanan;
-        $url_pdf = base_url("api/get_hasil/lab" . $id_customer);
+        $url_pdf = base_url("api/get_hasil_lab/" . $id_customer);
         $name_pdf = "Hasil_Test_{$nama_test}_{$nama}_{$order_id}";
         $Layanan->put_content_pdf($url_pdf, $name_pdf);
         $file_pdf = base_url("assets/pdf/{$name_pdf}.pdf");
@@ -827,12 +850,13 @@ class Laboratorium extends ResourceController
         } else {
             $data = $Email->printDebugger(['headers']);
             print_r($data);
+            return false;
         }
     }
 
     protected function send_whatsapp($customer)
     {
         $whatsapp_service = new Whatsapp_service;
-        $whatsapp_service->send_hasil_test($customer);
+        return $whatsapp_service->send_hasil_test($customer);
     }
 }

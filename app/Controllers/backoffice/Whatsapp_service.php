@@ -230,7 +230,6 @@ class Whatsapp_service extends ResourceController
             'urlDownloadImage' => $url_qr_code
         );
 
-
         $result = $this->send_curl($url, $data);
         if (!$result) {
             return false;

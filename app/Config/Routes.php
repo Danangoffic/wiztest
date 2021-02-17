@@ -72,6 +72,8 @@ $routes->get('detail_form2', 'Customer::detail_form2');
 
 $routes->get("/api/get-print-pdf-peserta/(:num)", "backoffice\Layanan::print_pdf/$1");
 $routes->get("/api/get_hasil_lab/(:num)", "backoffice\Laboratorium::print_hasil/$1");
+$routes->get("/api/get-hasil-lab/(:num)", "backoffice\Laboratorium::print_hasil/$1");
+$routes->get("/api/send-hasil-lab/(:num)", "backoffice\Laboratorium::send_hasil_peserta/$1");
 
 
 // $routes->get('/backoffice/peserta/edit/(:num)', 'backoffice\Registrasi::edit_peserta/$1');

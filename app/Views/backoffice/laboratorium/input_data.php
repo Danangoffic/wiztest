@@ -159,7 +159,7 @@
                             </div>
                             <div class="card-footer">
                                 <div class="float-right">
-                                    <a class="btn btn-primary btn-sm" href="/backoffice/layanan/print/barcode">Barcode</a>
+                                    <a class="btn btn-primary btn-sm" target="_blank" href="/backoffice/print/barcode/<?= $customer['id']; ?>">Barcode</a>
                                 </div>
                             </div>
                         </div>
@@ -402,9 +402,9 @@
                         <div class="card-footer">
                             <div class="float-right">
                                 <button class="btn btn-secondary btn-sm" onclick="return window.close()">Kembali</button>
-                                <button href="" class="btn btn-success btn-sm">Simpan</button>
-                                <a href="/api/get_hasil_lab/<?= $customer['id']; ?>" class="btn btn-primary btn-sm">Cetak Hasil(en)</a>
-                                <a class="btn btn-primary btn-sm" type="button" href="send_hasil_peserta/<?= $customer['id']; ?>">Kirim Hasil</a>
+                                <!-- <button href="" class="btn btn-success btn-sm">Simpan</button> -->
+                                <a href="/api/get_hasil_lab/<?= $customer['id']; ?>" id="btn_print" class="btn btn-primary btn-sm"><i class="fa fa-print"></i> Cetak Hasil(en)</a>
+                                <button class="btn btn-primary btn-sm" id="btn_kirim_hasil" onclick="kirim_hasil()" type="button"><i class="fa fa-paper-plane"></i> Kirim Hasil</button>
                             </div>
                         </div>
                     </div>
@@ -415,19 +415,48 @@
     </section>
 </div>
 <script>
+    var btn_print = document.getElementById("btn_print");
     $(document).ready(function() {
         $("select").select2({
             theme: "bootstrap4"
         });
+
+        btn_print.addEventListener("click", change_btn_print, false);
     });
 
     function kirim_hasil() {
+        var btn_kirim_hasil = document.getElementById("btn_kirim_hasil");
+        btn_kirim_hasil.disabled = true;
+        btn_kirim_hasil.innerHTML = "Mengirim...";
         let id_customer = <?= $customer['id']; ?>;
-        $.get("<?= base_url('backoffice/laboratorium/send_hasil_peserta/'); ?>" + id_customer, {
+        $.get("<?= base_url('/api/send-hasil-lab/' . $customer['id']); ?>", {
             id_customer
         }, (data) => {
-
+            let status = data.status;
+            let message = data.message;
+            if (status == "success") {
+                showToast(status, message);
+            } else {
+                showToast("error", message);
+            }
+            btn_kirim_hasil.disabled = false;
+        }).fail((err) => {
+            showToast("error", err.message);
+            btn_kirim_hasil.disabled = false;
+            btn_kirim_hasil.innerHTML = `<i class="fa fa-paper-plane"></i> Kirim Hasil`;
         });
+    }
+
+    function change_btn_print() {
+        btn_print.innerHTML = "Mencetak...";
+    }
+
+    function showToast(type = 'info', text) {
+        return Swal.fire(
+            text,
+            '',
+            type
+        );
     }
 </script>
 <?= $this->endSection(); ?>
