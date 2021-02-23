@@ -11,6 +11,7 @@ use App\Models\PemeriksaanModel;
 use App\Controllers\BaseController;
 use App\Controllers\backoffice\User;
 use App\Controllers\backoffice\Layanan;
+use App\Models\QRDokterModel;
 use App\Models\UserDetailModel;
 
 // use App\Controllers;
@@ -144,6 +145,14 @@ class Dokter extends BaseController
         $id_dokter = $this->dokterModel->getInsertID();
         $url_qrcode = $this->layananC->getUrlQRCode(base_url('assets/dokter/' . $namattd));
         $array_update = array('qrcode_ttd' => $url_qrcode);
+
+        $qr_dokter = new QRDokterModel();
+        $array_qr_dokter = [
+            'id_dokter' => $id_dokter,
+            'qr_code' => $url_qrcode,
+            'status' => "draft"
+        ];
+        $qr_dokter->insert($array_qr_dokter);
         $update = $this->dokterModel->update($id_dokter, $array_update);
         if ($update) {
             session()->setFlashdata('success', 'Berhasil tambah data dokter');
@@ -154,9 +163,15 @@ class Dokter extends BaseController
         }
     }
 
-    public function detail($id_dokter)
+    public function detail($id_dokter = null)
     {
-        # code...
+        if (!$this->session->has('logged_in')) return redirect()->to('backoffice/login');
+        if ($id_dokter == null) {
+            $this->session->setFlashdata('error', "Dokter tidak ditemukan");
+            return redirect()->to('/backoffice/dokter');
+        } else {
+            $detail_dokter = $this->dokterModel->find($id_dokter);
+        }
     }
 
     public function edit(int $id_dokter)

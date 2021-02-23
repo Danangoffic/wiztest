@@ -7,7 +7,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <?php
-                    if (session()->getFlashdata('success')) {
+                    if ($session->getFlashdata('success')) {
                     ?>
                         <div class="alert alert-success alert-dismissible">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -16,7 +16,7 @@
                         </div>
                     <?php
                     }
-                    if (session()->getFlashdata('error')) {
+                    if ($session->getFlashdata('error')) {
                     ?>
                         <div class="alert alert-warning alert-dismissible">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -42,7 +42,7 @@
                             <h5 class="card-title">Data Peserta</h5>
                         </div>
                         <div class="card-body">
-                            <table class="table">
+                            <table class="table table-borderless">
                                 <?php
                                 $id_customer = $detail_customer['id'];
                                 $no_registrasi = $detail_customer['customer_unique'];
@@ -105,143 +105,93 @@
                     <?= csrf_field(); ?>
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h5 class="card-title">Data Hasil Akhir</h5>
+                            <h5 class="card-title">Data Pemeriksaan</h5>
                         </div>
                         <div class="card-body">
                             <div class="form-group row">
-                                <?php
-
-                                $atribut_label = ['class' => 'col-md-4 col-label-form'];
-
-                                echo form_label('Result', 'status_result', $atribut_label);
-                                ?>
+                                <label for="waktu_kunjungan" class="col-label-form col-md-4">Waktu Kunjungan</label>
                                 <div class="col-md-8">
-                                    <select name="result" required id="result" class="form-control select2">
-                                        <?php foreach ($status_hasil as $hasil => $val) {
-                                            $selected = $val == $detail_hasil_lab['status_cov'] ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        }; ?>
+                                    <input type="datetime" name="waktu_kunjungan" id="waktu_kunjungan" class="form-control disabled" readonly disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="jenis_pemeriksaan" class="col-label-form col-md-4">Jenis Pemeriksaan</label>
+                                <div class="col-md-8">
+                                    <input type="text" name="jenis_pemeriksaan" id="jenis_pemeriksaan" class="form-contro disabled" readonly disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="alat" class="col-label-form col-md-4">Alat Pemeriksaan</label>
+                                <div class="col-md-4">
+                                    <input type="text" name="alat" id="alat" class="form-control disabled" readonly disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="waktu_ambil_sampling" class="col-label-form col-md-4">Waktu Ambil Sampling</label>
+                                <div class="col-md-8">
+                                    <input type="datetime" name="waktu_ambil_sampling" id="waktu_ambil_sampling" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="waktu_periksa_sampling" class="col-label-form col-md-4">Waktu Periksa Sampling</label>
+                                <div class="col-md-8">
+                                    <input type="datetime" name="waktu_periksa_sampling" id="waktu_periksa_sampling" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="waktu_selesai_periksa" class="col-label-form col-md-4">Waktu Selesai Periksa</label>
+                                <div class="col-md-8">
+                                    <input type="datetime" name="waktu_selesai_periksa" id="waktu_selesai_periksa" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="jenis_sample" class="col-label-from col-md-4">Jenis Sample</label>
+                                <div class="col-md-8">
+                                    <select name="jenis_sample" id="jenis_sample" class="form-control select2">
+                                        <option value="1" label="Orofaring & Nasofaring" aria-label="Orofaring & Nasofaring">Orofaring & Nasofaring</option>
+                                        <option value="2" label="Sputum" aria-label="Sputum">Sputum</option>
+                                        <option value="3" label="Saliva" aria-label="Saliva">Saliva</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <?php
-                                echo form_label('N gene', 'status_n_gene', $atribut_label);
-
-                                ?>
+                                <label for="status_antigen" class="col-label-form col-md-4">Antigen</label>
                                 <div class="col-md-8">
-                                    <select name="status_gene" id="status_gene" class="form-control select2">
-                                        <?php foreach ($status_gene_n as $gen => $val) {
-                                            $selected = ($val == $detail_hasil_lab['status_gene']) ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        } ?>
+                                    <select name="status_antigen" id="status_antigen" class="form-control select2">
+                                        <option value="Negatif" label="Negatif" aria-label="Negatif">Negatif</option>
+                                        <option value="Positif" label="Positif" aria-label="Positif">Positif</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <?php
-                                echo form_label('Gene ORF1ab', 'status_orf', $atribut_label);
-                                ?>
+                                <label for="dokter" class="col-label-form col-md-4">Dokter Pemeriksa</label>
                                 <div class="col-md-8">
-                                    <select name="status_orf" id="status_orf" class="form-control select2">
-                                        <?php foreach ($status_ngene as $ngene => $val) {
-                                            $selected = ($val == $detail_hasil_lab['status_orf']) ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        } ?>
+                                    <input type="text" name="dokter" id="dokter" class="form-control disabled" readonly aria-readonly="true" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="petugas" class="col-label-form col-md-4">Petugas Pemeriksa</label>
+                                <div class="col-md-8">
+                                    <input type="text" name="petugas" id="petugas" class="form-control disabled" readonly aria-readonly="true" disabled aria-disabled="true">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="status_pemeriksaan" class="col-label-form col-md-4">Status Pemeriksaan</label>
+                                <div class="col-md-8">
+                                    <select name="status_pemeriksaan" id="status_pemeriksaan" class="form-control select2">
+                                        <option value="Pemeriksaan Sample" aria-label="Pemeriksaan Sample" label="Pemeriksaan Sample">Pemeriksaan Sample</option>
+                                        <option value="Selesai" aria-label="Selesai" label="Selesai">Selesai</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <?php
-                                echo form_label('IC', 'nilai_ic', $atribut_label);
-                                $atribut_nilai_ic = [
-                                    'class' => "form-control",
-                                    'id' => 'nilai_ic',
-                                    'required'
-                                ];
-                                echo "<div class=\"col-md-8\">" . form_input('nilai_ic', $detail_hasil_lab['value_ic'], $atribut_nilai_ic, 'number') . "</div>";
-                                ?>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h5 class="card-title">Detail Hasil LIS</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group row">
-                                <?php
-                                echo form_label('Result', 'result', $atribut_label);
-                                // echo "<div class=\"col-md-8\">" . form_dropdown('result', $status_hasil, ["{$detail_hasil_lab['status_cov']}"], $atribut_result) . "</div>";
-                                ?>
+                                <label for="status_kirim" class="col-label-form col-md-4">Status Kirim Hasil</label>
                                 <div class="col-md-8">
-                                    <select name="result" required id="result" class="form-control select2">
-                                        <?php foreach ($status_hasil as $hasil => $val) {
-                                            $selected = $val == $detail_hasil_lab['status_cov'] ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        }; ?>
+                                    <select name="status_kirim" id="status_kirim" class="form-control select2">
+                                        <option value="Belum Dikirim" aria-label="Belum Dikirim" label="Belum Dikirim">Belum Dikirim</option>
+                                        <option value="Sudah Dikirim" aria-label="Sudah Dikirim" label="Sudah Dikirim">Sudah Dikirim</option>
                                     </select>
                                 </div>
-
-                            </div>
-                            <div class="form-group row">
-                                <?php
-                                echo form_label('Gene ORF1ab', 'status_orf', $atribut_label);
-                                ?>
-                                <div class="col-md-8">
-                                    <select name="status_orf" id="status_orf" class="form-control select2">
-                                        <?php foreach ($status_ngene as $ngene => $val) {
-                                            $selected = ($val == $detail_hasil_lab['status_orf']) ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        } ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <?php
-                                echo form_label('CT ORF1ab', 'nilai_ct_orf', $atribut_label);
-                                $atribut_ct = [
-                                    'class' => "form-control",
-                                    'id' => 'nilai_ct_orf',
-                                    'required'
-                                ];
-                                echo "<div class=\"col-md-8\">" . form_input('nilai_ct_orf', '0', $atribut_ct, 'number') . "</div>";
-                                ?>
-                            </div>
-                            <div class="form-group row">
-                                <?= form_label('Gene Hex/N', 'gene_hex_n', $atribut_label); ?>
-                                <div class="col-md-8">
-                                    <select name="status_gene" id="status_gene" class="form-control select2">
-                                        <?php foreach ($status_gene_n as $gen => $val) {
-                                            $selected = ($val == $detail_hasil_lab['status_gene']) ? 'selected' : '';
-                                            echo "<option {$selected} value='{$val}'>{$val}</option>";
-                                        } ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <?php
-                                echo form_label('CT HEX/N', 'nilai_ct_hex_n', $atribut_label);
-                                $atribut_ct_hex_n = [
-                                    'class' => "form-control",
-                                    'id' => 'nilai_ct_hex_n',
-                                    'required'
-                                ];
-                                echo "<div class=\"col-md-8\">" . form_input('nilai_ct_hex_n', '0', $atribut_ct_hex_n, 'number') . "</div>";
-                                ?>
-                            </div>
-                            <div class="form-group row">
-                                <?php
-                                echo form_label('IC', 'nilai_ic', $atribut_label);
-                                $atribut_nilai_ic = [
-                                    'class' => "form-control",
-                                    'id' => 'nilai_ic',
-                                    'required'
-                                ];
-                                echo "<div class=\"col-md-8\">" . form_input('nilai_ic', $detail_hasil_lab['value_ic'], $atribut_nilai_ic, 'number') . "</div>";
-                                ?>
                             </div>
                         </div>
                         <div class="card-footer">
@@ -250,7 +200,9 @@
                                 <button class="btn btn-success" id="saveButton" type="submit"><i class="fa fa-check"></i> Validasi</button>
                             </div>
                         </div>
+
                     </div>
+
 
                 </div>
             </div>
