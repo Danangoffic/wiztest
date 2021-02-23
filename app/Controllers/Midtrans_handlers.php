@@ -138,8 +138,9 @@ class Midtrans_handlers extends ResourceController
                      * SEND EMAIL AND WHATSAPP TO CUSTOMER
                      */
                     if ($transaction == "settlement" || $transaction == "capture") {
-                        $this->sendEmailCustomer($order_id, $notification_receiver);
-                        $this->send_whatsapp($id_customer);
+                        if ($this->sendEmailCustomer($order_id, $notification_receiver)) {
+                            $this->send_whatsapp($id_customer);
+                        }
                     }
                 } else {
                     $responseStatus = $notification_receiver->status_message;
@@ -263,12 +264,13 @@ class Midtrans_handlers extends ResourceController
         }
     }
 
-    public function send_whatsapp($id_customer = null)
+    public function send_whatsapp($id_customer = null): bool
     {
         if ($id_customer != null) {
             $whatsapp_service = new Whatsapp_service;
-            $whatsapp_service->send_whatsapp_QR($id_customer);
-            $whatsapp_service->send_whatsapp_invoice($id_customer);
+            if ($whatsapp_service->send_whatsapp_QR($id_customer)) {
+                return $whatsapp_service->send_whatsapp_invoice($id_customer);
+            }
         } else {
             return false;
         }

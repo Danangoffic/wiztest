@@ -119,6 +119,7 @@ class Finance extends BaseController
 
     public function detail_finance_instansi(int $id_instansi = null)
     {
+        if (!$this->session->has('logged_in')) return redirect()->to('/backoffice/login');
         if ($id_instansi == null) {
             $this->session->setFlashdata('error', 'Instansi tidak ditemukan');
             return redirect()->to("/backoffice/finance/instansi");
@@ -380,7 +381,7 @@ class Finance extends BaseController
         $PDF->render();
         $PDF->stream("{$title}.pdf", ['attachment' => 1]);
         //Close and output PDF document
-        $PDF->Output($title . '.pdf', 'I');
+        $PDF->Output();
     }
 
     public function pdf_customer_ttd($invoice_number = null, $attachment = 1)
